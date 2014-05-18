@@ -38,6 +38,7 @@ import os
 import re
 import sys
 
+import six
 from six.moves import configparser
 
 
@@ -120,6 +121,7 @@ def check_carriage_return(line):
 
 def check_lines(lines, line_checks):
     for idx, line in enumerate(lines, 1):
+        line = six.text_type(line, encoding='utf8')
         line = line.rstrip('\n')
         for check in line_checks:
             for code, message in check(line):
@@ -128,8 +130,8 @@ def check_lines(lines, line_checks):
 
 def check_files(filenames, line_checks, content_checks):
     for fn in filenames:
-        with open(fn) as f:
-            content = f.read()
+        with open(fn, 'rb') as f:
+            content = six.text_type(f.read(), encoding='utf8')
             for content_check in content_checks:
                 for line_num, code, message in content_check(content):
                     yield fn, line_num, code, message

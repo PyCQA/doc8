@@ -156,7 +156,7 @@ def extract_config(args):
     parser.read(filenames)
     cfg = {}
     try:
-        cfg['max_line_length'] = parser.getint("doc8", "max_line_length")
+        cfg['max_line_length'] = parser.getint("doc8", "max-line-length")
     except (configparser.NoSectionError, configparser.NoOptionError):
         cfg['max_line_length'] = MAX_LINE_LENGTH
     try:

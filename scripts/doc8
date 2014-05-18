@@ -46,6 +46,12 @@ FILE_PATTERNS = ['*.rst', '*.txt']
 MAX_LINE_LENGTH = 79
 TRAILING_WHITESPACE_REGEX = re.compile('\s$')
 STARTING_WHITESPACE_REGEX = re.compile('^(\s+)')
+CONFIG_FILENAMES = [
+    "doc8.ini",
+    "tox.ini",
+    "pep8.ini",
+    "setup.cfg",
+]
 
 
 def check_max_length(max_line_length, contents):
@@ -157,13 +163,14 @@ def find_files(pathes, patterns):
 
 
 def extract_config(args):
-    filenames = [
-        os.path.join(os.getcwd(), "doc8.ini"),
-        os.path.join(os.getcwd(), "tox.ini"),
-        os.path.join(os.getcwd(), "pep8.ini"),
-    ]
-    parser = configparser.RawConfigParser()
-    parser.read(filenames)
+    if args.config:
+        parser = configparser.RawConfigParser()
+        for fn in list(args.config):
+            with open(fn, 'r') as fh:
+                parser.readfp(fh, filename=fn)
+    else:
+        parser = configparser.RawConfigParser()
+        parser.read(filenames)
     cfg = {}
     try:
         cfg['max_line_length'] = parser.getint("doc8", "max-line-length")
@@ -195,6 +202,7 @@ def unique_itr(itr):
 
 def main():
     file_types = ", ".join(FILE_PATTERNS)
+    default_configs = ", ".join(CONFIG_FILENAMES)
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -202,6 +210,9 @@ def main():
                         help=("path to scan for %s files"
                               " (default: os.getcwd())") % file_types,
                         default=[os.getcwd()])
+    parser.add_argument("--config", metavar='path', action="append",
+                        help="user config file location"
+                             " (default: %s)" % default_configs)
     args = parser.parse_args()
     dirs = list(unique_itr(args.paths))
     cfg = extract_config(args)

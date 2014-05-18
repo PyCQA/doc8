@@ -82,6 +82,8 @@ def check_max_length(max_line_length, contents):
     for i, line in enumerate(lines):
         if re.match(r"^..\s(.*?)::\s*", line):
             directives.append((i, find_directive_end(i, lines)))
+        elif re.match(r"^::\s*$", line):
+            directives.append((i, find_directive_end(i, lines)))
 
     for i, line in enumerate(lines):
         in_directive = False

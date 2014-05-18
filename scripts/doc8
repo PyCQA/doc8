@@ -170,7 +170,7 @@ def extract_config(args):
                 parser.readfp(fh, filename=fn)
     else:
         parser = configparser.RawConfigParser()
-        parser.read(filenames)
+        parser.read(CONFIG_FILENAMES)
     cfg = {}
     try:
         cfg['max_line_length'] = parser.getint("doc8", "max-line-length")

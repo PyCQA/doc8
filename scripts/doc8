@@ -22,21 +22,23 @@
 
 What is checked:
     - lines should not be longer than 79 characters - D001
-      - exception: line with no whitespace except maybe in the beginning
-      - exception: line that starts with '..' -- longer directives are allowed,
-        including footnotes
+      - exception: line with no whitespace except in the beginning
+      - exception: lines with http or https urls
+      - exception: doctest and literal blocks
+      - exception: rst directives
     - no trailing whitespace - D002
     - no tabulation for indentation - D003
     - no carriage returns (use unix newlines) - D004
 """
 
 import argparse
-import collections
 import fnmatch
-import functools
 import os
 import re
 import sys
+
+from docutils import core
+from docutils import nodes as doc_nodes
 
 import six
 from six.moves import configparser
@@ -54,67 +56,106 @@ CONFIG_FILENAMES = [
 ]
 
 
-def check_max_length(max_line_length, contents):
-
-    def starting_whitespace(line):
-        m = re.match(r"^(\s+)(.*)$", line)
-        if not m:
-            return 0
-        return len(m.group(1))
-
-    def all_whitespace(line):
-        return bool(re.match(r"^(\s*)$", line))
+def check_max_length(cfg, contents):
 
     def contains_url(line):
         if "http://" in line or "https://" in line:
             return True
         return False
 
-    def find_directive_end(start, lines):
-        after_lines = collections.deque(lines[start + 1:])
-        k = 0
-        while after_lines:
-            line = after_lines.popleft()
-            if all_whitespace(line) or starting_whitespace(line) >= 1:
-                k += 1
-            else:
-                break
-        return start + k
+    doc = core.publish_doctree(
+        source=contents,
+        settings_overrides={'traceback': True, 'report': 5,
+                            'quiet': True, 'input_encoding': 'utf-8',
+                            'dump_settings': False, 'report_level': 5,
+                            'dump_transforms': False, 'dump_internals': False})
 
-    # Find where directives start & end so that we can exclude content in
-    # these directive regions.
-    lines = contents.split("\n")
-    directives = []
-    for i, line in enumerate(lines):
-        if re.match(r"^..\s(.*?)::\s*", line):
-            directives.append((i, find_directive_end(i, lines)))
-        elif re.match(r"^::\s*$", line):
-            directives.append((i, find_directive_end(i, lines)))
+    def extract_lines(node, start_line):
+        lines = [start_line]
+        if isinstance(node, (doc_nodes.literal_block, doc_nodes.title)):
+            lines.append(start_line - len(node.rawsource.splitlines()))
+        return lines
 
-    for i, line in enumerate(lines):
-        in_directive = False
-        for (start, end) in directives:
-            if i >= start and i <= end:
-                in_directive = True
-                break
-        if in_directive:
+    def gather_lines(node):
+        lines = []
+        for n in node.traverse(include_self=True):
+            lines.extend(extract_lines(n, find_line(n)))
+        return lines
+
+    def find_line(node):
+        if node.line is not None:
+            return node.line
+        n = node.parent
+        while n is not None:
+            if n.line is not None:
+                return n.line
+            n = n.parent
+        return None
+
+    node_lines = []
+    first_line = -1
+    for n in doc.traverse(include_self=True):
+        line = find_line(n)
+        if line is None:
             continue
+        if first_line == -1:
+            first_line = line
+        contained_lines = []
+        contained_lines.extend(gather_lines(n))
+        node_lines.append((n, (min(contained_lines),
+                               max(contained_lines))))
+
+    def find_node(num):
+        if num < first_line:
+            return node_lines[0][0]
+        contained_in = []
+        for (n, (line_min, line_max)) in node_lines:
+            if num >= line_min and num <= line_max:
+                contained_in.append((n, (line_min, line_max)))
+        smallest_span = None
+        best_nodes = []
+        for (n, (line_min, line_max)) in contained_in:
+            span = line_max - line_min
+            if smallest_span is None:
+                smallest_span = span
+                best_nodes = [n]
+            elif span < smallest_span:
+                smallest_span = span
+                best_nodes = [n]
+            elif span == smallest_span:
+                best_nodes.append(n)
+        return best_nodes
+
+    skip_types = (
+        doc_nodes.target,
+        doc_nodes.literal_block,
+    )
+    title_types = (
+        doc_nodes.title,
+    )
+    max_line_length = cfg['max_line_length']
+    allow_long = cfg['allow_long_titles']
+    for i, line in enumerate(contents.split("\n")):
         if len(line) > max_line_length:
             stripped = line.strip()
-            # line can't be split
             if ' ' not in stripped:
                 continue
             if contains_url(stripped):
                 continue
+            nodes = find_node(i + 1)
+            if any([isinstance(n, skip_types) for n in nodes]):
+                continue
+            if allow_long and any([isinstance(n, title_types) for n in nodes]):
+                continue
             yield (i + 1, 'D001', 'Line too long')
 
 
-def check_trailing_whitespace(line):
+def check_trailing_whitespace(cfg, line):
     if TRAILING_WHITESPACE_REGEX.search(line):
         yield ('D002', 'Trailing whitespace')
 
 
-def check_indentation_no_tab(line):
+def check_indentation_no_tab(cfg, line):
     match = STARTING_WHITESPACE_REGEX.search(line)
     if match:
         spaces = match.group(1)
@@ -122,29 +163,29 @@ def check_indentation_no_tab(line):
             yield ('D003', 'Tabulation used for indentation')
 
 
-def check_carriage_return(line):
+def check_carriage_return(cfg, line):
     if "\r" in line:
         yield ('D004', 'Found literal carriage return')
 
 
-def check_lines(lines, line_checks):
+def check_lines(cfg, lines, line_checks):
     for idx, line in enumerate(lines, 1):
         line = six.text_type(line, encoding='utf8')
         line = line.rstrip('\n')
         for check in line_checks:
-            for code, message in check(line):
+            for code, message in check(cfg, line):
                 yield idx, code, message
 
 
-def check_files(filenames, line_checks, content_checks):
+def check_files(cfg, filenames, line_checks, content_checks):
     for fn in filenames:
-        with open(fn, 'rb') as f:
-            content = six.text_type(f.read(), encoding='utf8')
+        with open(fn, 'rb') as fh:
+            content = six.text_type(fh.read(), encoding='utf8')
             for content_check in content_checks:
-                for line_num, code, message in content_check(content):
+                for line_num, code, message in content_check(cfg, content):
                     yield fn, line_num, code, message
-            f.seek(0)
-            for line_num, code, message in check_lines(f, line_checks):
+            fh.seek(0)
+            for line_num, code, message in check_lines(cfg, fh, line_checks):
                 yield fn, line_num, code, message
 
 
@@ -162,7 +203,17 @@ def find_files(pathes, patterns):
             print('Invalid path: %s' % path)
 
 
-def extract_config(args):
+def split_uniq_string(text):
+    items = set()
+    for i in text.split(","):
+        i = i.strip()
+        if not i:
+            continue
+        items.add(i)
+    return items
+
+
+def extract_config(args, default_cfg):
     if args.config:
         parser = configparser.RawConfigParser()
         for fn in list(args.config):
@@ -171,23 +222,22 @@ def extract_config(args):
     else:
         parser = configparser.RawConfigParser()
         parser.read(CONFIG_FILENAMES)
-    cfg = {}
+    cfg = dict(default_cfg)
     try:
         cfg['max_line_length'] = parser.getint("doc8", "max-line-length")
     except (configparser.NoSectionError, configparser.NoOptionError):
-        cfg['max_line_length'] = MAX_LINE_LENGTH
+        pass
     try:
         ignores = parser.get("doc8", "ignore")
     except (configparser.NoSectionError, configparser.NoOptionError):
-        cfg['ignore'] = set()
+        pass
     else:
-        ignoreables = set()
-        for i in ignores.split(","):
-            i = i.strip()
-            if not i:
-                continue
-            ignoreables.add(i)
-        cfg['ignore'] = ignoreables
+        cfg['ignore'].update(split_uniq_string(ignores))
+    try:
+        cfg['allow_long_titles'] = parser.getboolean("doc8",
+                                                     "allow-long-titles")
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        pass
     return cfg
 
 
@@ -213,19 +263,32 @@ def main():
     parser.add_argument("--config", metavar='path', action="append",
                         help="user config file location"
                              " (default: %s)" % default_configs)
+    parser.add_argument("--allow-long-titles", action="store_true",
+                        help="allow long section titles (default: False)",
+                        default=False)
+    parser.add_argument("--ignore", action="append", metavar="code",
+                        help="ignore the given errors code/codes",
+                        default=[])
     args = parser.parse_args()
-    dirs = list(unique_itr(args.paths))
-    cfg = extract_config(args)
+    default_cfg = {
+        'max_line_length': MAX_LINE_LENGTH,
+        'ignore': set(),
+        'allow_long_titles': args.allow_long_titles,
+    }
+    for c in args.ignore:
+        default_cfg['ignore'].update(split_uniq_string(c))
+    cfg = extract_config(args, default_cfg)
     line_checks = [
         check_trailing_whitespace,
         check_indentation_no_tab,
         check_carriage_return,
     ]
     content_checks = [
-        functools.partial(check_max_length, cfg['max_line_length']),
+        check_max_length,
     ]
     ok = True
-    for error in check_files(find_files(dirs, FILE_PATTERNS),
+    paths = unique_itr(args.paths)
+    for error in check_files(cfg, find_files(paths, FILE_PATTERNS),
                              line_checks, content_checks):
         if error[2] in cfg['ignore']:
             continue

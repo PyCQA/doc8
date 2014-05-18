@@ -41,6 +41,7 @@ setup(name='doc8',
       license="ASL 2.0",
       install_requires=[
           'argparse',
+          'docutils',
           'six',
       ],
       classifiers=[

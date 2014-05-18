@@ -19,6 +19,7 @@
 
 import os
 
+from setuptools import find_packages
 from setuptools import setup
 
 
@@ -35,15 +36,18 @@ setup(name='doc8',
       version='0.2.1',
       description='style checker for sphinx (or other) rst documentation.',
       url='https://github.com/harlowja/doc8',
-      scripts=[
-          _path(os.path.join('scripts', 'doc8')),
-      ],
       license="ASL 2.0",
       install_requires=[
           'argparse',
           'docutils',
           'six',
       ],
+      entry_points={
+          'console_scripts': [
+              'doc8 = doc8.main:main',
+          ],
+      },
+      packages=find_packages(),
       classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",

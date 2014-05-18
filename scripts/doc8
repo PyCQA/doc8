@@ -27,6 +27,7 @@ What is checked:
     - no trailing whitespace
 """
 
+import collections
 import fnmatch
 import functools
 import os
@@ -42,17 +43,57 @@ TRAILING_WHITESPACE_REGEX = re.compile('\s$')
 STARTING_WHITESPACE_REGEX = re.compile('^(\s+)')
 
 
-def check_max_length(max_line_length, line):
-    if len(line) > max_line_length:
-        stripped = line.strip()
-        if not any((
-            line.startswith('..'),  # this is directive
-            stripped.startswith('>>>'),  # this is doctest
-            stripped.startswith('...'),  # and this
-            stripped.startswith('taskflow.'),
-            ' ' not in stripped  # line can't be split
-        )):
-            yield ('D001', 'Line too long')
+def check_max_length(max_line_length, contents):
+
+    def whitespace(line):
+        m = re.match(r"^(\s+)(.*)$", line)
+        if not m:
+            return 0
+        return len(m.group(1))
+
+    def all_whitespace(line):
+        return bool(re.match(r"^(\s*)$", line))
+
+    def contains_url(line):
+        if "http://" in line or "https://" in line:
+            return True
+        return False
+
+    def find_directive_end(start, lines):
+        after_lines = collections.deque(lines[start + 1:])
+        k = 0
+        while after_lines:
+            line = after_lines.popleft()
+            if all_whitespace(line) or whitespace(line) >= 1:
+                k += 1
+            else:
+                break
+        return start + k
+
+    # Find where directives start & end so that we can exclude content in
+    # these directive regions.
+    lines = contents.split("\n")
+    directives = []
+    for i, line in enumerate(lines):
+        if re.match(r"^..\s(.*?)::\s*", line):
+            directives.append((i, find_directive_end(i, lines)))
+
+    for i, line in enumerate(lines):
+        in_directive = False
+        for (start, end) in directives:
+            if i >= start and i <= end:
+                in_directive = True
+                break
+        if in_directive:
+            continue
+        if len(line) > max_line_length:
+            stripped = line.strip()
+            # line can't be split
+            if ' ' not in stripped:
+                continue
+            if contains_url(stripped):
+                continue
+            yield (i + 1, 'D001', 'Line too long')
 
 
 def check_trailing_whitespace(line):
@@ -76,9 +117,14 @@ def check_lines(lines, line_checks):
                 yield idx, code, message
 
 
-def check_files(filenames, line_checks):
+def check_files(filenames, line_checks, content_checks):
     for fn in filenames:
         with open(fn) as f:
+            content = f.read()
+            for content_check in content_checks:
+                for line_num, code, message in content_check(content):
+                    yield fn, line_num, code, message
+            f.seek(0)
             for line_num, code, message in check_lines(f, line_checks):
                 yield fn, line_num, code, message
 
@@ -133,11 +179,14 @@ def main():
         dirs = ['.']
     cfg = extract_config()
     line_checks = [
-        functools.partial(check_max_length, cfg['max_line_length']),
         check_trailing_whitespace,
         check_indentation_no_tab,
     ]
-    for error in check_files(find_files(dirs, FILE_PATTERNS), line_checks):
+    content_checks = [
+        functools.partial(check_max_length, cfg['max_line_length']),
+    ]
+    for error in check_files(find_files(dirs, FILE_PATTERNS),
+                             line_checks, content_checks):
         if error[2] in cfg['ignore']:
             continue
         ok = False

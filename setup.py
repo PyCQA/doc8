@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 # -*- coding: utf-8 -*-
 
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
@@ -33,7 +32,7 @@ def _readme():
 
 
 setup(name='doc8',
-      version='0.1',
+      version='0.1.1',
       description='style checker for sphinx (or other) rst documentation.',
       url='https://github.com/harlowja/doc8',
       scripts=[

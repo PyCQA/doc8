@@ -105,9 +105,9 @@ def check_max_length(cfg, contents):
         node_lines.append((n, (min(contained_lines),
                                max(contained_lines))))
 
-    def find_node(num):
+    def find_containing_nodes(num):
         if num < first_line:
-            return node_lines[0][0]
+            return [node_lines[0][0]]
         contained_in = []
         for (n, (line_min, line_max)) in node_lines:
             if num >= line_min and num <= line_max:
@@ -142,7 +142,7 @@ def check_max_length(cfg, contents):
                 continue
             if contains_url(stripped):
                 continue
-            nodes = find_node(i + 1)
+            nodes = find_containing_nodes(i + 1)
             if any([isinstance(n, skip_types) for n in nodes]):
                 continue
             if allow_long and any([isinstance(n, title_types) for n in nodes]):

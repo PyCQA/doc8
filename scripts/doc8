@@ -27,6 +27,7 @@ What is checked:
         including footnotes
     - no tabulation for indentation
     - no trailing whitespace
+    - no carriage returns (use unix newlines)
 """
 
 import argparse
@@ -109,7 +110,12 @@ def check_indentation_no_tab(line):
     if match:
         spaces = match.group(1)
         if '\t' in spaces:
-            yield ('D003', 'Tabulation used for indentation')
+            yield ('D003', 'Found used for indentation')
+
+
+def check_carriage_return(line):
+    if "\r" in line:
+        yield ('D004', 'Found literal carriage return')
 
 
 def check_lines(lines, line_checks):
@@ -196,6 +202,7 @@ def main():
     line_checks = [
         check_trailing_whitespace,
         check_indentation_no_tab,
+        check_carriage_return,
     ]
     content_checks = [
         functools.partial(check_max_length, cfg['max_line_length']),

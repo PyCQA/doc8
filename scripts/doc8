@@ -66,10 +66,11 @@ def check_max_length(fn, cfg, contents):
             return True
         return False
 
-    def has_system_message_parent(node):
+    def any_node_type(node, node_types):
         n = node
+        node_types = tuple(node_types)
         while n is not None:
-            if isinstance(n, (doc_nodes.system_message)):
+            if isinstance(n, node_types):
                 return True
             n = n.parent
         return False
@@ -159,7 +160,7 @@ def check_max_length(fn, cfg, contents):
         line = find_line(n)
         if line is None:
             continue
-        if has_system_message_parent(n):
+        if any_node_type(n, [doc_nodes.system_message]):
             # These are failures, and there node content isn't correct,
             # so skip them; we should work on making it so that the parser
             # stops doing this custom parent creation in the first place.

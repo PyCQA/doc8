@@ -32,7 +32,7 @@ def _readme():
 
 
 setup(name='doc8',
-      version='0.1.2',
+      version='0.1.3',
       description='style checker for sphinx (or other) rst documentation.',
       url='https://github.com/harlowja/doc8',
       scripts=[

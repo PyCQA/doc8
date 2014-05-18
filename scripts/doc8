@@ -21,13 +21,13 @@
 """Check documentation for simple style requirements.
 
 What is checked:
-    - lines should not be longer than 79 characters
+    - lines should not be longer than 79 characters - D001
       - exception: line with no whitespace except maybe in the beginning
       - exception: line that starts with '..' -- longer directives are allowed,
         including footnotes
-    - no tabulation for indentation
-    - no trailing whitespace
-    - no carriage returns (use unix newlines)
+    - no trailing whitespace - D002
+    - no tabulation for indentation - D003
+    - no carriage returns (use unix newlines) - D004
 """
 
 import argparse

@@ -31,8 +31,8 @@ Usage
         - lines should not be longer than 79 characters - D001
           - exception: line with no whitespace except in the beginning
           - exception: lines with http or https urls
-          - exception: doctest and literal blocks
-          - exception: rst directives
+          - exception: literal blocks
+          - exception: rst target directives
         - no trailing whitespace - D002
         - no tabulation for indentation - D003
         - no carriage returns (use unix newlines) - D004

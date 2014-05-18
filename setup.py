@@ -27,7 +27,7 @@ def _path(fn):
 
 
 def _readme():
-    with open(_path("README.rst"), "rb") as handle:
+    with open(_path("README.rst"), "r") as handle:
         return handle.read()
 
 

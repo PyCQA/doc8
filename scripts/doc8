@@ -48,7 +48,7 @@ STARTING_WHITESPACE_REGEX = re.compile('^(\s+)')
 
 def check_max_length(max_line_length, contents):
 
-    def whitespace(line):
+    def starting_whitespace(line):
         m = re.match(r"^(\s+)(.*)$", line)
         if not m:
             return 0
@@ -67,7 +67,7 @@ def check_max_length(max_line_length, contents):
         k = 0
         while after_lines:
             line = after_lines.popleft()
-            if all_whitespace(line) or whitespace(line) >= 1:
+            if all_whitespace(line) or starting_whitespace(line) >= 1:
                 k += 1
             else:
                 break

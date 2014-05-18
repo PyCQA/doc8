@@ -171,8 +171,7 @@ def check_max_length(fn, cfg, contents):
         if first_line == -1:
             first_line = line
         contained_lines = set(gather_lines(n))
-        node_lines.append((n, (min(contained_lines),
-                               max(contained_lines))))
+        node_lines.append((n, (min(contained_lines), max(contained_lines))))
 
     # Find where directives start & end so that we can exclude content in
     # these directive regions (the rst parser may not handle this correctly

@@ -32,7 +32,7 @@ def _readme():
 
 
 setup(name='doc8',
-      version='0.1.1',
+      version='0.1.2',
       description='style checker for sphinx (or other) rst documentation.',
       url='https://github.com/harlowja/doc8',
       scripts=[
@@ -40,6 +40,7 @@ setup(name='doc8',
       ],
       license="ASL 2.0",
       install_requires=[
+          'argparse',
           'six',
       ],
       classifiers=[

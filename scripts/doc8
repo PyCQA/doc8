@@ -29,6 +29,7 @@ What is checked:
     - no trailing whitespace
 """
 
+import argparse
 import collections
 import fnmatch
 import functools
@@ -145,7 +146,7 @@ def find_files(pathes, patterns):
             print('Invalid path: %s' % path)
 
 
-def extract_config():
+def extract_config(args):
     filenames = [
         os.path.join(os.getcwd(), "doc8.ini"),
         os.path.join(os.getcwd(), "tox.ini"),
@@ -173,13 +174,25 @@ def extract_config():
     return cfg
 
 
+def unique_itr(itr):
+    seen = set()
+    for i in itr:
+        if i in seen:
+            continue
+        yield i
+        seen.add(i)
+
+
 def main():
-    ok = True
-    if len(sys.argv) > 1:
-        dirs = sys.argv[1:]
-    else:
-        dirs = ['.']
-    cfg = extract_config()
+    file_types = ", ".join(FILE_PATTERNS)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("paths", metavar='path', type=str, nargs='*',
+                        help=("path to scan for %s files"
+                              " (default: os.getcwd())") % file_types,
+                        default=[os.getcwd()])
+    args = parser.parse_args()
+    dirs = list(unique_itr(args.paths))
+    cfg = extract_config(args)
     line_checks = [
         check_trailing_whitespace,
         check_indentation_no_tab,
@@ -187,6 +200,7 @@ def main():
     content_checks = [
         functools.partial(check_max_length, cfg['max_line_length']),
     ]
+    ok = True
     for error in check_files(find_files(dirs, FILE_PATTERNS),
                              line_checks, content_checks):
         if error[2] in cfg['ignore']:

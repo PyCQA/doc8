@@ -24,8 +24,8 @@ What is checked:
     - lines should not be longer than 79 characters - D001
       - exception: line with no whitespace except in the beginning
       - exception: lines with http or https urls
-      - exception: doctest and literal blocks
-      - exception: rst directives
+      - exception: literal blocks
+      - exception: rst target directives
     - no trailing whitespace - D002
     - no tabulation for indentation - D003
     - no carriage returns (use unix newlines) - D004
@@ -38,8 +38,10 @@ import os
 import re
 import sys
 
-from docutils import core
+from docutils import frontend
 from docutils import nodes as doc_nodes
+from docutils.parsers import rst
+from docutils import utils
 
 import six
 from six.moves import configparser
@@ -57,19 +59,12 @@ CONFIG_FILENAMES = [
 ]
 
 
-def check_max_length(cfg, contents):
+def check_max_length(fn, cfg, contents):
 
     def contains_url(line):
         if "http://" in line or "https://" in line:
             return True
         return False
-
-    doc = core.publish_doctree(
-        source=contents,
-        settings_overrides={'traceback': True, 'report': 5,
-                            'quiet': True, 'input_encoding': 'utf-8',
-                            'dump_settings': False, 'report_level': 5,
-                            'dump_transforms': False, 'dump_internals': False})
 
     def has_system_message_parent(node):
         n = node
@@ -104,23 +99,8 @@ def check_max_length(cfg, contents):
             n = n.parent
         return None
 
-    node_lines = []
-    first_line = -1
-    for n in doc.traverse(include_self=True):
-        line = find_line(n)
-        if line is None:
-            continue
-        if has_system_message_parent(n):
-            continue
-        if first_line == -1:
-            first_line = line
-        contained_lines = []
-        contained_lines.extend(gather_lines(n))
-        node_lines.append((n, (min(contained_lines),
-                               max(contained_lines))))
-
-    def find_containing_nodes(num):
-        if num < first_line:
+    def find_containing_nodes(num, node_lines, first_line):
+        if num < first_line and len(node_lines):
             return [node_lines[0][0]]
         contained_in = []
         for (n, (line_min, line_max)) in node_lines:
@@ -140,16 +120,17 @@ def check_max_length(cfg, contents):
                 best_nodes.append(n)
         return best_nodes
 
-    def starting_whitespace(line):
-        m = re.match(r"^(\s+)(.*)$", line)
-        if not m:
-            return 0
-        return len(m.group(1))
-
-    def all_whitespace(line):
-        return bool(re.match(r"^(\s*)$", line))
-
     def find_directive_end(start, lines):
+
+        def starting_whitespace(line):
+            m = re.match(r"^(\s+)(.*)$", line)
+            if not m:
+                return 0
+            return len(m.group(1))
+
+        def all_whitespace(line):
+            return bool(re.match(r"^(\s*)$", line))
+
         after_lines = collections.deque(lines[start + 1:])
         k = 0
         while after_lines:
@@ -160,8 +141,38 @@ def check_max_length(cfg, contents):
                 break
         return start + k
 
+    parser = rst.Parser()
+    defaults = {
+        'input_encoding': 'utf8',
+        'halt_level': 5,
+        'report_level': 5,
+        'quiet': True,
+        'file_insertion_enabled': False,
+        'traceback': True,
+    }
+    opt = frontend.OptionParser(components=[parser], defaults=defaults)
+    doc = utils.new_document(source_path=fn, settings=opt.get_default_values())
+    parser.parse(contents, doc)
+    node_lines = []
+    first_line = -1
+    for n in doc.traverse(include_self=True):
+        line = find_line(n)
+        if line is None:
+            continue
+        if has_system_message_parent(n):
+            # These are failures, and there node content isn't correct,
+            # so skip them; we should work on making it so that the parser
+            # stops doing this custom parent creation in the first place.
+            continue
+        if first_line == -1:
+            first_line = line
+        contained_lines = set(gather_lines(n))
+        node_lines.append((n, (min(contained_lines),
+                               max(contained_lines))))
+
     # Find where directives start & end so that we can exclude content in
-    # these directive regions.
+    # these directive regions (the rst parser may not handle this correctly
+    # for unknown directives, so we have to do it manually).
     lines = contents.split("\n")
     directives = []
     for i, line in enumerate(lines):
@@ -180,20 +191,20 @@ def check_max_length(cfg, contents):
     max_line_length = cfg['max_line_length']
     allow_long = cfg['allow_long_titles']
     for i, line in enumerate(lines):
-        in_directive = False
-        for (start, end) in directives:
-            if i >= start and i <= end:
-                in_directive = True
-                break
-        if in_directive:
-            continue
         if len(line) > max_line_length:
+            in_directive = False
+            for (start, end) in directives:
+                if i >= start and i <= end:
+                    in_directive = True
+                    break
+            if in_directive:
+                continue
             stripped = line.strip()
             if ' ' not in stripped:
                 continue
             if contains_url(stripped):
                 continue
-            nodes = find_containing_nodes(i + 1)
+            nodes = find_containing_nodes(i + 1, node_lines, first_line)
             if any([isinstance(n, skip_types) for n in nodes]):
                 continue
             if allow_long and any([isinstance(n, title_types) for n in nodes]):
@@ -201,12 +212,12 @@ def check_max_length(cfg, contents):
             yield (i + 1, 'D001', 'Line too long')
 
 
-def check_trailing_whitespace(cfg, line):
+def check_trailing_whitespace(fn, cfg, line):
     if TRAILING_WHITESPACE_REGEX.search(line):
         yield ('D002', 'Trailing whitespace')
 
 
-def check_indentation_no_tab(cfg, line):
+def check_indentation_no_tab(fn, cfg, line):
     match = STARTING_WHITESPACE_REGEX.search(line)
     if match:
         spaces = match.group(1)
@@ -214,17 +225,17 @@ def check_indentation_no_tab(cfg, line):
             yield ('D003', 'Tabulation used for indentation')
 
 
-def check_carriage_return(cfg, line):
+def check_carriage_return(fn, cfg, line):
     if "\r" in line:
         yield ('D004', 'Found literal carriage return')
 
 
-def check_lines(cfg, lines, line_checks):
+def check_lines(fn, cfg, lines, line_checks):
     for idx, line in enumerate(lines, 1):
         line = six.text_type(line, encoding='utf8')
         line = line.rstrip('\n')
         for check in line_checks:
-            for code, message in check(cfg, line):
+            for code, message in check(fn, cfg, line):
                 yield idx, code, message
 
 
@@ -233,10 +244,11 @@ def check_files(cfg, filenames, line_checks, content_checks):
         with open(fn, 'rb') as fh:
             content = six.text_type(fh.read(), encoding='utf8')
             for content_check in content_checks:
-                for line_num, code, message in content_check(cfg, content):
+                for line_num, code, message in content_check(fn, cfg, content):
                     yield fn, line_num, code, message
             fh.seek(0)
-            for line_num, code, message in check_lines(cfg, fh, line_checks):
+            for line_num, code, message in check_lines(fn, cfg,
+                                                       fh, line_checks):
                 yield fn, line_num, code, message
 
 

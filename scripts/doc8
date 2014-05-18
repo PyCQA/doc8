@@ -203,14 +203,8 @@ def find_files(pathes, patterns):
             print('Invalid path: %s' % path)
 
 
-def split_uniq_string(text):
-    items = set()
-    for i in text.split(","):
-        i = i.strip()
-        if not i:
-            continue
-        items.add(i)
-    return items
+def split_string(text):
+    return [i.strip() for i in text.split(",") if i.strip()]
 
 
 def extract_config(args, default_cfg):
@@ -232,7 +226,7 @@ def extract_config(args, default_cfg):
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
     else:
-        cfg['ignore'].update(split_uniq_string(ignores))
+        cfg['ignore'].update(split_string(ignores))
     try:
         cfg['allow_long_titles'] = parser.getboolean("doc8",
                                                      "allow-long-titles")
@@ -276,7 +270,7 @@ def main():
         'allow_long_titles': args.allow_long_titles,
     }
     for c in args.ignore:
-        default_cfg['ignore'].update(split_uniq_string(c))
+        default_cfg['ignore'].update(split_string(c))
     cfg = extract_config(args, default_cfg)
     line_checks = [
         check_trailing_whitespace,

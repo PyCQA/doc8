@@ -70,10 +70,27 @@ def check_max_length(cfg, contents):
                             'dump_settings': False, 'report_level': 5,
                             'dump_transforms': False, 'dump_internals': False})
 
+    def has_system_message_parent(node):
+        n = node
+        while n is not None:
+            if isinstance(n, (doc_nodes.system_message)):
+                return True
+            n = n.parent
+        return False
+
     def extract_lines(node, start_line):
         lines = [start_line]
-        if isinstance(node, (doc_nodes.literal_block, doc_nodes.title)):
-            lines.append(start_line - len(node.rawsource.splitlines()))
+        if isinstance(node, (doc_nodes.title)):
+            start = start_line - len(node.rawsource.splitlines())
+            if start >= 0:
+                lines.append(start)
+        if isinstance(node, (doc_nodes.literal_block)):
+            if has_system_message_parent(node):
+                start = start_line - len(node.rawsource.splitlines())
+                if start >= 0:
+                    lines.append(start)
+            else:
+                lines.append(start_line + len(node.rawsource.splitlines()) - 1)
         return lines
 
     def gather_lines(node):
@@ -104,6 +121,12 @@ def check_max_length(cfg, contents):
         contained_lines.extend(gather_lines(n))
         node_lines.append((n, (min(contained_lines),
                                max(contained_lines))))
+
+    # for n, (line_min, line_max) in node_lines:
+    #     print type(n)
+    #     print n
+    #     print line_min
+    #     print line_max
 
     def find_containing_nodes(num):
         if num < first_line:

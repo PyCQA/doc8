@@ -111,7 +111,7 @@ def check_indentation_no_tab(line):
     if match:
         spaces = match.group(1)
         if '\t' in spaces:
-            yield ('D003', 'Found used for indentation')
+            yield ('D003', 'Tabulation used for indentation')
 
 
 def check_carriage_return(line):

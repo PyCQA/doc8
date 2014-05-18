@@ -32,6 +32,7 @@ What is checked:
 """
 
 import argparse
+import collections
 import fnmatch
 import os
 import re
@@ -85,12 +86,8 @@ def check_max_length(cfg, contents):
             if start >= 0:
                 lines.append(start)
         if isinstance(node, (doc_nodes.literal_block)):
-            if has_system_message_parent(node):
-                start = start_line - len(node.rawsource.splitlines())
-                if start >= 0:
-                    lines.append(start)
-            else:
-                lines.append(start_line + len(node.rawsource.splitlines()) - 1)
+            end = start_line + len(node.rawsource.splitlines()) - 1
+            lines.append(end)
         return lines
 
     def gather_lines(node):
@@ -100,9 +97,7 @@ def check_max_length(cfg, contents):
         return lines
 
     def find_line(node):
-        if node.line is not None:
-            return node.line
-        n = node.parent
+        n = node
         while n is not None:
             if n.line is not None:
                 return n.line
@@ -115,18 +110,14 @@ def check_max_length(cfg, contents):
         line = find_line(n)
         if line is None:
             continue
+        if has_system_message_parent(n):
+            continue
         if first_line == -1:
             first_line = line
         contained_lines = []
         contained_lines.extend(gather_lines(n))
         node_lines.append((n, (min(contained_lines),
                                max(contained_lines))))
-
-    # for n, (line_min, line_max) in node_lines:
-    #     print type(n)
-    #     print n
-    #     print line_min
-    #     print line_max
 
     def find_containing_nodes(num):
         if num < first_line:
@@ -149,6 +140,36 @@ def check_max_length(cfg, contents):
                 best_nodes.append(n)
         return best_nodes
 
+    def starting_whitespace(line):
+        m = re.match(r"^(\s+)(.*)$", line)
+        if not m:
+            return 0
+        return len(m.group(1))
+
+    def all_whitespace(line):
+        return bool(re.match(r"^(\s*)$", line))
+
+    def find_directive_end(start, lines):
+        after_lines = collections.deque(lines[start + 1:])
+        k = 0
+        while after_lines:
+            line = after_lines.popleft()
+            if all_whitespace(line) or starting_whitespace(line) >= 1:
+                k += 1
+            else:
+                break
+        return start + k
+
+    # Find where directives start & end so that we can exclude content in
+    # these directive regions.
+    lines = contents.split("\n")
+    directives = []
+    for i, line in enumerate(lines):
+        if re.match(r"^..\s(.*?)::\s*", line):
+            directives.append((i, find_directive_end(i, lines)))
+        elif re.match(r"^::\s*$", line):
+            directives.append((i, find_directive_end(i, lines)))
+
     skip_types = (
         doc_nodes.target,
         doc_nodes.literal_block,
@@ -158,7 +179,14 @@ def check_max_length(cfg, contents):
     )
     max_line_length = cfg['max_line_length']
     allow_long = cfg['allow_long_titles']
-    for i, line in enumerate(contents.split("\n")):
+    for i, line in enumerate(lines):
+        in_directive = False
+        for (start, end) in directives:
+            if i >= start and i <= end:
+                in_directive = True
+                break
+        if in_directive:
+            continue
         if len(line) > max_line_length:
             stripped = line.strip()
             if ' ' not in stripped:

@@ -39,6 +39,8 @@ Usage
       path        path to scan for *.rst, *.txt files (default: os.getcwd())
 
     optional arguments:
-      -h, --help  show this help message and exit
+      -h, --help     show this help message and exit
+      --config path  user config file location (default: doc8.ini, tox.ini,
+                     pep8.ini, setup.cfg)
 
 .. _rst: http://docutils.sourceforge.net/docs/ref/rst/introduction.html

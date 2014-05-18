@@ -142,6 +142,9 @@ def check_max_length(fn, cfg, contents):
                 break
         return start + k
 
+    # Use the rst parsers document output to do as much of the validation
+    # as we can without resorting to custom logic (this parser is what sphinx
+    # and others use anyway so it's very mature).
     parser = rst.Parser()
     defaults = {
         'input_encoding': 'utf8',

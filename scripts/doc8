@@ -193,7 +193,9 @@ def unique_itr(itr):
 
 def main():
     file_types = ", ".join(FILE_PATTERNS)
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("paths", metavar='path', type=str, nargs='*',
                         help=("path to scan for %s files"
                               " (default: os.getcwd())") % file_types,

@@ -193,6 +193,8 @@ class CheckMaxLineLength(ContentCheck):
         )
         title_types = (
             docutils_nodes.title,
+            docutils_nodes.subtitle,
+            docutils_nodes.section,
         )
         max_line_length = self._cfg['max_line_length']
         allow_long_titles = self._cfg['allow_long_titles']

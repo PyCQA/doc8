@@ -47,5 +47,7 @@ Usage
                            pep8.ini, setup.cfg)
       --allow-long-titles  allow long section titles (default: False)
       --ignore code        ignore the given errors code/codes
+      --max-line-length int
+                           maximum allowed line length (default: 79)
 
 .. _rst: http://docutils.sourceforge.net/docs/ref/rst/introduction.html

@@ -50,6 +50,10 @@ class ParsedFile(object):
                 'quiet': True,
                 'file_insertion_enabled': False,
                 'traceback': True,
+                # Development use only.
+                'dump_settings': False,
+                'dump_internals': False,
+                'dump_transforms': False,
             }
             opt = frontend.OptionParser(components=[parser], defaults=defaults)
             doc = utils.new_document(source_path=self.filename,

@@ -42,6 +42,7 @@ setup(
         'argparse',
         'docutils',
         'six',
+        'stevedore',
     ],
     entry_points={
         'console_scripts': [

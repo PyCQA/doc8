@@ -34,6 +34,7 @@ import argparse
 import os
 
 from six.moves import configparser
+from stevedore import extension
 
 from doc8 import checks
 from doc8 import parser as file_parser
@@ -90,12 +91,21 @@ def extract_config(args):
 
 
 def fetch_checks(cfg):
-    return [
+    base = [
         checks.CheckTrailingWhitespace(cfg),
         checks.CheckIndentationNoTab(cfg),
         checks.CheckCarriageReturn(cfg),
         checks.CheckMaxLineLength(cfg),
     ]
+    mgr = extension.ExtensionManager(
+        namespace='doc8.extension.check',
+        invoke_on_load=True,
+        invoke_args=(cfg.copy(),),
+    )
+    addons = []
+    for e in mgr:
+        addons.append(e.obj)
+    return base + addons
 
 
 def main():

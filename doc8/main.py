@@ -110,7 +110,9 @@ def main():
                         type=split_set_type,
                         default=[])
     parser.add_argument("--max-line-length", action="store", metavar="int",
-                        type=int, help="maximum allowed line length",
+                        type=int,
+                        help="maximum allowed line"
+                             " length (default: %s)" % MAX_LINE_LENGTH,
                         default=MAX_LINE_LENGTH)
     args = vars(parser.parse_args())
     args['ignore'] = merge_sets(args['ignore'])

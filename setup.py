@@ -32,23 +32,24 @@ def _readme():
         return handle.read()
 
 
-setup(name='doc8',
-      version='0.2.1',
-      description='style checker for sphinx (or other) rst documentation.',
-      url='https://github.com/harlowja/doc8',
-      license="ASL 2.0",
-      install_requires=[
-          'argparse',
-          'docutils',
-          'six',
-      ],
-      entry_points={
-          'console_scripts': [
-              'doc8 = doc8.main:main',
-          ],
-      },
-      packages=find_packages(),
-      classifiers=[
+setup(
+    name='doc8',
+    version='0.2.1',
+    description='style checker for sphinx (or other) rst documentation.',
+    url='https://github.com/harlowja/doc8',
+    license="ASL 2.0",
+    install_requires=[
+        'argparse',
+        'docutils',
+        'six',
+    ],
+    entry_points={
+        'console_scripts': [
+            'doc8 = doc8.main:main',
+        ],
+    },
+    packages=find_packages(),
+    classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",
         "License :: OSI Approved :: Apache Software License",
@@ -61,7 +62,7 @@ setup(name='doc8',
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
-      ],
-      keywords="rst docs style checking",
-      long_description=_readme(),
-     )
+    ],
+    keywords="rst docs style checking",
+    long_description=_readme(),
+)

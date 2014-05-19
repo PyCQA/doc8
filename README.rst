@@ -5,6 +5,11 @@ Doc8
 Doc8 is a *opinionated* style checker for sphinx (or other) `rst`_
 documentation.
 
+Features
+--------
+
+* Ability to parse and validate rst files.
+
 QuickStart
 ==========
 

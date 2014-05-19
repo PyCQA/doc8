@@ -54,7 +54,7 @@ class ParsedFile(object):
             opt = frontend.OptionParser(components=[parser], defaults=defaults)
             self._doc = utils.new_document(source_path=self.filename,
                                            settings=opt.get_default_values())
-            parser.parse(self.raw_contents, self._doc)
+            parser.parse(self.contents, self._doc)
         return self._doc
 
     def lines_iter(self, remove_trailing_newline=True):

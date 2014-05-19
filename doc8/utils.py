@@ -34,7 +34,22 @@ def find_files(paths, patterns):
             raise IOError('Invalid path: %s' % path)
 
 
-def filter_document(document, filter_func):
+def filtered_traverse(document, filter_func):
     for n in document.traverse(include_self=True):
         if filter_func(n):
             yield n
+
+
+def contains_url(line):
+    if "http://" in line or "https://" in line:
+        return True
+    return False
+
+
+def has_any_node_type(node, node_types):
+    n = node
+    while n is not None:
+        if isinstance(n, node_types):
+            return True
+        n = n.parent
+    return False

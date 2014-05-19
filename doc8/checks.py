@@ -17,9 +17,13 @@
 # under the License.
 
 import abc
+import collections
 import re
 
+from docutils import nodes as docutils_nodes
 import six
+
+from doc8 import utils
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -74,5 +78,142 @@ class CheckCarriageReturn(LineCheck):
 class CheckMaxLineLength(ContentCheck):
     REPORTS = frozenset(["D001"])
 
+    def _extract_node_lines(self, doc):
+
+        def extract_lines(node, start_line):
+            lines = [start_line]
+            if isinstance(node, (docutils_nodes.title)):
+                start = start_line - len(node.rawsource.splitlines())
+                if start >= 0:
+                    lines.append(start)
+            if isinstance(node, (docutils_nodes.literal_block)):
+                end = start_line + len(node.rawsource.splitlines()) - 1
+                lines.append(end)
+            return lines
+
+        def gather_lines(node):
+            lines = []
+            for n in node.traverse(include_self=True):
+                lines.extend(extract_lines(n, find_line(n)))
+            return lines
+
+        def find_line(node):
+            n = node
+            while n is not None:
+                if n.line is not None:
+                    return n.line
+                n = n.parent
+            return None
+
+        def filter_systems(node):
+            if utils.has_any_node_type(node, (docutils_nodes.system_message,)):
+                return False
+            return True
+
+        nodes_lines = []
+        first_line = -1
+        for n in utils.filtered_traverse(doc, filter_systems):
+            line = find_line(n)
+            if line is None:
+                continue
+            if first_line == -1:
+                first_line = line
+            contained_lines = set(gather_lines(n))
+            nodes_lines.append((n, (min(contained_lines),
+                                    max(contained_lines))))
+        return (nodes_lines, first_line)
+
+    def _extract_directives(self, lines):
+
+        def starting_whitespace(line):
+            m = re.match(r"^(\s+)(.*)$", line)
+            if not m:
+                return 0
+            return len(m.group(1))
+
+        def all_whitespace(line):
+            return bool(re.match(r"^(\s*)$", line))
+
+        def find_directive_end(start, lines):
+            after_lines = collections.deque(lines[start + 1:])
+            k = 0
+            while after_lines:
+                line = after_lines.popleft()
+                if all_whitespace(line) or starting_whitespace(line) >= 1:
+                    k += 1
+                else:
+                    break
+            return start + k
+
+        # Find where directives start & end so that we can exclude content in
+        # these directive regions (the rst parser may not handle this correctly
+        # for unknown directives, so we have to do it manually).
+        directives = []
+        for i, line in enumerate(lines):
+            if re.match(r"^..\s(.*?)::\s*", line):
+                directives.append((i, find_directive_end(i, lines)))
+            elif re.match(r"^::\s*$", line):
+                directives.append((i, find_directive_end(i, lines)))
+        return directives
+
     def report_iter(self, parsed_file):
-        pass
+        doc = parsed_file.document
+        lines = list(parsed_file.lines_iter())
+
+        nodes_lines, first_line = self._extract_node_lines(doc)
+        directives = self._extract_directives(lines)
+
+        def find_containing_nodes(num):
+            if num < first_line and len(nodes_lines):
+                return [nodes_lines[0][0]]
+            contained_in = []
+            for (n, (line_min, line_max)) in nodes_lines:
+                if num >= line_min and num <= line_max:
+                    contained_in.append((n, (line_min, line_max)))
+            smallest_span = None
+            best_nodes = []
+            for (n, (line_min, line_max)) in contained_in:
+                span = line_max - line_min
+                if smallest_span is None:
+                    smallest_span = span
+                    best_nodes = [n]
+                elif span < smallest_span:
+                    smallest_span = span
+                    best_nodes = [n]
+                elif span == smallest_span:
+                    best_nodes.append(n)
+            return best_nodes
+
+        def any_types(nodes, types):
+            return any([isinstance(n, types) for n in nodes])
+
+        skip_types = (
+            docutils_nodes.target,
+            docutils_nodes.literal_block,
+        )
+        title_types = (
+            docutils_nodes.title,
+        )
+        max_line_length = self._cfg['max_line_length']
+        allow_long_titles = self._cfg['allow_long_titles']
+        for i, line in enumerate(lines):
+            if len(line) > max_line_length:
+                in_directive = False
+                for (start, end) in directives:
+                    if i >= start and i <= end:
+                        in_directive = True
+                        break
+                if in_directive:
+                    continue
+                stripped = line.lstrip()
+                if ' ' not in stripped:
+                    # No room to split even if we could.
+                    continue
+                if utils.contains_url(stripped):
+                    continue
+                nodes = find_containing_nodes(i + 1)
+                if any_types(nodes, skip_types):
+                    continue
+                if allow_long_titles and any_types(nodes, title_types):
+                    continue
+                yield (i + 1, 'D001', 'Line too long')

@@ -35,6 +35,7 @@ import os
 
 from six.moves import configparser
 
+from doc8 import checks
 from doc8 import parser as file_parser
 from doc8 import utils
 
@@ -88,6 +89,15 @@ def extract_config(args):
     return cfg
 
 
+def fetch_checks(cfg):
+    return [
+        checks.CheckTrailingWhitespace(cfg),
+        checks.CheckIndentationNoTab(cfg),
+        checks.CheckCarriageReturn(cfg),
+        checks.CheckMaxLineLength(cfg),
+    ]
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -121,5 +131,36 @@ def main():
     args.update(cfg)
 
     files = []
-    for filename in utils.find_files(args['paths'], FILE_PATTERNS):
+    for filename in utils.find_files(args.pop('paths', []), FILE_PATTERNS):
         files.append(file_parser.parse(filename))
+
+    ignoreables = frozenset(args.pop('ignore', []))
+    errors = 0
+    for f in files:
+        for c in fetch_checks(args):
+            try:
+                reports = set(c.REPORTS)
+            except AttributeError:
+                pass
+            else:
+                reports = reports - ignoreables
+                if not reports:
+                    continue
+            if isinstance(c, checks.ContentCheck):
+                for line_num, code, message in c.report_iter(f):
+                    print('%s:%s: %s %s'
+                          % (f.filename, line_num, code, message))
+                    errors += 1
+            elif isinstance(c, checks.LineCheck):
+                for line_num, line in enumerate(f.lines_iter(), 1):
+                    for code, message in c.report_iter(line):
+                        print('%s:%s: %s %s'
+                              % (f.filename, line_num, code, message))
+                        errors += 1
+            else:
+                raise TypeError("Unknown check type: %s, %s"
+                                % (type(c), c))
+    if errors:
+        return 1
+    else:
+        return 0

@@ -35,6 +35,9 @@ import os
 
 from six.moves import configparser
 
+from doc8 import parser as file_parser
+from doc8 import utils
+
 FILE_PATTERNS = ['*.rst', '*.txt']
 MAX_LINE_LENGTH = 79
 CONFIG_FILENAMES = [
@@ -114,3 +117,7 @@ def main():
     cfg = extract_config(args)
     args['ignore'].update(cfg.pop("ignore", set()))
     args.update(cfg)
+
+    files = []
+    for filename in utils.find_files(args['paths'], FILE_PATTERNS):
+        files.append(file_parser.parse(filename))

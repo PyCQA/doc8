@@ -24,6 +24,9 @@ import six
 
 @six.add_metaclass(abc.ABCMeta)
 class ContentCheck(object):
+    def __init__(self, cfg):
+        self._cfg = cfg
+
     @abc.abstractmethod
     def report_iter(self, parsed_file):
         pass
@@ -31,6 +34,9 @@ class ContentCheck(object):
 
 @six.add_metaclass(abc.ABCMeta)
 class LineCheck(object):
+    def __init__(self, cfg):
+        self._cfg = cfg
+
     @abc.abstractmethod
     def report_iter(self, line):
         pass
@@ -65,3 +71,8 @@ class CheckCarriageReturn(LineCheck):
             yield ('D004', 'Found literal carriage return')
 
 
+class CheckMaxLineLength(ContentCheck):
+    REPORTS = frozenset(["D001"])
+
+    def report_iter(self, parsed_file):
+        pass

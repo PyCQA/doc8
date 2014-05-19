@@ -52,9 +52,10 @@ class ParsedFile(object):
                 'traceback': True,
             }
             opt = frontend.OptionParser(components=[parser], defaults=defaults)
-            self._doc = utils.new_document(source_path=self.filename,
-                                           settings=opt.get_default_values())
-            parser.parse(self.contents, self._doc)
+            doc = utils.new_document(source_path=self.filename,
+                                     settings=opt.get_default_values())
+            parser.parse(self.contents, doc)
+            self._doc = doc
         return self._doc
 
     def lines_iter(self, remove_trailing_newline=True):

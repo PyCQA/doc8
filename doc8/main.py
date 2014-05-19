@@ -31,6 +31,7 @@ What is checked:
 """
 
 import argparse
+import collections
 import os
 
 from six.moves import configparser
@@ -140,13 +141,14 @@ def main():
     args['ignore'].update(cfg.pop("ignore", set()))
     args.update(cfg)
 
-    files = []
+    files = collections.deque()
     for filename in utils.find_files(args.pop('paths', []), FILE_PATTERNS):
         files.append(file_parser.parse(filename))
 
     ignoreables = frozenset(args.pop('ignore', []))
     errors = 0
-    for f in files:
+    while files:
+        f = files.popleft()
         for c in fetch_checks(args):
             try:
                 reports = set(c.REPORTS)

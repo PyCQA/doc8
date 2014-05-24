@@ -16,20 +16,26 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import fnmatch
 import os
 
 
-def find_files(paths, patterns):
+def find_files(paths, extensions):
+    extensions = set(extensions)
+
+    def extension_matches(path):
+        _base, ext = os.path.splitext(path)
+        return ext in extensions
+
     for path in paths:
         if os.path.isfile(path):
-            yield path
+            if extension_matches(path):
+                yield path
         elif os.path.isdir(path):
             for root, dirnames, filenames in os.walk(path):
                 for filename in filenames:
-                    if any(fnmatch.fnmatch(filename, pattern)
-                           for pattern in patterns):
-                        yield os.path.join(root, filename)
+                    path = os.path.join(root, filename)
+                    if extension_matches(path):
+                        yield path
         else:
             raise IOError('Invalid path: %s' % path)
 

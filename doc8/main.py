@@ -41,7 +41,7 @@ from doc8 import checks
 from doc8 import parser as file_parser
 from doc8 import utils
 
-FILE_PATTERNS = ['*.rst', '*.txt']
+FILE_PATTERNS = ['.rst', '.txt']
 MAX_LINE_LENGTH = 79
 CONFIG_FILENAMES = [
     "doc8.ini",
@@ -88,6 +88,14 @@ def extract_config(args):
                                                      "allow-long-titles")
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
+    try:
+        extensions = parser.get("doc8", "extensions")
+        extensions = extensions.split(",")
+        extensions = [s.strip() for s in extensions if s.strip()]
+        if extensions:
+            cfg['extension'] = extensions
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        pass
     return cfg
 
 
@@ -113,11 +121,10 @@ def main():
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    file_types = ", ".join(FILE_PATTERNS)
     default_configs = ", ".join(CONFIG_FILENAMES)
     parser.add_argument("paths", metavar='path', type=str, nargs='*',
-                        help=("path to scan for %s files"
-                              " (default: os.getcwd())") % file_types,
+                        help=("path to scan for doc files"
+                              " (default: os.getcwd())"),
                         default=[os.getcwd()])
     parser.add_argument("--config", metavar='path', action="append",
                         help="user config file location"
@@ -135,14 +142,23 @@ def main():
                         help="maximum allowed line"
                              " length (default: %s)" % MAX_LINE_LENGTH,
                         default=MAX_LINE_LENGTH)
+    parser.add_argument("-e", "--extension", action="append",
+                        metavar="extension",
+                        help="check file extensions of the given type"
+                             " (default: %s)" % ", ".join(FILE_PATTERNS),
+                        default=[])
     args = vars(parser.parse_args())
     args['ignore'] = merge_sets(args['ignore'])
     cfg = extract_config(args)
     args['ignore'].update(cfg.pop("ignore", set()))
+    args['extension'].extend(cfg.pop('extension', []))
     args.update(cfg)
+    if not args.get('extension'):
+        args['extension'] = list(FILE_PATTERNS)
 
     files = collections.deque()
-    for filename in utils.find_files(args.pop('paths', []), FILE_PATTERNS):
+    for filename in utils.find_files(args.pop('paths', []),
+                                     args.pop('extension', [])):
         files.append(file_parser.parse(filename))
 
     ignoreables = frozenset(args.pop('ignore', []))
@@ -176,3 +192,8 @@ def main():
         return 1
     else:
         return 0
+
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(main())

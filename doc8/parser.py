@@ -21,7 +21,9 @@ import os
 
 import six
 
+from docutils import core
 from docutils import frontend
+from docutils import nodes as docutils_nodes
 from docutils import parsers as docutils_parser
 from docutils import utils
 
@@ -33,6 +35,67 @@ class ParsedFile(object):
         self._raw_content = None
         self._encoding = encoding
         self._doc = None
+        self._errors = None
+        self._defaults = {
+            'input_encoding': self._encoding,
+            'halt_level': 5,
+            'report_level': 5,
+            'quiet': True,
+            'file_insertion_enabled': False,
+            'traceback': True,
+            # Development use only.
+            'dump_settings': False,
+            'dump_internals': False,
+            'dump_transforms': False,
+        }
+
+    @property
+    def errors(self):
+        if self._errors is not None:
+            return self._errors
+        # Borrowed from pypi package restructuredtext-lint but modified to work
+        # better when there exists fatal/critical errors.
+        pub = core.Publisher(None, None, None, settings=None)
+        pub.set_components('standalone', 'restructuredtext', 'pseudoxml')
+        defaults = dict(self._defaults)
+        settings = pub.get_settings(**defaults)
+        pub.set_io()
+        reader = pub.reader
+        document = utils.new_document(self.filename, settings)
+        document.reporter.stream = None
+        # Collect errors via an observer
+        errors = []
+        def error_collector(data):
+            # Mutate the data since it was just generated
+            data.line = data['line']
+            data.source = data['source']
+            data.level = data['level']
+            data.type = data['type']
+            data.message = docutils_nodes.Element.astext(data.children[0])
+            data.full_message = docutils_nodes.Element.astext(data)
+            # Save the error
+            errors.append(data)
+        document.reporter.attach_observer(error_collector)
+        reader.parser.parse(self.contents, document)
+        document.transformer.populate_from_components(
+            (pub.source, pub.reader, pub.reader.parser, pub.writer,
+             pub.destination))
+        transformer = document.transformer
+        while transformer.transforms:
+            if not transformer.sorted:
+                # Unsorted initially, and whenever a transform is added.
+                transformer.transforms.sort()
+                transformer.transforms.reverse()
+                transformer.sorted = True
+            transform = transformer.transforms.pop()
+            priority, transform_class, pending, kwargs = transform
+            transform = transform_class(transformer.document,
+                                        startnode=pending)
+            transform.apply(**kwargs)
+            transformer.applied.append((priority, transform_class,
+                                        pending, kwargs))
+        self._errors = errors
+        return errors
 
     @property
     def document(self):
@@ -43,18 +106,7 @@ class ParsedFile(object):
             # mature).
             parser_cls = docutils_parser.get_parser_class("rst")
             parser = parser_cls()
-            defaults = {
-                'input_encoding': self.encoding,
-                'halt_level': 5,
-                'report_level': 5,
-                'quiet': True,
-                'file_insertion_enabled': False,
-                'traceback': True,
-                # Development use only.
-                'dump_settings': False,
-                'dump_internals': False,
-                'dump_transforms': False,
-            }
+            defaults = dict(self._defaults)
             opt = frontend.OptionParser(components=[parser], defaults=defaults)
             doc = utils.new_document(source_path=self.filename,
                                      settings=opt.get_default_values())

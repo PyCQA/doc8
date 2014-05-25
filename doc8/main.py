@@ -20,6 +20,7 @@
 """Check documentation for simple style requirements.
 
 What is checked:
+    - invalid rst format - D000
     - lines should not be longer than 79 characters - D001
       - exception: line with no whitespace except in the beginning
       - exception: lines with http or https urls
@@ -107,6 +108,7 @@ def extract_config(args):
 
 def fetch_checks(cfg):
     base = [
+        checks.CheckValidity(cfg),
         checks.CheckTrailingWhitespace(cfg),
         checks.CheckIndentationNoTab(cfg),
         checks.CheckCarriageReturn(cfg),

@@ -75,6 +75,18 @@ class CheckCarriageReturn(LineCheck):
             yield ('D004', 'Found literal carriage return')
 
 
+class CheckValidity(ContentCheck):
+    REPORTS = frozenset(["D000"])
+
+    def report_iter(self, parsed_file):
+        for error in parsed_file.errors:
+            if error.line is None:
+                continue
+            if error.level <= 1:
+                continue
+            yield (error.line, 'D000', error.message)
+
+
 class CheckMaxLineLength(ContentCheck):
     REPORTS = frozenset(["D001"])
 

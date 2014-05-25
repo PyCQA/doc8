@@ -33,6 +33,12 @@ What is checked:
 import argparse
 import collections
 import os
+import sys
+
+if __name__ == '__main__':
+    # Only useful for when running directly (for dev/debugging).
+    sys.path.insert(0, os.path.abspath(os.getcwd()))
+    sys.path.insert(0, os.path.abspath(os.path.join(os.pardir, os.getcwd())))
 
 from six.moves import configparser
 from stevedore import extension
@@ -119,6 +125,7 @@ def fetch_checks(cfg):
 
 def main():
     parser = argparse.ArgumentParser(
+        prog='doc8',
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     default_configs = ", ".join(CONFIG_FILENAMES)
@@ -195,5 +202,4 @@ def main():
 
 
 if __name__ == "__main__":
-    import sys
     sys.exit(main())

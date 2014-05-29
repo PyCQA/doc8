@@ -36,7 +36,7 @@ setup(
     name='doc8',
     version='0.3.4',
     description='style checker for sphinx (or other) rst documentation.',
-    url='https://github.com/harlowja/doc8',
+    url='http://git.openstack.org/cgit/stackforge/doc8',
     license="ASL 2.0",
     install_requires=[
         'argparse',

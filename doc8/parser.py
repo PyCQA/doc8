@@ -19,6 +19,7 @@
 import errno
 import os
 
+import restructuredtext_lint as rl
 import six
 
 from docutils import core
@@ -53,49 +54,8 @@ class ParsedFile(object):
     def errors(self):
         if self._errors is not None:
             return self._errors
-        # Borrowed from pypi package restructuredtext-lint but modified to work
-        # better when there exists fatal/critical errors.
-        pub = core.Publisher(None, None, None, settings=None)
-        pub.set_components('standalone', 'restructuredtext', 'pseudoxml')
-        defaults = dict(self._defaults)
-        settings = pub.get_settings(**defaults)
-        pub.set_io()
-        reader = pub.reader
-        document = utils.new_document(self.filename, settings)
-        document.reporter.stream = None
-        # Collect errors via an observer
-        errors = []
-        def error_collector(data):
-            # Mutate the data since it was just generated
-            data.line = data['line']
-            data.source = data['source']
-            data.level = data['level']
-            data.type = data['type']
-            data.message = docutils_nodes.Element.astext(data.children[0])
-            data.full_message = docutils_nodes.Element.astext(data)
-            # Save the error
-            errors.append(data)
-        document.reporter.attach_observer(error_collector)
-        reader.parser.parse(self.contents, document)
-        document.transformer.populate_from_components(
-            (pub.source, pub.reader, pub.reader.parser, pub.writer,
-             pub.destination))
-        transformer = document.transformer
-        while transformer.transforms:
-            if not transformer.sorted:
-                # Unsorted initially, and whenever a transform is added.
-                transformer.transforms.sort()
-                transformer.transforms.reverse()
-                transformer.sorted = True
-            transform = transformer.transforms.pop()
-            priority, transform_class, pending, kwargs = transform
-            transform = transform_class(transformer.document,
-                                        startnode=pending)
-            transform.apply(**kwargs)
-            transformer.applied.append((priority, transform_class,
-                                        pending, kwargs))
-        self._errors = errors
-        return errors
+        self._errors = rl.lint(self.contents, filepath=self.filename)
+        return self._errors
 
     @property
     def document(self):

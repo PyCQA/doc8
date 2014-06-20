@@ -43,6 +43,7 @@ setup(
         'docutils',
         'six',
         'stevedore',
+        'restructuredtext-lint>=0.7',
     ],
     entry_points={
         'console_scripts': [

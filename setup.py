@@ -41,6 +41,7 @@ setup(
     install_requires=[
         'argparse',
         'docutils',
+        'restructuredtext-lint>=0.7',
         'six',
         'stevedore',
     ],

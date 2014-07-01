@@ -22,9 +22,7 @@ import os
 import restructuredtext_lint as rl
 import six
 
-from docutils import core
 from docutils import frontend
-from docutils import nodes as docutils_nodes
 from docutils import parsers as docutils_parser
 from docutils import utils
 

@@ -19,9 +19,7 @@
 import errno
 import os
 
-from docutils import core
 from docutils import frontend
-from docutils import nodes as docutils_nodes
 from docutils import parsers as docutils_parser
 from docutils import utils
 import restructuredtext_lint as rl

@@ -34,7 +34,7 @@ def _readme():
 
 setup(
     name='doc8',
-    version='0.3.4',
+    version='0.3.5',
     description='style checker for sphinx (or other) rst documentation.',
     url='http://git.openstack.org/cgit/stackforge/doc8',
     license="ASL 2.0",

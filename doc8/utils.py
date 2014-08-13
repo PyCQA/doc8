@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2014 Ivan Melnikov <iv at altlinux dot org>
 #
 # Author: Joshua Harlow <harlowja@yahoo-inc.com>

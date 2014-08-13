@@ -144,6 +144,8 @@ def main():
                         help="ignore the given errors code/codes",
                         type=split_set_type,
                         default=[])
+    parser.add_argument("--ignore-path", action="append", default=[],
+                        help="ignore the given directory or file")
     parser.add_argument("--max-line-length", action="store", metavar="int",
                         type=int,
                         help="maximum allowed line"
@@ -164,8 +166,12 @@ def main():
         args['extension'] = list(FILE_PATTERNS)
 
     files = collections.deque()
+    ignored_paths = []
+    for path in args.pop('ignore_path', []):
+        ignored_paths.append(os.path.normpath(path))
     for filename in utils.find_files(args.pop('paths', []),
-                                     args.pop('extension', [])):
+                                     args.pop('extension', []),
+                                     ignored_paths):
         files.append(file_parser.parse(filename))
 
     ignoreables = frozenset(args.pop('ignore', []))

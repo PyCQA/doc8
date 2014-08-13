@@ -17,22 +17,29 @@
 import os
 
 
-def find_files(paths, extensions):
+def find_files(paths, extensions, ignored_paths):
     extensions = set(extensions)
 
     def extension_matches(path):
         _base, ext = os.path.splitext(path)
         return ext in extensions
 
+    def path_ignored(path):
+        return os.path.normpath(path) in ignored_paths
+
     for path in paths:
+        if path_ignored(path):
+            continue
         if os.path.isfile(path):
             if extension_matches(path):
                 yield path
         elif os.path.isdir(path):
             for root, dirnames, filenames in os.walk(path):
+                if path_ignored(root):
+                    continue
                 for filename in filenames:
                     path = os.path.join(root, filename)
-                    if extension_matches(path):
+                    if extension_matches(path) and not path_ignored(path):
                         yield path
         else:
             raise IOError('Invalid path: %s' % path)

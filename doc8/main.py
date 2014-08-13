@@ -145,7 +145,8 @@ def main():
                         type=split_set_type,
                         default=[])
     parser.add_argument("--ignore-path", action="append", default=[],
-                        help="ignore the given directory or file")
+                        help="ignore the given directory or file",
+                        metavar='path')
     parser.add_argument("--max-line-length", action="store", metavar="int",
                         type=int,
                         help="maximum allowed line"

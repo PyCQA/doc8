@@ -26,9 +26,10 @@ Usage
 
 ::
 
-    $ ./doc8  -h
+    $ doc8  -h
+
     usage: doc8 [-h] [--config path] [--allow-long-titles] [--ignore code]
-                [--max-line-length int] [-e extension]
+                [--ignore-path path] [--max-line-length int] [-e extension]
                 [path [path ...]]
 
     Check documentation for simple style requirements.
@@ -53,6 +54,8 @@ Usage
                             pep8.ini, setup.cfg)
       --allow-long-titles   allow long section titles (default: False)
       --ignore code         ignore the given errors code/codes
+      --ignore-path path
+                            ignore the given directory or file
       --max-line-length int
                             maximum allowed line length (default: 79)
       -e extension, --extension extension

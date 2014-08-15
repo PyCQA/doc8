@@ -94,6 +94,10 @@ def extract_config(args):
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
     try:
+        cfg['sphinx'] = parser.getboolean("doc8", "sphinx")
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        pass
+    try:
         extensions = parser.get("doc8", "extensions")
         extensions = extensions.split(",")
         extensions = [s.strip() for s in extensions if s.strip()]
@@ -144,6 +148,9 @@ def main():
                         help="ignore the given errors code/codes",
                         type=split_set_type,
                         default=[])
+    parser.add_argument("--sphinx", action="store_false",
+                        help="ignore sphinx specific false positives"
+                             " (default: True)", default=True)
     parser.add_argument("--ignore-path", action="append", default=[],
                         help="ignore the given directory or file",
                         metavar='path')
@@ -161,6 +168,8 @@ def main():
     args['ignore'] = merge_sets(args['ignore'])
     cfg = extract_config(args)
     args['ignore'].update(cfg.pop("ignore", set()))
+    if 'sphinx' in cfg:
+        args['sphinx'] = cfg.pop("sphinx")
     args['extension'].extend(cfg.pop('extension', []))
     args.update(cfg)
     if not args.get('extension'):

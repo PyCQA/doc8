@@ -54,6 +54,7 @@ Usage
                             pep8.ini, setup.cfg)
       --allow-long-titles   allow long section titles (default: False)
       --ignore code         ignore the given errors code/codes
+      --no-sphinx           do not ignore sphinx specific false positives
       --ignore-path path
                             ignore the given directory or file
       --max-line-length int

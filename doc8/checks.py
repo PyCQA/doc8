@@ -76,13 +76,32 @@ class CheckCarriageReturn(LineCheck):
 class CheckValidity(ContentCheck):
     REPORTS = frozenset(["D000"])
 
+    # Only used when running in sphinx mode.
+    SPHINX_PREFIX_IGNORES = [
+        'Unknown interpreted text',
+        'Unknown directive type',
+        'Undefined substitution',
+        'Substitution definition contains illegal element',
+    ]
+
+    def __init__(self, cfg):
+        super(CheckValidity, self).__init__(cfg)
+        self._sphinx_mode = cfg.get('sphinx')
+
     def report_iter(self, parsed_file):
         for error in parsed_file.errors:
             if error.line is None:
                 continue
             if error.level <= 1:
                 continue
-            yield (error.line, 'D000', error.message)
+            ignore = False
+            if self._sphinx_mode:
+                for m in self.SPHINX_PREFIX_IGNORES:
+                    if error.message.startswith(m):
+                        ignore = True
+                        break
+            if not ignore:
+                yield (error.line, 'D000', error.message)
 
 
 class CheckMaxLineLength(ContentCheck):

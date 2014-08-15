@@ -150,7 +150,7 @@ def main():
                         default=[])
     parser.add_argument("--no-sphinx", action="store_false",
                         help="do not ignore sphinx specific false positives",
-                        default=True)
+                        default=True, dest='sphinx')
     parser.add_argument("--ignore-path", action="append", default=[],
                         help="ignore the given directory or file",
                         metavar='path')

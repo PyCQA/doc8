@@ -31,14 +31,18 @@ What is checked:
 
 import argparse
 import collections
+import logging
 import os
 import sys
+
+LOG = logging.getLogger(__name__)
 
 if __name__ == '__main__':
     # Only useful for when running directly (for dev/debugging).
     sys.path.insert(0, os.path.abspath(os.getcwd()))
     sys.path.insert(0, os.path.abspath(os.path.join(os.pardir, os.getcwd())))
 
+import six
 from six.moves import configparser
 from stevedore import extension
 
@@ -98,6 +102,10 @@ def extract_config(args):
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
     try:
+        cfg['verbose'] = parser.getboolean("doc8", "verbose")
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        pass
+    try:
         extensions = parser.get("doc8", "extensions")
         extensions = extensions.split(",")
         extensions = [s.strip() for s in extensions if s.strip()]
@@ -125,6 +133,15 @@ def fetch_checks(cfg):
     for e in mgr:
         addons.append(e.obj)
     return base + addons
+
+
+def setup_logging(verbose):
+    if verbose:
+        level = logging.DEBUG
+    else:
+        level = logging.ERROR
+    logging.basicConfig(level=level,
+                        format='%(levelname)s: %(message)s', stream=sys.stdout)
 
 
 def main():
@@ -164,6 +181,8 @@ def main():
                         help="check file extensions of the given type"
                              " (default: %s)" % ", ".join(FILE_PATTERNS),
                         default=[])
+    parser.add_argument("-v", "--verbose", dest="verbose", action='store_true',
+                        help="run in verbose mode", default=False)
     args = vars(parser.parse_args())
     args['ignore'] = merge_sets(args['ignore'])
     cfg = extract_config(args)
@@ -174,21 +193,33 @@ def main():
     args.update(cfg)
     if not args.get('extension'):
         args['extension'] = list(FILE_PATTERNS)
-
+    setup_logging(args.get('verbose'))
     files = collections.deque()
     ignored_paths = []
     for path in args.pop('ignore_path', []):
         ignored_paths.append(os.path.normpath(path))
+    print("Scanning...")
     for filename in utils.find_files(args.pop('paths', []),
                                      args.pop('extension', []),
                                      ignored_paths):
         files.append(file_parser.parse(filename))
 
     ignoreables = frozenset(args.pop('ignore', []))
-    errors = 0
+    error_counts = {}
     while files:
         f = files.popleft()
+        if args.get('verbose'):
+            print("Validating %s" % f)
         for c in fetch_checks(args):
+            try:
+                # http://legacy.python.org/dev/peps/pep-3155/
+                c_name = c.__class__.__qualname__
+            except AttributeError:
+                c_name = ".".join([c.__class__.__module__,
+                                   c.__class__.__name__])
+            if args.get('verbose'):
+                print("  Running check '%s'" % c_name)
+            error_counts.setdefault(c_name, 0)
             try:
                 reports = set(c.REPORTS)
             except AttributeError:
@@ -196,22 +227,40 @@ def main():
             else:
                 reports = reports - ignoreables
                 if not reports:
+                    LOG.debug("Skipping check '%s', determined to only"
+                              " check ignoreable codes", c_name)
                     continue
             if isinstance(c, checks.ContentCheck):
                 for line_num, code, message in c.report_iter(f):
-                    print('%s:%s: %s %s'
-                          % (f.filename, line_num, code, message))
-                    errors += 1
+                    if args.get('verbose'):
+                        print('    - %s:%s: %s %s'
+                              % (f.filename, line_num, code, message))
+                    else:
+                        print('%s:%s: %s %s'
+                              % (f.filename, line_num, code, message))
+                    error_counts[c_name] += 1
             elif isinstance(c, checks.LineCheck):
                 for line_num, line in enumerate(f.lines_iter(), 1):
                     for code, message in c.report_iter(line):
-                        print('%s:%s: %s %s'
-                              % (f.filename, line_num, code, message))
-                        errors += 1
+                        if args.get('verbose'):
+                            print('    - %s:%s: %s %s'
+                                  % (f.filename, line_num, code, message))
+                        else:
+                            print('%s:%s: %s %s'
+                                  % (f.filename, line_num, code, message))
+                        error_counts[c_name] += 1
             else:
                 raise TypeError("Unknown check type: %s, %s"
                                 % (type(c), c))
-    if errors:
+    total_errors = sum(six.itervalues(error_counts))
+    print("=" * 8)
+    print("Total accumulated errors = %s" % total_errors)
+    if error_counts:
+        print("Detailed error counts:")
+        for check_name in sorted(six.iterkeys(error_counts)):
+            check_errors = error_counts[check_name]
+            print("    - %s = %s" % (check_name, check_errors))
+    if total_errors:
         return 1
     else:
         return 0

@@ -1,5 +1,6 @@
 argparse
 docutils
+chardet
 restructuredtext-lint>=0.7
 six
 stevedore

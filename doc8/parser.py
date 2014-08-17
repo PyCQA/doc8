@@ -17,6 +17,7 @@
 import errno
 import os
 
+import chardet
 from docutils import frontend
 from docutils import parsers as docutils_parser
 from docutils import utils
@@ -25,7 +26,7 @@ import six
 
 
 class ParsedFile(object):
-    def __init__(self, filename, encoding='utf8'):
+    def __init__(self, filename, encoding=None):
         self._filename = filename
         self._content = None
         self._raw_content = None
@@ -33,7 +34,6 @@ class ParsedFile(object):
         self._doc = None
         self._errors = None
         self._defaults = {
-            'input_encoding': self._encoding,
             'halt_level': 5,
             'report_level': 5,
             'quiet': True,
@@ -83,6 +83,8 @@ class ParsedFile(object):
 
     @property
     def encoding(self):
+        if self._encoding is None:
+            self._encoding = chardet.detect(self.raw_contents)['encoding']
         return self._encoding
 
     @property
@@ -100,7 +102,7 @@ class ParsedFile(object):
         return self._content
 
 
-def parse(filename, encoding="utf8"):
+def parse(filename, encoding=None):
     if not os.path.isfile(filename):
         raise IOError(errno.ENOENT, 'File not found', filename)
     return ParsedFile(filename, encoding=encoding)

@@ -82,6 +82,10 @@ class ParsedFile(object):
         return self._filename
 
     @property
+    def abs_filename(self):
+        return os.path.abspath(self._filename)
+
+    @property
     def encoding(self):
         return self._encoding
 
@@ -98,6 +102,11 @@ class ParsedFile(object):
             self._content = six.text_type(self.raw_contents,
                                           encoding=self.encoding)
         return self._content
+
+    def __str__(self):
+        return "%s (%s, %s chars, %s lines)" % (
+            self.abs_filename, self.encoding, len(self.contents),
+            len(list(self.lines_iter())))
 
 
 def parse(filename, encoding="utf8"):

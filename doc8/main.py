@@ -232,6 +232,8 @@ def main():
                     continue
             if isinstance(c, checks.ContentCheck):
                 for line_num, code, message in c.report_iter(f):
+                    if code in ignoreables:
+                        continue
                     if args.get('verbose'):
                         print('    - %s:%s: %s %s'
                               % (f.filename, line_num, code, message))
@@ -242,6 +244,8 @@ def main():
             elif isinstance(c, checks.LineCheck):
                 for line_num, line in enumerate(f.lines_iter(), 1):
                     for code, message in c.report_iter(line):
+                        if code in ignoreables:
+                            continue
                         if args.get('verbose'):
                             print('    - %s:%s: %s %s'
                                   % (f.filename, line_num, code, message))

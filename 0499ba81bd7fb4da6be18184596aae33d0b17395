@@ -1,0 +1,8 @@
+Verified+2: Jenkins
+Code-Review+2: Joshua Harlow <harlowja@yahoo-inc.com>
+Workflow+1: Joshua Harlow <harlowja@yahoo-inc.com>
+Submitted-by: Jenkins
+Submitted-at: Wed, 27 Aug 2014 04:43:54 +0000
+Reviewed-on: https://review.openstack.org/114797
+Project: stackforge/doc8
+Branch: refs/heads/master

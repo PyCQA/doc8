@@ -100,6 +100,11 @@ class ParsedFile(object):
                                           encoding=self.encoding)
         return self._content
 
+    def __str__(self):
+        return "%s (%s, %s chars, %s lines)" % (
+            self.filename, self.encoding, len(self.contents),
+            len(list(self.lines_iter())))
+
 
 def parse(filename, encoding=None):
     if not os.path.isfile(filename):

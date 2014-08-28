@@ -77,11 +77,11 @@ class CheckValidity(ContentCheck):
     REPORTS = frozenset(["D000"])
 
     # Only used when running in sphinx mode.
-    SPHINX_PREFIX_IGNORES = [
-        'Unknown interpreted text',
-        'Unknown directive type',
-        'Undefined substitution',
-        'Substitution definition contains illegal element',
+    SPHINX_IGNORES_REGEX = [
+        re.compile(r'^Unknown interpreted text'),
+        re.compile(r'^Unknown directive type'),
+        re.compile(r'^Undefined substitution'),
+        re.compile(r'^Substitution definition contains illegal element'),
     ]
 
     def __init__(self, cfg):
@@ -96,8 +96,8 @@ class CheckValidity(ContentCheck):
                 continue
             ignore = False
             if self._sphinx_mode:
-                for m in self.SPHINX_PREFIX_IGNORES:
-                    if error.message.startswith(m):
+                for m in self.SPHINX_IGNORES_REGEX:
+                    if m.match(error.message):
                         ignore = True
                         break
             if not ignore:

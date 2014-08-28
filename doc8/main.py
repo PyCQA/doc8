@@ -206,6 +206,7 @@ def main():
 
     ignoreables = frozenset(args.pop('ignore', []))
     error_counts = {}
+    file_count = len(files)
     while files:
         f = files.popleft()
         if args.get('verbose'):
@@ -258,6 +259,7 @@ def main():
                                 % (type(c), c))
     total_errors = sum(six.itervalues(error_counts))
     print("=" * 8)
+    print("Scanned files = %s" % file_count)
     print("Total accumulated errors = %s" % total_errors)
     if error_counts:
         print("Detailed error counts:")

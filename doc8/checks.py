@@ -77,6 +77,9 @@ class CheckValidity(ContentCheck):
     REPORTS = frozenset(["D000"])
 
     # Only used when running in sphinx mode.
+    #
+    # TODO(harlowja): hopefully will be made better when
+    # https://github.com/twolfson/restructuredtext-lint/issues/11 is ready...
     SPHINX_IGNORES_REGEX = [
         re.compile(r'^Unknown interpreted text'),
         re.compile(r'^Unknown directive type'),

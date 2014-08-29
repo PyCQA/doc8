@@ -4,3 +4,4 @@ nose
 oslosphinx
 pylint==0.25.2
 sphinx>=1.1.2,!=1.2.0,<1.3
+testtools

@@ -93,6 +93,11 @@ def extract_config(args):
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
     try:
+        cfg['ignore_path'] = split_set_type(parser.get("doc8",
+                                                       "ignore_path"))
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        pass
+    try:
         cfg['allow_long_titles'] = parser.getboolean("doc8",
                                                      "allow-long-titles")
     except (configparser.NoSectionError, configparser.NoOptionError):
@@ -190,6 +195,7 @@ def main():
     if 'sphinx' in cfg:
         args['sphinx'] = cfg.pop("sphinx")
     args['extension'].extend(cfg.pop('extension', []))
+    args['ignore_path'].extend(cfg.pop('ignore_path', []))
     args.update(cfg)
     if not args.get('extension'):
         args['extension'] = list(FILE_PATTERNS)
@@ -197,7 +203,7 @@ def main():
 
     print("Scanning...")
     files = collections.deque()
-    ignored_paths = list(args.pop('ignore_path', []))
+    ignored_paths = args.pop('ignore_path')
     files_ignored = 0
     files_selected = 0
     file_iter = utils.find_files(args.pop('paths', []),

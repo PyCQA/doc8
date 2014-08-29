@@ -24,6 +24,9 @@ To run doc8 just invoke it against any doc directory::
 Usage
 =====
 
+Command line usage
+******************
+
 ::
 
     $ doc8  -h
@@ -64,5 +67,27 @@ Usage
                             check file extensions of the given type (default:
                             .rst, .txt)
       -v, --verbose         run in verbose mode
+
+Ini file usage
+**************
+
+Instead of using the CLI for options the following files will also be examined
+for ``[doc8]`` sections that can also provided the same set of options. If
+the ``--config path`` option is used these files will **not** be scanned for
+the current working directory and that configuration path will be used
+instead.
+
+* ``$CWD/doc8.ini``
+* ``$CWD/tox.ini``
+* ``$CWD/pep8.ini``
+* ``$CWD/setup.cfg``
+
+An example section that can be placed into one of these files::
+
+    [doc8]
+
+    ignore_path=/tmp/stuff,/tmp/other_stuff
+    max_line_length=99
+    verbose=1
 
 .. _rst: http://docutils.sourceforge.net/docs/ref/rst/introduction.html

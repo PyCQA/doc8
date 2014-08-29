@@ -29,7 +29,8 @@ Usage
     $ doc8  -h
 
     usage: doc8 [-h] [--config path] [--allow-long-titles] [--ignore code]
-                [--ignore-path path] [--max-line-length int] [-e extension]
+                [--no-sphinx] [--ignore-path path] [--max-line-length int]
+                [-e extension] [-v]
                 [path [path ...]]
 
     Check documentation for simple style requirements.
@@ -55,12 +56,13 @@ Usage
       --allow-long-titles   allow long section titles (default: False)
       --ignore code         ignore the given errors code/codes
       --no-sphinx           do not ignore sphinx specific false positives
-      --ignore-path path
-                            ignore the given directory or file
+      --ignore-path path    ignore the given directory or file (globs are
+                            supported)
       --max-line-length int
                             maximum allowed line length (default: 79)
       -e extension, --extension extension
                             check file extensions of the given type (default:
                             .rst, .txt)
+      -v, --verbose         run in verbose mode
 
 .. _rst: http://docutils.sourceforge.net/docs/ref/rst/introduction.html

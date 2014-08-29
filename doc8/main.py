@@ -199,10 +199,21 @@ def main():
     for path in args.pop('ignore_path', []):
         ignored_paths.append(os.path.normpath(path))
     print("Scanning...")
-    for filename in utils.find_files(args.pop('paths', []),
-                                     args.pop('extension', []),
-                                     ignored_paths):
-        files.append(file_parser.parse(filename))
+    files_ignored = 0
+    files_selected = 0
+    file_iter = utils.find_files(args.pop('paths', []),
+                                 args.pop('extension', []),
+                                 ignored_paths)
+    for filename, ignoreable in file_iter:
+        if ignoreable:
+            files_ignored += 1
+            if args.get('verbose'):
+                print("  Ignoring '%s'" % (filename))
+        else:
+            files_selected += 1
+            files.append(file_parser.parse(filename))
+            if args.get('verbose'):
+                print("  Selecting '%s'" % (filename))
 
     ignoreables = frozenset(args.pop('ignore', []))
     error_counts = {}
@@ -258,6 +269,8 @@ def main():
                                 % (type(c), c))
     total_errors = sum(six.itervalues(error_counts))
     print("=" * 8)
+    print("Total files scanned = %s" % (files_selected))
+    print("Total files ignored = %s" % (files_ignored))
     print("Total accumulated errors = %s" % total_errors)
     if error_counts:
         print("Detailed error counts:")

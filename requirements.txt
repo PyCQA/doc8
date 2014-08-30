@@ -1,4 +1,5 @@
 argparse
+pbr
 chardet
 docutils
 restructuredtext-lint>=0.7

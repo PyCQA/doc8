@@ -74,7 +74,7 @@ test
         content += ("a" * 60) + " " + ("b" * 60)
         content += "\n"
 
-        with tempfile.NamedTemporaryFile() as fh:
+        with tempfile.NamedTemporaryFile(suffix='.txt') as fh:
             fh.write(content)
             fh.flush()
             parsed_file = parser.ParsedFile(fh.name)
@@ -103,7 +103,7 @@ test
         content += "a" * 100
         content += "\n"
 
-        with tempfile.NamedTemporaryFile() as fh:
+        with tempfile.NamedTemporaryFile(suffix='.rst') as fh:
             fh.write(content)
             fh.flush()
             parsed_file = parser.ParsedFile(fh.name)

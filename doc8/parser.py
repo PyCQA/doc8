@@ -33,6 +33,7 @@ class ParsedFile(object):
         self._encoding = encoding
         self._doc = None
         self._errors = None
+        self._extension = os.path.splitext(filename)[1]
 
     @property
     def errors(self):
@@ -75,6 +76,10 @@ class ParsedFile(object):
                 if remove_trailing_newline and line.endswith("\n"):
                     line = line[0:-1]
                 yield line
+
+    @property
+    def extension(self):
+        return self._extension
 
     @property
     def filename(self):

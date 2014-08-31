@@ -75,6 +75,7 @@ class CheckCarriageReturn(LineCheck):
 
 class CheckValidity(ContentCheck):
     REPORTS = frozenset(["D000"])
+    EXT_MATCHER = re.compile(r"(.*)[.]rst", re.I)
 
     # Only used when running in sphinx mode.
     SPHINX_IGNORES_REGEX = [
@@ -185,10 +186,15 @@ class CheckMaxLineLength(ContentCheck):
                 directives.append((i, find_directive_end(i, lines)))
         return directives
 
-    def report_iter(self, parsed_file):
-        doc = parsed_file.document
-        lines = list(parsed_file.lines_iter())
+    def _text_checker(self, parsed_file):
+        max_line_length = self._cfg['max_line_length']
+        for i, line in enumerate(parsed_file.lines_iter()):
+            if len(line) > max_line_length:
+                yield (i + 1, 'D001', 'Line too long')
 
+    def _rst_checker(self, parsed_file):
+        lines = list(parsed_file.lines_iter())
+        doc = parsed_file.document
         nodes_lines, first_line = self._extract_node_lines(doc)
         directives = self._extract_directives(lines)
 
@@ -248,3 +254,11 @@ class CheckMaxLineLength(ContentCheck):
                 if allow_long_titles and any_types(nodes, title_types):
                     continue
                 yield (i + 1, 'D001', 'Line too long')
+
+    def report_iter(self, parsed_file):
+        if parsed_file.extension.lower() != '.rst':
+            checker_func = self._text_checker
+        else:
+            checker_func = self._rst_checker
+        for issue in checker_func(parsed_file):
+            yield issue

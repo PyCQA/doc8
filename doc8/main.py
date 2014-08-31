@@ -35,8 +35,6 @@ import logging
 import os
 import sys
 
-LOG = logging.getLogger(__name__)
-
 if __name__ == '__main__':
     # Only useful for when running directly (for dev/debugging).
     sys.path.insert(0, os.path.abspath(os.getcwd()))
@@ -217,8 +215,6 @@ def main():
             except AttributeError:
                 check_name = ".".join([c.__class__.__module__,
                                        c.__class__.__name__])
-            if args.get('verbose'):
-                print("  Running check '%s'" % check_name)
             error_counts.setdefault(check_name, 0)
             try:
                 reports = set(c.REPORTS)
@@ -227,9 +223,12 @@ def main():
             else:
                 reports = reports - ignoreables
                 if not reports:
-                    LOG.debug("Skipping check '%s', determined to only"
-                              " check ignoreable codes", check_name)
+                    if args.get('verbose'):
+                        print("  Skipping check '%s', determined to only"
+                              " check ignoreable codes" % check_name)
                     continue
+            if args.get('verbose'):
+                print("  Running check '%s'" % check_name)
             if isinstance(c, checks.ContentCheck):
                 for line_num, code, message in c.report_iter(f):
                     if code in ignoreables:

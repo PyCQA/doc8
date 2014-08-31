@@ -217,9 +217,17 @@ def main():
             except AttributeError:
                 check_name = ".".join([c.__class__.__module__,
                                        c.__class__.__name__])
-            if args.get('verbose'):
-                print("  Running check '%s'" % check_name)
             error_counts.setdefault(check_name, 0)
+            try:
+                extension_matcher = c.EXT_MATCHER
+            except AttributeError:
+                pass
+            else:
+                if not extension_matcher.match(f.extension):
+                    LOG.debug("Skipping check '%s' since it does not"
+                              " understand parsing a file with"
+                              " extension '%s'", check_name, f.extension)
+                    continue
             try:
                 reports = set(c.REPORTS)
             except AttributeError:
@@ -230,6 +238,8 @@ def main():
                     LOG.debug("Skipping check '%s', determined to only"
                               " check ignoreable codes", check_name)
                     continue
+            if args.get('verbose'):
+                print("  Running check '%s'" % check_name)
             if isinstance(c, checks.ContentCheck):
                 for line_num, code, message in c.report_iter(f):
                     if code in ignoreables:

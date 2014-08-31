@@ -75,6 +75,7 @@ class CheckCarriageReturn(LineCheck):
 
 class CheckValidity(ContentCheck):
     REPORTS = frozenset(["D000"])
+    EXT_MATCHER = re.compile(r"(.*)[.]rst", re.I)
 
     # Only used when running in sphinx mode.
     SPHINX_IGNORES_REGEX = [
@@ -106,6 +107,11 @@ class CheckValidity(ContentCheck):
 
 class CheckMaxLineLength(ContentCheck):
     REPORTS = frozenset(["D001"])
+
+    def __init__(self, cfg):
+        super(CheckMaxLineLength, self).__init__(cfg)
+        self._max_line_length = self._cfg['max_line_length']
+        self._allow_long_titles = self._cfg['allow_long_titles']
 
     def _extract_node_lines(self, doc):
 
@@ -185,10 +191,14 @@ class CheckMaxLineLength(ContentCheck):
                 directives.append((i, find_directive_end(i, lines)))
         return directives
 
-    def report_iter(self, parsed_file):
-        doc = parsed_file.document
-        lines = list(parsed_file.lines_iter())
+    def _txt_checker(self, parsed_file):
+        for i, line in enumerate(parsed_file.lines_iter()):
+            if len(line) > self._max_line_length:
+                yield (i + 1, 'D001', 'Line too long')
 
+    def _rst_checker(self, parsed_file):
+        lines = list(parsed_file.lines_iter())
+        doc = parsed_file.document
         nodes_lines, first_line = self._extract_node_lines(doc)
         directives = self._extract_directives(lines)
 
@@ -225,10 +235,8 @@ class CheckMaxLineLength(ContentCheck):
             docutils_nodes.subtitle,
             docutils_nodes.section,
         )
-        max_line_length = self._cfg['max_line_length']
-        allow_long_titles = self._cfg['allow_long_titles']
         for i, line in enumerate(lines):
-            if len(line) > max_line_length:
+            if len(line) > self._max_line_length:
                 in_directive = False
                 for (start, end) in directives:
                     if i >= start and i <= end:
@@ -245,6 +253,14 @@ class CheckMaxLineLength(ContentCheck):
                 nodes = find_containing_nodes(i + 1)
                 if any_types(nodes, skip_types):
                     continue
-                if allow_long_titles and any_types(nodes, title_types):
+                if self._allow_long_titles and any_types(nodes, title_types):
                     continue
                 yield (i + 1, 'D001', 'Line too long')
+
+    def report_iter(self, parsed_file):
+        if parsed_file.extension.lower() != '.rst':
+            checker_func = self._txt_checker
+        else:
+            checker_func = self._rst_checker
+        for issue in checker_func(parsed_file):
+            yield issue

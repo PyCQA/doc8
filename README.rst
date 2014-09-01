@@ -24,6 +24,9 @@ To run doc8 just invoke it against any doc directory::
 Usage
 =====
 
+Command line usage
+******************
+
 ::
 
     $ doc8  -h
@@ -64,5 +67,57 @@ Usage
                             check file extensions of the given type (default:
                             .rst, .txt)
       -v, --verbose         run in verbose mode
+
+Ini file usage
+**************
+
+Instead of using the CLI for options the following files will also be examined
+for ``[doc8]`` sections that can also provided the same set of options. If
+the ``--config path`` option is used these files will **not** be scanned for
+the current working directory and that configuration path will be used
+instead.
+
+* ``$CWD/doc8.ini``
+* ``$CWD/tox.ini``
+* ``$CWD/pep8.ini``
+* ``$CWD/setup.cfg``
+
+An example section that can be placed into one of these files::
+
+    [doc8]
+
+    ignore_path=/tmp/stuff,/tmp/other_stuff
+    max_line_length=99
+    verbose=1
+
+**Note:** The option names are the same as the command line ones but instead
+of dashes underscores are used instead (with the only variation of this being
+the ``no-sphinx`` option which from configuration file will be ``sphinx``
+instead).
+
+Option conflict resolution
+**************************
+
+When the same option is passed on the command line and also via configuration
+files the following strategies are applied to resolve these types
+of conflicts.
+
+=====================  ===========  ========
+Option                 Overrides    Merges
+=====================  ===========  ========
+``allow-long-titles``  Yes          No
+``extension``          No           Yes
+``ignore-path``        No           Yes
+``ignore``             No           Yes
+``max-line-length``    Yes          No
+``sphinx``             Yes          No
+=====================  ===========  ========
+
+**Note:** In the above table the configuration file option when specified as
+*overrides* will replace the same option given via the command line. When
+*merges* is stated then the option will be combined with the command line
+option (for example by becoming a larger list or set of values that contains
+the values passed on the command line *and* the values passed via
+configuration).
 
 .. _rst: http://docutils.sourceforge.net/docs/ref/rst/introduction.html

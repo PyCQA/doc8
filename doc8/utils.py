@@ -14,33 +14,46 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import glob
 import os
 
 
 def find_files(paths, extensions, ignored_paths):
     extensions = set(extensions)
+    ignored_absolute_paths = set()
+    for path in ignored_paths:
+        for expanded_path in glob.iglob(path):
+            expanded_path = os.path.abspath(expanded_path)
+            ignored_absolute_paths.add(expanded_path)
 
     def extension_matches(path):
         _base, ext = os.path.splitext(path)
         return ext in extensions
 
-    def path_ignored(path):
-        return os.path.normpath(path) in ignored_paths
+    def path_ignorable(path):
+        path = os.path.abspath(path)
+        if path in ignored_absolute_paths:
+            return True
+        last_path = None
+        while path != last_path:
+            # If we hit the root, this loop will stop since the resolution
+            # of "/../" is still "/" when ran through the abspath function...
+            last_path = path
+            path = os.path.abspath(os.path.join(path, os.path.pardir))
+            if path in ignored_absolute_paths:
+                return True
+        return False
 
     for path in paths:
-        if path_ignored(path):
-            continue
         if os.path.isfile(path):
             if extension_matches(path):
-                yield path
+                yield (path, path_ignorable(path))
         elif os.path.isdir(path):
             for root, dirnames, filenames in os.walk(path):
-                if path_ignored(root):
-                    continue
                 for filename in filenames:
                     path = os.path.join(root, filename)
-                    if extension_matches(path) and not path_ignored(path):
-                        yield path
+                    if extension_matches(path):
+                        yield (path, path_ignorable(path))
         else:
             raise IOError('Invalid path: %s' % path)
 

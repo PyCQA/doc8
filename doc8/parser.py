@@ -26,6 +26,8 @@ import six
 
 
 class ParsedFile(object):
+    FALLBACK_ENCODING = 'utf-8'
+
     def __init__(self, filename, encoding=None):
         self._filename = filename
         self._content = None
@@ -82,8 +84,11 @@ class ParsedFile(object):
 
     @property
     def encoding(self):
-        if self._encoding is None:
-            self._encoding = chardet.detect(self.raw_contents)['encoding']
+        if not self._encoding:
+            encoding = chardet.detect(self.raw_contents)['encoding']
+            if not encoding:
+                encoding = self.FALLBACK_ENCODING
+            self._encoding = encoding
         return self._encoding
 
     @property

@@ -47,6 +47,7 @@ from stevedore import extension
 from doc8 import checks
 from doc8 import parser as file_parser
 from doc8 import utils
+from doc8 import version
 
 FILE_PATTERNS = ['.rst', '.txt']
 MAX_LINE_LENGTH = 79
@@ -186,7 +187,12 @@ def main():
                         default=[])
     parser.add_argument("-v", "--verbose", dest="verbose", action='store_true',
                         help="run in verbose mode", default=False)
+    parser.add_argument("--version", dest="version", action='store_true',
+                        help="show the version and exit", default=False)
     args = vars(parser.parse_args())
+    if args.get('version'):
+        print(version.version_string())
+        return 0
     args['ignore'] = merge_sets(args['ignore'])
     cfg = extract_config(args)
     args['ignore'].update(cfg.pop("ignore", set()))

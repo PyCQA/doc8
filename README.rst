@@ -2,8 +2,8 @@
 Doc8
 ====
 
-Doc8 is a *opinionated* style checker for sphinx (or other) `rst`_
-documentation.
+Doc8 is a *opinionated* style checker for `rst`_ (with basic support for
+plain text) styles of documentation.
 
 Features
 --------

@@ -243,9 +243,10 @@ def main():
                 pass
             else:
                 if not extension_matcher.match(f.extension):
-                    print("  Skipping check '%s' since it does not understand"
-                          " parsing a file with extension '%s'"
-                          % (check_name, f.extension))
+                    if args.get('verbose'):
+                        print("  Skipping check '%s' since it does not"
+                              " understand parsing a file with extension '%s'"
+                              % (check_name, f.extension))
                     continue
             try:
                 reports = set(c.REPORTS)

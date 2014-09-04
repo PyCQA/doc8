@@ -73,20 +73,21 @@ test
         content += "\n\n"
         content += ("a" * 60) + " " + ("b" * 60)
         content += "\n"
+        conf = {
+            'max_line_length': 79,
+            'allow_long_titles': True,
+        }
+        for ext in ['.rst', '.txt']:
+            with tempfile.NamedTemporaryFile(suffix=ext) as fh:
+                fh.write(content)
+                fh.flush()
 
-        with tempfile.NamedTemporaryFile() as fh:
-            fh.write(content)
-            fh.flush()
-            parsed_file = parser.ParsedFile(fh.name)
-            conf = {
-                'max_line_length': 79,
-                'allow_long_titles': True,
-            }
-            check = checks.CheckMaxLineLength(conf)
-            errors = list(check.report_iter(parsed_file))
-            self.assertEqual(1, len(errors))
-            (line, code, msg) = errors[0]
-            self.assertIn(code, check.REPORTS)
+                parsed_file = parser.ParsedFile(fh.name)
+                check = checks.CheckMaxLineLength(conf)
+                errors = list(check.report_iter(parsed_file))
+                self.assertEqual(1, len(errors))
+                (line, code, msg) = errors[0]
+                self.assertIn(code, check.REPORTS)
 
     def test_unsplittable_length(self):
         content = """
@@ -102,15 +103,20 @@ test
         content += "\n\n"
         content += "a" * 100
         content += "\n"
+        conf = {
+            'max_line_length': 79,
+            'allow_long_titles': True,
+        }
+        # This number is different since rst parsing is aware that titles
+        # are allowed to be over-length, while txt parsing is not aware of
+        # this fact (since it has no concept of title sections).
+        extensions = [(0, '.rst'), (1, '.txt')]
+        for expected_errors, ext in extensions:
+            with tempfile.NamedTemporaryFile(suffix=ext) as fh:
+                fh.write(content)
+                fh.flush()
 
-        with tempfile.NamedTemporaryFile() as fh:
-            fh.write(content)
-            fh.flush()
-            parsed_file = parser.ParsedFile(fh.name)
-            conf = {
-                'max_line_length': 79,
-                'allow_long_titles': True,
-            }
-            check = checks.CheckMaxLineLength(conf)
-            errors = list(check.report_iter(parsed_file))
-            self.assertEqual(0, len(errors))
+                parsed_file = parser.ParsedFile(fh.name)
+                check = checks.CheckMaxLineLength(conf)
+                errors = list(check.report_iter(parsed_file))
+                self.assertEqual(expected_errors, len(errors))

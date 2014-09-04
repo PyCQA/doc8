@@ -232,6 +232,16 @@ def main():
                                        c.__class__.__name__])
             error_counts.setdefault(check_name, 0)
             try:
+                extension_matcher = c.EXT_MATCHER
+            except AttributeError:
+                pass
+            else:
+                if not extension_matcher.match(f.extension):
+                    print("  Skipping check '%s' since it does not understand"
+                          " parsing a file with extension '%s'"
+                          % (check_name, f.extension))
+                    continue
+            try:
                 reports = set(c.REPORTS)
             except AttributeError:
                 pass

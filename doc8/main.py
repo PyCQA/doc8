@@ -20,10 +20,10 @@
 What is checked:
     - invalid rst format - D000
     - lines should not be longer than 79 characters - D001
-      - exception: line with no whitespace except in the beginning
-      - exception: lines with http or https urls
-      - exception: literal blocks
-      - exception: rst target directives
+      - RST exception: line with no whitespace except in the beginning
+      - RST exception: lines with http or https urls
+      - RST exception: literal blocks
+      - RST exception: rst target directives
     - no trailing whitespace - D002
     - no tabulation for indentation - D003
     - no carriage returns (use unix newlines) - D004

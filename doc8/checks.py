@@ -77,6 +77,14 @@ class CheckValidity(ContentCheck):
     REPORTS = frozenset(["D000"])
     EXT_MATCHER = re.compile(r"(.*)[.]rst", re.I)
 
+    # From docutils docs:
+    #
+    # Report system messages at or higher than <level>: "info" or "1",
+    # "warning"/"2" (default), "error"/"3", "severe"/"4", "none"/"5"
+    #
+    # See: http://docutils.sourceforge.net/docs/user/config.html#report-level
+    WARN_LEVELS = frozenset([2, 3, 4])
+
     # Only used when running in sphinx mode.
     SPHINX_IGNORES_REGEX = [
         re.compile(r'^Unknown interpreted text'),
@@ -93,7 +101,7 @@ class CheckValidity(ContentCheck):
         for error in parsed_file.errors:
             if error.line is None:
                 continue
-            if error.level <= 1:
+            if error.level not in self.WARN_LEVELS:
                 continue
             ignore = False
             if self._sphinx_mode:

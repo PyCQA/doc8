@@ -35,6 +35,7 @@ class ParsedFile(object):
         self._encoding = encoding
         self._doc = None
         self._errors = None
+        self._lines = None
         self._extension = os.path.splitext(filename)[1]
 
     @property
@@ -72,12 +73,14 @@ class ParsedFile(object):
         return self._doc
 
     def lines_iter(self, remove_trailing_newline=True):
-        with open(self.filename, 'rb') as fh:
-            for line in fh:
-                line = six.text_type(line, encoding=self.encoding)
-                if remove_trailing_newline and line.endswith("\n"):
-                    line = line[0:-1]
-                yield line
+        if self._lines is None:
+            with open(self.filename, 'rb') as fh:
+                self._lines = list(fh)
+        for line in self._lines:
+            line = six.text_type(line, encoding=self.encoding)
+            if remove_trailing_newline and line.endswith("\n"):
+                line = line[0:-1]
+            yield line
 
     @property
     def extension(self):

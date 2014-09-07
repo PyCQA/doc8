@@ -65,9 +65,7 @@ def filtered_traverse(document, filter_func):
 
 
 def contains_url(line):
-    if "http://" in line or "https://" in line:
-        return True
-    return False
+    return "http://" in line or "https://" in line
 
 
 def has_any_node_type(node, node_types):

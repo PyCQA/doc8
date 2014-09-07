@@ -148,6 +148,94 @@ def setup_logging(verbose):
                         format='%(levelname)s: %(message)s', stream=sys.stdout)
 
 
+def scan(cfg):
+    print("Scanning...")
+    files = collections.deque()
+    ignored_paths = cfg.pop('ignore_path')
+    files_ignored = 0
+    file_iter = utils.find_files(cfg.pop('paths', []),
+                                 cfg.pop('extension', []), ignored_paths)
+    for filename, ignoreable in file_iter:
+        if ignoreable:
+            files_ignored += 1
+            if cfg.get('verbose'):
+                print("  Ignoring '%s'" % (filename))
+        else:
+            files.append(file_parser.parse(filename))
+            if cfg.get('verbose'):
+                print("  Selecting '%s'" % (filename))
+    return (files, files_ignored)
+
+
+def validate(cfg, files):
+    print("Validating...")
+    error_counts = {}
+    ignoreables = frozenset(cfg.pop('ignore', []))
+    while files:
+        f = files.popleft()
+        if cfg.get('verbose'):
+            print("Validating %s" % f)
+        for c in fetch_checks(cfg):
+            try:
+                # http://legacy.python.org/dev/peps/pep-3155/
+                check_name = c.__class__.__qualname__
+            except AttributeError:
+                check_name = ".".join([c.__class__.__module__,
+                                       c.__class__.__name__])
+            error_counts.setdefault(check_name, 0)
+            try:
+                extension_matcher = c.EXT_MATCHER
+            except AttributeError:
+                pass
+            else:
+                if not extension_matcher.match(f.extension):
+                    if cfg.get('verbose'):
+                        print("  Skipping check '%s' since it does not"
+                              " understand parsing a file with extension '%s'"
+                              % (check_name, f.extension))
+                    continue
+            try:
+                reports = set(c.REPORTS)
+            except AttributeError:
+                pass
+            else:
+                reports = reports - ignoreables
+                if not reports:
+                    if cfg.get('verbose'):
+                        print("  Skipping check '%s', determined to only"
+                              " check ignoreable codes" % check_name)
+                    continue
+            if cfg.get('verbose'):
+                print("  Running check '%s'" % check_name)
+            if isinstance(c, checks.ContentCheck):
+                for line_num, code, message in c.report_iter(f):
+                    if code in ignoreables:
+                        continue
+                    if cfg.get('verbose'):
+                        print('    - %s:%s: %s %s'
+                              % (f.filename, line_num, code, message))
+                    else:
+                        print('%s:%s: %s %s'
+                              % (f.filename, line_num, code, message))
+                    error_counts[check_name] += 1
+            elif isinstance(c, checks.LineCheck):
+                for line_num, line in enumerate(f.lines_iter(), 1):
+                    for code, message in c.report_iter(line):
+                        if code in ignoreables:
+                            continue
+                        if cfg.get('verbose'):
+                            print('    - %s:%s: %s %s'
+                                  % (f.filename, line_num, code, message))
+                        else:
+                            print('%s:%s: %s %s'
+                                  % (f.filename, line_num, code, message))
+                        error_counts[check_name] += 1
+            else:
+                raise TypeError("Unknown check type: %s, %s"
+                                % (type(c), c))
+    return error_counts
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog='doc8',
@@ -203,93 +291,15 @@ def main():
     args.update(cfg)
     setup_logging(args.get('verbose'))
 
-    print("Scanning...")
-    files = collections.deque()
-    ignored_paths = args.pop('ignore_path')
-    files_ignored = 0
-    files_selected = 0
-    file_iter = utils.find_files(args.pop('paths', []),
-                                 args.pop('extension', []), ignored_paths)
-    for filename, ignoreable in file_iter:
-        if ignoreable:
-            files_ignored += 1
-            if args.get('verbose'):
-                print("  Ignoring '%s'" % (filename))
-        else:
-            files_selected += 1
-            files.append(file_parser.parse(filename))
-            if args.get('verbose'):
-                print("  Selecting '%s'" % (filename))
-
-    ignoreables = frozenset(args.pop('ignore', []))
-    error_counts = {}
-    while files:
-        f = files.popleft()
-        if args.get('verbose'):
-            print("Validating %s" % f)
-        for c in fetch_checks(args):
-            try:
-                # http://legacy.python.org/dev/peps/pep-3155/
-                check_name = c.__class__.__qualname__
-            except AttributeError:
-                check_name = ".".join([c.__class__.__module__,
-                                       c.__class__.__name__])
-            error_counts.setdefault(check_name, 0)
-            try:
-                extension_matcher = c.EXT_MATCHER
-            except AttributeError:
-                pass
-            else:
-                if not extension_matcher.match(f.extension):
-                    if args.get('verbose'):
-                        print("  Skipping check '%s' since it does not"
-                              " understand parsing a file with extension '%s'"
-                              % (check_name, f.extension))
-                    continue
-            try:
-                reports = set(c.REPORTS)
-            except AttributeError:
-                pass
-            else:
-                reports = reports - ignoreables
-                if not reports:
-                    if args.get('verbose'):
-                        print("  Skipping check '%s', determined to only"
-                              " check ignoreable codes" % check_name)
-                    continue
-            if args.get('verbose'):
-                print("  Running check '%s'" % check_name)
-            if isinstance(c, checks.ContentCheck):
-                for line_num, code, message in c.report_iter(f):
-                    if code in ignoreables:
-                        continue
-                    if args.get('verbose'):
-                        print('    - %s:%s: %s %s'
-                              % (f.filename, line_num, code, message))
-                    else:
-                        print('%s:%s: %s %s'
-                              % (f.filename, line_num, code, message))
-                    error_counts[check_name] += 1
-            elif isinstance(c, checks.LineCheck):
-                for line_num, line in enumerate(f.lines_iter(), 1):
-                    for code, message in c.report_iter(line):
-                        if code in ignoreables:
-                            continue
-                        if args.get('verbose'):
-                            print('    - %s:%s: %s %s'
-                                  % (f.filename, line_num, code, message))
-                        else:
-                            print('%s:%s: %s %s'
-                                  % (f.filename, line_num, code, message))
-                        error_counts[check_name] += 1
-            else:
-                raise TypeError("Unknown check type: %s, %s"
-                                % (type(c), c))
+    files, files_ignored = scan(args)
+    files_selected = len(files)
+    error_counts = validate(args, files)
     total_errors = sum(six.itervalues(error_counts))
+
     print("=" * 8)
     print("Total files scanned = %s" % (files_selected))
     print("Total files ignored = %s" % (files_ignored))
-    print("Total accumulated errors = %s" % total_errors)
+    print("Total accumulated errors = %s" % (total_errors))
     if error_counts:
         print("Detailed error counts:")
         for check_name in sorted(six.iterkeys(error_counts)):

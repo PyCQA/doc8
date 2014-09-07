@@ -155,40 +155,40 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter)
     default_configs = ", ".join(CONFIG_FILENAMES)
     parser.add_argument("paths", metavar='path', type=str, nargs='*',
-                        help=("path to scan for doc files"
-                              " (default: os.getcwd())"),
+                        help=("Path to scan for doc files"
+                              " (default: current directory)."),
                         default=[os.getcwd()])
     parser.add_argument("--config", metavar='path', action="append",
-                        help="user config file location"
-                             " (default: %s)" % default_configs,
+                        help="User config file location"
+                             " (default: %s)." % default_configs,
                         default=[])
     parser.add_argument("--allow-long-titles", action="store_true",
-                        help="allow long section titles (default: False)",
+                        help="Allow long section titles (default: False).",
                         default=False)
     parser.add_argument("--ignore", action="append", metavar="code",
-                        help="ignore the given errors code/codes",
+                        help="Ignore the given error code(s).",
                         type=split_set_type,
                         default=[])
     parser.add_argument("--no-sphinx", action="store_false",
-                        help="do not ignore sphinx specific false positives",
+                        help="Do not ignore sphinx specific false positives.",
                         default=True, dest='sphinx')
     parser.add_argument("--ignore-path", action="append", default=[],
-                        help="ignore the given directory or file (globs"
-                             " are supported)", metavar='path')
+                        help="Ignore the given directory or file (globs"
+                             " are supported).", metavar='path')
     parser.add_argument("--max-line-length", action="store", metavar="int",
                         type=int,
-                        help="maximum allowed line"
-                             " length (default: %s)" % MAX_LINE_LENGTH,
+                        help="Maximum allowed line"
+                             " length (default: %s)." % MAX_LINE_LENGTH,
                         default=MAX_LINE_LENGTH)
     parser.add_argument("-e", "--extension", action="append",
                         metavar="extension",
-                        help="check file extensions of the given type"
-                             " (default: %s)" % ", ".join(FILE_PATTERNS),
+                        help="Check file extensions of the given type"
+                             " (default: %s)." % ", ".join(FILE_PATTERNS),
                         default=list(FILE_PATTERNS))
     parser.add_argument("-v", "--verbose", dest="verbose", action='store_true',
-                        help="run in verbose mode", default=False)
+                        help="Run in verbose mode.", default=False)
     parser.add_argument("--version", dest="version", action='store_true',
-                        help="show the version and exit", default=False)
+                        help="Show the version and exit.", default=False)
     args = vars(parser.parse_args())
     if args.get('version'):
         print(version.version_string())

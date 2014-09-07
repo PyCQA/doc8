@@ -184,7 +184,7 @@ def main():
                         metavar="extension",
                         help="check file extensions of the given type"
                              " (default: %s)" % ", ".join(FILE_PATTERNS),
-                        default=[])
+                        default=list(FILE_PATTERNS))
     parser.add_argument("-v", "--verbose", dest="verbose", action='store_true',
                         help="run in verbose mode", default=False)
     parser.add_argument("--version", dest="version", action='store_true',
@@ -201,8 +201,6 @@ def main():
     args['extension'].extend(cfg.pop('extension', []))
     args['ignore_path'].extend(cfg.pop('ignore_path', []))
     args.update(cfg)
-    if not args.get('extension'):
-        args['extension'] = list(FILE_PATTERNS)
     setup_logging(args.get('verbose'))
 
     print("Scanning...")

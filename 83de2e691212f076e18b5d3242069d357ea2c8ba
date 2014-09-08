@@ -1,0 +1,9 @@
+Verified+2: Jenkins
+Code-Review+2: Christian Berendt <berendt@b1-systems.de>
+Workflow+1: Christian Berendt <berendt@b1-systems.de>
+Code-Review+2: Joshua Harlow <harlowja@yahoo-inc.com>
+Submitted-by: Jenkins
+Submitted-at: Mon, 08 Sep 2014 07:02:03 +0000
+Reviewed-on: https://review.openstack.org/119626
+Project: stackforge/doc8
+Branch: refs/heads/master

@@ -202,7 +202,8 @@ class CheckMaxLineLength(ContentCheck):
     def _txt_checker(self, parsed_file):
         for i, line in enumerate(parsed_file.lines_iter()):
             if len(line) > self._max_line_length:
-                yield (i + 1, 'D001', 'Line too long')
+                if not utils.contains_url(line):
+                    yield (i + 1, 'D001', 'Line too long')
 
     def _rst_checker(self, parsed_file):
         lines = list(parsed_file.lines_iter())

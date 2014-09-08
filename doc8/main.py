@@ -151,10 +151,10 @@ def setup_logging(verbose):
 def scan(cfg):
     print("Scanning...")
     files = collections.deque()
-    ignored_paths = cfg.pop('ignore_path')
+    ignored_paths = cfg.get('ignore_path', [])
     files_ignored = 0
-    file_iter = utils.find_files(cfg.pop('paths', []),
-                                 cfg.pop('extension', []), ignored_paths)
+    file_iter = utils.find_files(cfg.get('paths', []),
+                                 cfg.get('extension', []), ignored_paths)
     for filename, ignoreable in file_iter:
         if ignoreable:
             files_ignored += 1
@@ -170,7 +170,7 @@ def scan(cfg):
 def validate(cfg, files):
     print("Validating...")
     error_counts = {}
-    ignoreables = frozenset(cfg.pop('ignore', []))
+    ignoreables = frozenset(cfg.get('ignore', []))
     while files:
         f = files.popleft()
         if cfg.get('verbose'):

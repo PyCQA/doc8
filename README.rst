@@ -27,8 +27,8 @@ Command line usage
     $ doc8  -h
 
     usage: doc8 [-h] [--config path] [--allow-long-titles] [--ignore code]
-                [--no-sphinx] [--ignore-path path] [--max-line-length int]
-                [-e extension] [-v]
+                [--no-sphinx] [--ignore-path path] [--default-extension extension]
+                [--max-line-length int] [-e extension] [-v] [--version]
                 [path [path ...]]
 
     Check documentation for simple style requirements.
@@ -56,12 +56,16 @@ Command line usage
       --no-sphinx           do not ignore sphinx specific false positives
       --ignore-path path    ignore the given directory or file (globs are
                             supported)
+      --default-extension extension
+                            Default file extension to use when a file is found
+                            without a file extension.
       --max-line-length int
                             maximum allowed line length (default: 79)
       -e extension, --extension extension
                             check file extensions of the given type (default:
                             .rst, .txt)
       -v, --verbose         run in verbose mode
+      --version             Show the version and exit.
 
 Ini file usage
 **************

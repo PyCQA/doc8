@@ -16,6 +16,7 @@
 
 import errno
 import os
+import threading
 
 import chardet
 from docutils import frontend
@@ -36,7 +37,9 @@ class ParsedFile(object):
         self._doc = None
         self._errors = None
         self._lines = None
+        self._has_read = False
         self._extension = os.path.splitext(filename)[1]
+        self._read_lock = threading.Lock()
 
     @property
     def errors(self):
@@ -72,10 +75,19 @@ class ParsedFile(object):
             self._doc = doc
         return self._doc
 
+    def _read(self):
+        if self._has_read:
+            return
+        with self._read_lock:
+            if not self._has_read:
+                with open(self.filename, 'rb') as fh:
+                    self._lines = list(fh)
+                    fh.seek(0)
+                    self._raw_content = fh.read()
+                self._has_read = True
+
     def lines_iter(self, remove_trailing_newline=True):
-        if self._lines is None:
-            with open(self.filename, 'rb') as fh:
-                self._lines = list(fh)
+        self._read()
         for line in self._lines:
             line = six.text_type(line, encoding=self.encoding)
             if remove_trailing_newline and line.endswith("\n"):
@@ -101,9 +113,7 @@ class ParsedFile(object):
 
     @property
     def raw_contents(self):
-        if self._raw_content is None:
-            with open(self.filename, 'rb') as fh:
-                self._raw_content = fh.read()
+        self._read()
         return self._raw_content
 
     @property

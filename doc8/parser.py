@@ -29,7 +29,7 @@ import six
 class ParsedFile(object):
     FALLBACK_ENCODING = 'utf-8'
 
-    def __init__(self, filename, encoding=None):
+    def __init__(self, filename, encoding=None, default_extension=''):
         self._filename = filename
         self._content = None
         self._raw_content = None
@@ -40,6 +40,8 @@ class ParsedFile(object):
         self._has_read = False
         self._extension = os.path.splitext(filename)[1]
         self._read_lock = threading.Lock()
+        if not self._extension:
+            self._extension = default_extension
 
     @property
     def errors(self):
@@ -129,7 +131,9 @@ class ParsedFile(object):
             len(list(self.lines_iter())))
 
 
-def parse(filename, encoding=None):
+def parse(filename, encoding=None, default_extension=''):
     if not os.path.isfile(filename):
         raise IOError(errno.ENOENT, 'File not found', filename)
-    return ParsedFile(filename, encoding=encoding)
+    return ParsedFile(filename,
+                      encoding=encoding,
+                      default_extension=default_extension)

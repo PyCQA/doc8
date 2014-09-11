@@ -110,6 +110,10 @@ def extract_config(args):
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
     try:
+        cfg['default_extension'] = parser.get("doc8", "default-extension")
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        pass
+    try:
         extensions = parser.get("doc8", "extensions")
         extensions = extensions.split(",")
         extensions = [s.strip() for s in extensions if s.strip()]
@@ -155,13 +159,16 @@ def scan(cfg):
     files_ignored = 0
     file_iter = utils.find_files(cfg.get('paths', []),
                                  cfg.get('extension', []), ignored_paths)
+    default_extension = cfg.get('default_extension')
     for filename, ignoreable in file_iter:
         if ignoreable:
             files_ignored += 1
             if cfg.get('verbose'):
                 print("  Ignoring '%s'" % (filename))
         else:
-            files.append(file_parser.parse(filename))
+            f = file_parser.parse(filename,
+                                  default_extension=default_extension)
+            files.append(f)
             if cfg.get('verbose'):
                 print("  Selecting '%s'" % (filename))
     return (files, files_ignored)
@@ -263,6 +270,11 @@ def main():
     parser.add_argument("--ignore-path", action="append", default=[],
                         help="Ignore the given directory or file (globs"
                              " are supported).", metavar='path')
+    parser.add_argument("--default-extension", action="store",
+                        help="Default file extension to use when a file is"
+                             " found without a file extension.",
+                        default='', dest='default_extension',
+                        metavar='extension')
     parser.add_argument("--max-line-length", action="store", metavar="int",
                         type=int,
                         help="Maximum allowed line"

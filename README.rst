@@ -43,6 +43,7 @@ Command line usage
         - no trailing whitespace - D002
         - no tabulation for indentation - D003
         - no carriage returns (use unix newlines) - D004
+        - no newline at end of file - D005
 
     positional arguments:
       path                  path to scan for doc files (default: os.getcwd())

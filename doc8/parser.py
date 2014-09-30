@@ -97,6 +97,11 @@ class ParsedFile(object):
             yield line
 
     @property
+    def lines(self):
+        self._read()
+        return self._lines
+
+    @property
     def extension(self):
         return self._extension
 

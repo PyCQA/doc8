@@ -120,3 +120,20 @@ test
                 check = checks.CheckMaxLineLength(conf)
                 errors = list(check.report_iter(parsed_file))
                 self.assertEqual(expected_errors, len(errors))
+
+
+class TestNewlineEndOfFile(testtools.TestCase):
+    def test_newline(self):
+        tests = [(1, "testing"),
+                 (1, "testing\ntesting"),
+                 (0, "testing\n"),
+                 (0, "testing\ntesting\n")]
+
+        for expected_errors, line in tests:
+            with tempfile.NamedTemporaryFile() as fh:
+                fh.write(line)
+                fh.flush()
+                parsed_file = parser.ParsedFile(fh.name)
+                check = checks.CheckNewlineEndOfFile({})
+                errors = list(check.report_iter(parsed_file))
+                self.assertEqual(expected_errors, len(errors))

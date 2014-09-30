@@ -73,6 +73,17 @@ class CheckCarriageReturn(LineCheck):
             yield ('D004', 'Found literal carriage return')
 
 
+class CheckNewlineEndOfFile(ContentCheck):
+    REPORTS = frozenset(["D005"])
+
+    def __init__(self, cfg):
+        super(CheckNewlineEndOfFile, self).__init__(cfg)
+
+    def report_iter(self, parsed_file):
+        if parsed_file.lines and not parsed_file.lines[-1].endswith('\n'):
+            yield (len(parsed_file.lines), 'D005', 'No newline at end of file')
+
+
 class CheckValidity(ContentCheck):
     REPORTS = frozenset(["D000"])
     EXT_MATCHER = re.compile(r"(.*)[.]rst", re.I)

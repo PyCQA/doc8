@@ -110,6 +110,10 @@ def extract_config(args):
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
     try:
+        cfg['file_encoding'] = parser.get("doc8", "file-encoding")
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        pass
+    try:
         cfg['default_extension'] = parser.get("doc8", "default-extension")
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
@@ -167,7 +171,8 @@ def scan(cfg):
                 print("  Ignoring '%s'" % (filename))
         else:
             f = file_parser.parse(filename,
-                                  default_extension=default_extension)
+                                  default_extension=default_extension,
+                                  encoding=cfg.get('file_encoding'))
             files.append(f)
             if cfg.get('verbose'):
                 print("  Selecting '%s'" % (filename))
@@ -275,6 +280,13 @@ def main():
                              " found without a file extension.",
                         default='', dest='default_extension',
                         metavar='extension')
+    parser.add_argument("--file-encoding", action="store",
+                        help="Override encoding to use when attempting"
+                             " to determine an input files text encoding "
+                             "(providing this avoids using `chardet` to"
+                             " automatically detect encoding/s)",
+                        default='', dest='file_encoding',
+                        metavar='encoding')
     parser.add_argument("--max-line-length", action="store", metavar="int",
                         type=int,
                         help="Maximum allowed line"

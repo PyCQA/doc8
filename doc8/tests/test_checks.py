@@ -89,6 +89,20 @@ test
                 (line, code, msg) = errors[0]
                 self.assertIn(code, check.REPORTS)
 
+    def test_correct_length(self):
+        conf = {
+            'max_line_length': 79,
+            'allow_long_titles': True,
+        }
+        x = (b'known exploit in the wild, for example \xe2\x80\x93 the time'
+              ' between advance notification')
+        with tempfile.NamedTemporaryFile(suffix='.rst') as fh:
+            fh.write(x)
+            parsed_file = parser.ParsedFile(fh.name, encoding='utf-8')
+            check = checks.CheckMaxLineLength(conf)
+            errors = list(check.report_iter(parsed_file))
+            self.assertEqual(0, len(errors))
+
     def test_unsplittable_length(self):
         content = """
 ===

@@ -60,6 +60,10 @@ Command line usage
       --default-extension extension
                             Default file extension to use when a file is found
                             without a file extension.
+      --file-encoding encoding
+                            Override encoding to use when attempting to determine
+                            an input files text encoding (providing this avoids
+                            using `chardet` to automatically detect encoding/s)
       --max-line-length int
                             maximum allowed line length (default: 79)
       -e extension, --extension extension
@@ -111,6 +115,7 @@ Option                 Overrides    Merges
 ``ignore-path``        No           Yes
 ``ignore``             No           Yes
 ``max-line-length``    Yes          No
+``file-encoding``      Yes          No
 ``sphinx``             Yes          No
 =====================  ===========  ========
 

@@ -94,7 +94,7 @@ def extract_config(args):
         pass
     try:
         cfg['ignore_path'] = split_set_type(parser.get("doc8",
-                                                       "ignore_path"))
+                                                       "ignore-path"))
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
     try:

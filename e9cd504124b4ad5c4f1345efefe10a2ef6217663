@@ -1,0 +1,8 @@
+Verified+2: Jenkins
+Code-Review+2: Christian Berendt <berendt@b1-systems.de>
+Workflow+1: Christian Berendt <berendt@b1-systems.de>
+Submitted-by: Jenkins
+Submitted-at: Sat, 06 Dec 2014 16:34:10 +0000
+Reviewed-on: https://review.openstack.org/139459
+Project: stackforge/doc8
+Branch: refs/heads/master

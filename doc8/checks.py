@@ -80,7 +80,7 @@ class CheckNewlineEndOfFile(ContentCheck):
         super(CheckNewlineEndOfFile, self).__init__(cfg)
 
     def report_iter(self, parsed_file):
-        if parsed_file.lines and not parsed_file.lines[-1].endswith('\n'):
+        if parsed_file.lines and not parsed_file.lines[-1].endswith(b'\n'):
             yield (len(parsed_file.lines), 'D005', 'No newline at end of file')
 
 

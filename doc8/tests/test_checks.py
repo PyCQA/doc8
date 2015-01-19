@@ -60,7 +60,7 @@ class TestCarriageReturn(testtools.TestCase):
 
 class TestLineLength(testtools.TestCase):
     def test_over_length(self):
-        content = """
+        content = b"""
 ===
 aaa
 ===
@@ -70,9 +70,9 @@ test
 ----
 
 """
-        content += "\n\n"
-        content += ("a" * 60) + " " + ("b" * 60)
-        content += "\n"
+        content += b"\n\n"
+        content += (b"a" * 60) + b" " + (b"b" * 60)
+        content += b"\n"
         conf = {
             'max_line_length': 79,
             'allow_long_titles': True,
@@ -96,8 +96,8 @@ test
         }
         with tempfile.NamedTemporaryFile(suffix='.rst') as fh:
             fh.write(b'known exploit in the wild, for example'
-                     ' \xe2\x80\x93 the time'
-                     ' between advance notification')
+                     b' \xe2\x80\x93 the time'
+                     b' between advance notification')
             fh.flush()
 
             parsed_file = parser.ParsedFile(fh.name, encoding='utf-8')
@@ -106,7 +106,7 @@ test
             self.assertEqual(0, len(errors))
 
     def test_unsplittable_length(self):
-        content = """
+        content = b"""
 ===
 aaa
 ===
@@ -116,9 +116,9 @@ test
 ----
 
 """
-        content += "\n\n"
-        content += "a" * 100
-        content += "\n"
+        content += b"\n\n"
+        content += b"a" * 100
+        content += b"\n"
         conf = {
             'max_line_length': 79,
             'allow_long_titles': True,
@@ -140,10 +140,10 @@ test
 
 class TestNewlineEndOfFile(testtools.TestCase):
     def test_newline(self):
-        tests = [(1, "testing"),
-                 (1, "testing\ntesting"),
-                 (0, "testing\n"),
-                 (0, "testing\ntesting\n")]
+        tests = [(1, b"testing"),
+                 (1, b"testing\ntesting"),
+                 (0, b"testing\n"),
+                 (0, b"testing\ntesting\n")]
 
         for expected_errors, line in tests:
             with tempfile.NamedTemporaryFile() as fh:

@@ -102,6 +102,7 @@ class CheckValidity(ContentCheck):
         re.compile(r'^Unknown directive type'),
         re.compile(r'^Undefined substitution'),
         re.compile(r'^Substitution definition contains illegal element'),
+        re.compile(r'^unknown option: \"linenos\"'),
     ]
 
     def __init__(self, cfg):

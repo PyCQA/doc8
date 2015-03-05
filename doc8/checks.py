@@ -110,8 +110,6 @@ class CheckValidity(ContentCheck):
 
     def report_iter(self, parsed_file):
         for error in parsed_file.errors:
-            if error.line is None:
-                continue
             if error.level not in self.WARN_LEVELS:
                 continue
             ignore = False

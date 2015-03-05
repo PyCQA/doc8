@@ -226,6 +226,8 @@ def validate(cfg, files):
                 for line_num, code, message in c.report_iter(f):
                     if code in ignoreables:
                         continue
+                    if not isinstance(line_num, (float, int)):
+                        line_num = "?"
                     if cfg.get('verbose'):
                         print('    - %s:%s: %s %s'
                               % (f.filename, line_num, code, message))

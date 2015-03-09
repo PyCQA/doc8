@@ -60,8 +60,8 @@ CONFIG_FILENAMES = [
 ]
 
 
-def split_set_type(text):
-    return set([i.strip() for i in text.split(",") if i.strip()])
+def split_set_type(text, delimiter=","):
+    return set([i.strip() for i in text.split(delimiter) if i.strip()])
 
 
 def merge_sets(sets):
@@ -95,6 +95,17 @@ def extract_config(args):
     try:
         cfg['ignore_path'] = split_set_type(parser.get("doc8",
                                                        "ignore-path"))
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        pass
+    try:
+        tmp_ignore_path_errors = parser.get("doc8", "ignore-path-errors")
+        ignore_path_errors = collections.defaultdict(set)
+        for path in tmp_ignore_path_errors.split(","):
+            path = path.strip()
+            path, ignored_errors = path.split(";", 1)
+            ignored_errors = split_set_type(ignored_errors, delimiter=";")
+            ignore_path_errors[path].update(ignored_errors)
+        cfg['ignore_path_errors'] = dict(ignore_path_errors)
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
     try:
@@ -186,10 +197,13 @@ def validate(cfg, files):
     print("Validating...")
     error_counts = {}
     ignoreables = frozenset(cfg.get('ignore', []))
+    ignore_targeted = cfg.get('ignore_path_errors', {})
     while files:
         f = files.popleft()
         if cfg.get('verbose'):
             print("Validating %s" % f)
+        targeted_ignoreables = set(ignore_targeted.get(f.filename, set()))
+        targeted_ignoreables.update(ignoreables)
         for c in fetch_checks(cfg):
             try:
                 # http://legacy.python.org/dev/peps/pep-3155/
@@ -214,7 +228,7 @@ def validate(cfg, files):
             except AttributeError:
                 pass
             else:
-                reports = reports - ignoreables
+                reports = reports - targeted_ignoreables
                 if not reports:
                     if cfg.get('verbose'):
                         print("  Skipping check '%s', determined to only"
@@ -224,7 +238,7 @@ def validate(cfg, files):
                 print("  Running check '%s'" % check_name)
             if isinstance(c, checks.ContentCheck):
                 for line_num, code, message in c.report_iter(f):
-                    if code in ignoreables:
+                    if code in targeted_ignoreables:
                         continue
                     if cfg.get('verbose'):
                         print('    - %s:%s: %s %s'
@@ -236,7 +250,7 @@ def validate(cfg, files):
             elif isinstance(c, checks.LineCheck):
                 for line_num, line in enumerate(f.lines_iter(), 1):
                     for code, message in c.report_iter(line):
-                        if code in ignoreables:
+                        if code in targeted_ignoreables:
                             continue
                         if cfg.get('verbose'):
                             print('    - %s:%s: %s %s'

@@ -90,9 +90,10 @@ An example section that can be placed into one of these files::
 
     [doc8]
 
-    ignore_path=/tmp/stuff,/tmp/other_stuff
-    max_line_length=99
+    ignore-path=/tmp/stuff,/tmp/other_stuff
+    max-line-length=99
     verbose=1
+    ignore-path-errors=/tmp/other_thing.rst;D001;D002
 
 **Note:** The option names are the same as the command line ones but instead
 of dashes underscores are used instead (with the only variation of this being

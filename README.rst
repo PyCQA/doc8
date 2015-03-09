@@ -27,7 +27,8 @@ Command line usage
     $ doc8  -h
 
     usage: doc8 [-h] [--config path] [--allow-long-titles] [--ignore code]
-                [--no-sphinx] [--ignore-path path] [--default-extension extension]
+                [--no-sphinx] [--ignore-path path] [--ignore-path-errors path]
+                [--default-extension extension] [--file-encoding encoding]
                 [--max-line-length int] [-e extension] [-v] [--version]
                 [path [path ...]]
 
@@ -46,17 +47,20 @@ Command line usage
         - no newline at end of file - D005
 
     positional arguments:
-      path                  path to scan for doc files (default: os.getcwd())
+      path                  Path to scan for doc files (default: current
+                            directory).
 
     optional arguments:
       -h, --help            show this help message and exit
-      --config path         user config file location (default: doc8.ini, tox.ini,
-                            pep8.ini, setup.cfg)
-      --allow-long-titles   allow long section titles (default: False)
-      --ignore code         ignore the given errors code/codes
-      --no-sphinx           do not ignore sphinx specific false positives
-      --ignore-path path    ignore the given directory or file (globs are
-                            supported)
+      --config path         User config file location (default: doc8.ini, tox.ini,
+                            pep8.ini, setup.cfg).
+      --allow-long-titles   Allow long section titles (default: False).
+      --ignore code         Ignore the given error code(s).
+      --no-sphinx           Do not ignore sphinx specific false positives.
+      --ignore-path path    Ignore the given directory or file (globs are
+                            supported).
+      --ignore-path-errors path
+                            Ignore the given specific errors in the provided file.
       --default-extension extension
                             Default file extension to use when a file is found
                             without a file extension.
@@ -65,11 +69,11 @@ Command line usage
                             an input files text encoding (providing this avoids
                             using `chardet` to automatically detect encoding/s)
       --max-line-length int
-                            maximum allowed line length (default: 79)
+                            Maximum allowed line length (default: 79).
       -e extension, --extension extension
-                            check file extensions of the given type (default:
-                            .rst, .txt)
-      -v, --verbose         run in verbose mode
+                            Check file extensions of the given type (default:
+                            .rst, .txt).
+      -v, --verbose         Run in verbose mode.
       --version             Show the version and exit.
 
 Ini file usage
@@ -90,14 +94,14 @@ An example section that can be placed into one of these files::
 
     [doc8]
 
-    ignore_path=/tmp/stuff,/tmp/other_stuff
-    max_line_length=99
+    ignore-path=/tmp/stuff,/tmp/other_stuff
+    max-line-length=99
     verbose=1
+    ignore-path-errors=/tmp/other_thing.rst;D001;D002
 
-**Note:** The option names are the same as the command line ones but instead
-of dashes underscores are used instead (with the only variation of this being
-the ``no-sphinx`` option which from configuration file will be ``sphinx``
-instead).
+**Note:** The option names are the same as the command line ones (with the
+only variation of this being the ``no-sphinx`` option which from
+configuration file will be ``sphinx`` instead).
 
 Option conflict resolution
 **************************
@@ -110,6 +114,7 @@ of conflicts.
 Option                 Overrides    Merges
 =====================  ===========  ========
 ``allow-long-titles``  Yes          No
+``ignore-path-errors`` No           Yes
 ``default-extension``  Yes          No
 ``extension``          No           Yes
 ``ignore-path``        No           Yes

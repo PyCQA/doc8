@@ -52,29 +52,29 @@ Command line usage
 
     optional arguments:
       -h, --help            show this help message and exit
-      --config path         User config file location (default: doc8.ini, tox.ini,
+      --config path         user config file location (default: doc8.ini, tox.ini,
                             pep8.ini, setup.cfg).
-      --allow-long-titles   Allow long section titles (default: False).
-      --ignore code         Ignore the given error code(s).
-      --no-sphinx           Do not ignore sphinx specific false positives.
-      --ignore-path path    Ignore the given directory or file (globs are
+      --allow-long-titles   allow long section titles (default: False).
+      --ignore code         ignore the given error code(s).
+      --no-sphinx           do not ignore sphinx specific false positives.
+      --ignore-path path    ignore the given directory or file (globs are
                             supported).
       --ignore-path-errors path
-                            Ignore the given specific errors in the provided file.
+                            ignore the given specific errors in the provided file.
       --default-extension extension
-                            Default file extension to use when a file is found
+                            default file extension to use when a file is found
                             without a file extension.
       --file-encoding encoding
-                            Override encoding to use when attempting to determine
+                            override encoding to use when attempting to determine
                             an input files text encoding (providing this avoids
                             using `chardet` to automatically detect encoding/s)
       --max-line-length int
-                            Maximum allowed line length (default: 79).
+                            maximum allowed line length (default: 79).
       -e extension, --extension extension
-                            Check file extensions of the given type (default:
+                            check file extensions of the given type (default:
                             .rst, .txt).
-      -v, --verbose         Run in verbose mode.
-      --version             Show the version and exit.
+      -v, --verbose         run in verbose mode.
+      --version             show the version and exit.
 
 Ini file usage
 **************

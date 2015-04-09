@@ -280,36 +280,36 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter)
     default_configs = ", ".join(CONFIG_FILENAMES)
     parser.add_argument("paths", metavar='path', type=str, nargs='*',
-                        help=("Path to scan for doc files"
+                        help=("path to scan for doc files"
                               " (default: current directory)."),
                         default=[os.getcwd()])
     parser.add_argument("--config", metavar='path', action="append",
-                        help="User config file location"
+                        help="user config file location"
                              " (default: %s)." % default_configs,
                         default=[])
     parser.add_argument("--allow-long-titles", action="store_true",
-                        help="Allow long section titles (default: False).",
+                        help="allow long section titles (default: False).",
                         default=False)
     parser.add_argument("--ignore", action="append", metavar="code",
-                        help="Ignore the given error code(s).",
+                        help="ignore the given error code(s).",
                         type=split_set_type,
                         default=[])
     parser.add_argument("--no-sphinx", action="store_false",
-                        help="Do not ignore sphinx specific false positives.",
+                        help="do not ignore sphinx specific false positives.",
                         default=True, dest='sphinx')
     parser.add_argument("--ignore-path", action="append", default=[],
-                        help="Ignore the given directory or file (globs"
+                        help="ignore the given directory or file (globs"
                              " are supported).", metavar='path')
     parser.add_argument("--ignore-path-errors", action="append", default=[],
-                        help="Ignore the given specific errors in the"
+                        help="ignore the given specific errors in the"
                              " provided file.", metavar='path')
     parser.add_argument("--default-extension", action="store",
-                        help="Default file extension to use when a file is"
+                        help="default file extension to use when a file is"
                              " found without a file extension.",
                         default='', dest='default_extension',
                         metavar='extension')
     parser.add_argument("--file-encoding", action="store",
-                        help="Override encoding to use when attempting"
+                        help="override encoding to use when attempting"
                              " to determine an input files text encoding "
                              "(providing this avoids using `chardet` to"
                              " automatically detect encoding/s)",
@@ -317,18 +317,18 @@ def main():
                         metavar='encoding')
     parser.add_argument("--max-line-length", action="store", metavar="int",
                         type=int,
-                        help="Maximum allowed line"
+                        help="maximum allowed line"
                              " length (default: %s)." % MAX_LINE_LENGTH,
                         default=MAX_LINE_LENGTH)
     parser.add_argument("-e", "--extension", action="append",
                         metavar="extension",
-                        help="Check file extensions of the given type"
+                        help="check file extensions of the given type"
                              " (default: %s)." % ", ".join(FILE_PATTERNS),
                         default=list(FILE_PATTERNS))
     parser.add_argument("-v", "--verbose", dest="verbose", action='store_true',
-                        help="Run in verbose mode.", default=False)
+                        help="run in verbose mode.", default=False)
     parser.add_argument("--version", dest="version", action='store_true',
-                        help="Show the version and exit.", default=False)
+                        help="show the version and exit.", default=False)
     args = vars(parser.parse_args())
     if args.get('version'):
         print(version.version_string())

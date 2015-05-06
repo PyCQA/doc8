@@ -26,7 +26,7 @@ Command line usage
 
     $ doc8  -h
 
-    usage: doc8 [-h] [--config path] [--allow-long-titles] [--ignore code]
+    usage: doc8 [-h] [--config path] [--where dir] [--allow-long-titles] [--ignore code]
                 [--no-sphinx] [--ignore-path path] [--ignore-path-errors path]
                 [--default-extension extension] [--file-encoding encoding]
                 [--max-line-length int] [-e extension] [-v] [--version]
@@ -54,6 +54,7 @@ Command line usage
       -h, --help            show this help message and exit
       --config path         user config file location (default: doc8.ini, tox.ini,
                             pep8.ini, setup.cfg).
+      --where dir           provide an explicit base directory
       --allow-long-titles   allow long section titles (default: false).
       --ignore code         ignore the given error code(s).
       --no-sphinx           do not ignore sphinx specific false positives.

@@ -143,6 +143,10 @@ def extract_config(args):
             cfg['extension'] = extensions
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
+    try:
+        cfg['where'] = parser.get("doc8", "where")
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        pass
     return cfg
 
 
@@ -282,11 +286,14 @@ def main():
     parser.add_argument("paths", metavar='path', type=str, nargs='*',
                         help=("path to scan for doc files"
                               " (default: current directory)."),
-                        default=[os.getcwd()])
+                        default=['.'])
     parser.add_argument("--config", metavar='path', action="append",
                         help="user config file location"
                              " (default: %s)." % default_configs,
                         default=[])
+    parser.add_argument("--where", metavar='dir', action="store",
+                        help="provide an explicit base directory",
+                        default=None)
     parser.add_argument("--allow-long-titles", action="store_true",
                         help="allow long section titles (default: false).",
                         default=False)
@@ -352,6 +359,12 @@ def main():
 
     args.update(cfg)
     setup_logging(args.get('verbose'))
+
+    if args.get('where', None):
+        os.chdir(args['where'])
+    for idx, path in enumerate(args.get('paths', [])):
+        if path == '.':
+            args['paths'][idx] = os.getcwd()
 
     files, files_ignored = scan(args)
     files_selected = len(files)

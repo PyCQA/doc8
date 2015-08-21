@@ -202,7 +202,7 @@ class CheckMaxLineLength(ContentCheck):
         # for unknown directives, so we have to do it manually).
         directives = []
         for i, line in enumerate(lines):
-            if re.match(r"^..\s(.*?)::\s*", line):
+            if re.match(r"\ *..\s(.*?)::\s*", line):
                 directives.append((i, find_directive_end(i, lines)))
             elif re.match(r"^::\s*$", line):
                 directives.append((i, find_directive_end(i, lines)))

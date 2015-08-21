@@ -105,6 +105,25 @@ test
             errors = list(check.report_iter(parsed_file))
             self.assertEqual(0, len(errors))
 
+    def test_ignore_code_block(self):
+        conf = {
+            'max_line_length': 79,
+            'allow_long_titles': True,
+        }
+        with tempfile.NamedTemporaryFile(suffix='.rst') as fh:
+            fh.write(b'List which contains items with code-block\n'
+                     b'- this is a list item\n\n'
+                     b'  .. code-block:: ini\n\n'
+                     b'     this line exceeds 80 chars but should be ignored'
+                     b'this line exceeds 80 chars but should be ignored'
+                     b'this line exceeds 80 chars but should be ignored')
+            fh.flush()
+
+            parsed_file = parser.ParsedFile(fh.name, encoding='utf-8')
+            check = checks.CheckMaxLineLength(conf)
+            errors = list(check.report_iter(parsed_file))
+            self.assertEqual(0, len(errors))
+
     def test_unsplittable_length(self):
         content = b"""
 ===

@@ -110,19 +110,19 @@ When the same option is passed on the command line and also via configuration
 files the following strategies are applied to resolve these types
 of conflicts.
 
-=====================  ===========  ========
-Option                 Overrides    Merges
-=====================  ===========  ========
-``allow-long-titles``  Yes          No
-``ignore-path-errors`` No           Yes
-``default-extension``  Yes          No
-``extension``          No           Yes
-``ignore-path``        No           Yes
-``ignore``             No           Yes
-``max-line-length``    Yes          No
-``file-encoding``      Yes          No
-``sphinx``             Yes          No
-=====================  ===========  ========
+======================   ===========  ========
+Option                   Overrides    Merges
+======================   ===========  ========
+``allow-long-titles``    Yes          No
+``ignore-path-errors``   No           Yes
+``default-extension``    Yes          No
+``extension``            No           Yes
+``ignore-path``          No           Yes
+``ignore``               No           Yes
+``max-line-length``      Yes          No
+``file-encoding``        Yes          No
+``sphinx``               Yes          No
+======================   ===========  ========
 
 **Note:** In the above table the configuration file option when specified as
 *overrides* will replace the same option given via the command line. When

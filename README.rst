@@ -2,7 +2,7 @@
 Doc8
 ====
 
-Doc8 is a *opinionated* style checker for `rst`_ (with basic support for
+Doc8 is an *opinionated* style checker for `rst`_ (with basic support for
 plain text) styles of documentation.
 
 QuickStart

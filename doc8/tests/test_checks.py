@@ -22,6 +22,69 @@ from doc8 import checks
 from doc8 import parser
 
 
+class TestUnknownDirectives(testtools.TestCase):
+    def test_unknown_directive(self):
+        content = b"""
+=====
+HELLO
+=====
+
+.. something_something::
+
+   abc
+
+"""
+        with tempfile.NamedTemporaryFile(suffix=".rst") as fh:
+            fh.write(content)
+            fh.flush()
+
+            parsed_file = parser.ParsedFile(fh.name, encoding='utf-8')
+            check = checks.CheckKnownDirectives({})
+            errors = list(check.report_iter(parsed_file))
+            self.assertEqual(1, len(errors))
+
+    def test_known_sphinx_directive(self):
+        conf = {'sphinx': True}
+        content = b"""
+=====
+HELLO
+=====
+
+.. toctree::
+
+   abc
+
+"""
+        with tempfile.NamedTemporaryFile(suffix=".rst") as fh:
+            fh.write(content)
+            fh.flush()
+
+            parsed_file = parser.ParsedFile(fh.name, encoding='utf-8')
+            check = checks.CheckKnownDirectives(conf)
+            errors = list(check.report_iter(parsed_file))
+            self.assertEqual(0, len(errors))
+
+    def test_known_directive(self):
+        content = b"""
+=====
+HELLO
+=====
+
+.. code::
+
+   abc
+
+"""
+        with tempfile.NamedTemporaryFile(suffix=".rst") as fh:
+            fh.write(content)
+            fh.flush()
+
+            parsed_file = parser.ParsedFile(fh.name, encoding='utf-8')
+            check = checks.CheckKnownDirectives({})
+            errors = list(check.report_iter(parsed_file))
+            self.assertEqual(0, len(errors))
+
+
 class TestTrailingWhitespace(testtools.TestCase):
     def test_trailing(self):
         lines = ["a b  ", "ab"]

@@ -28,6 +28,7 @@ What is checked:
     - no tabulation for indentation - D003
     - no carriage returns (use unix newlines) - D004
     - no newline at end of file - D005
+    - unknown rst directive - D006
 """
 
 import argparse
@@ -154,6 +155,7 @@ def fetch_checks(cfg):
         checks.CheckCarriageReturn(cfg),
         checks.CheckMaxLineLength(cfg),
         checks.CheckNewlineEndOfFile(cfg),
+        checks.CheckKnownDirectives(cfg),
     ]
     mgr = extension.ExtensionManager(
         namespace='doc8.extension.check',

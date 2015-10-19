@@ -1,0 +1,10 @@
+Verified+2: Jenkins
+Code-Review+2: Joshua Harlow <harlowja@yahoo-inc.com>
+Workflow+1: Joshua Harlow <harlowja@yahoo-inc.com>
+Code-Review+1: venkatamahesh <venkatamaheshkotha@gmail.com>
+Code-Review+1: Clint Adams <clint@gcfm.net>
+Submitted-by: Jenkins
+Submitted-at: Mon, 19 Oct 2015 18:12:02 +0000
+Reviewed-on: https://review.openstack.org/236315
+Project: openstack/doc8
+Branch: refs/heads/master

@@ -206,6 +206,24 @@ class CheckMaxLineLength(ContentCheck):
                 directives.append((i, find_directive_end(i, lines)))
             elif re.match(r"^::\s*$", line):
                 directives.append((i, find_directive_end(i, lines)))
+
+        # Find definition terms in definition lists
+        # This check may match the code, which is already appended
+        lwhitespaces = r"^\s*"
+        listspattern = r"^\s*(\* |- |#\. |\d+\. )"
+        for i in range (0, len(lines) - 1):
+            line = lines[i]
+            next_line = lines[i + 1]
+            # if line is a blank, line is not a definition term
+            if all_whitespace(line):
+                continue
+            # if line is a list, line is checked as normal line
+            if re.match(listspattern, line):
+                continue
+            if (len(re.search(lwhitespaces, line).group()) <
+                len(re.search(lwhitespaces, next_line).group())):
+                directives.append((i, i))
+
         return directives
 
     def _txt_checker(self, parsed_file):

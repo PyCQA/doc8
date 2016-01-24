@@ -156,6 +156,23 @@ test
                 errors = list(check.report_iter(parsed_file))
                 self.assertEqual(expected_errors, len(errors))
 
+    def test_definition_term_length(self):
+        conf = {
+            'max_line_length': 79,
+            'allow_long_titles': True,
+        }
+        with tempfile.NamedTemporaryFile(suffix='.rst') as fh:
+            fh.write(b'Definition List which contains long term.\n\n'
+                     b'looooooooooooooooooooooooooooooong definition term'
+                     b'this line exceeds 80 chars but should be ignored\n'
+                     b' this is a definition\n'
+            fh.flush()
+
+            parsed_file = parser.ParsedFile(fh.name, encoding='utf-8')
+            check = checks.CheckMaxLineLength(conf)
+            errors = list(check.report_iter(parsed_file))
+            self.assertEqual(0, len(errors))
+
 
 class TestNewlineEndOfFile(testtools.TestCase):
     def test_newline(self):

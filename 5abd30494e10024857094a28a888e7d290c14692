@@ -1,0 +1,10 @@
+Code-Review+1: Shu Muto <shu-mutou@rf.jp.nec.com>
+Code-Review+1: Kenji Yasui <k-yasui@ti.jp.nec.com>
+Code-Review+2: Joshua Harlow <harlowja@yahoo-inc.com>
+Workflow+1: Joshua Harlow <harlowja@yahoo-inc.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 25 Jan 2016 22:41:25 +0000
+Reviewed-on: https://review.openstack.org/264501
+Project: openstack/doc8
+Branch: refs/heads/master

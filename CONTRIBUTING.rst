@@ -10,3 +10,6 @@ the workflow documented at:
    http://docs.openstack.org/infra/manual/developers.html#development-workflow
 
 Pull requests submitted through GitHub will be ignored.
+You can report the bugs at launchpad.
+
+   https://bugs.launchpad.net/doc8

@@ -1,0 +1,9 @@
+Code-Review+2: Joshua Harlow <harlowja@yahoo-inc.com>
+Code-Review+2: Christian Berendt <christian@berendt.io>
+Workflow+1: Christian Berendt <christian@berendt.io>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 29 Jan 2016 12:28:51 +0000
+Reviewed-on: https://review.openstack.org/271757
+Project: openstack/doc8
+Branch: refs/heads/master

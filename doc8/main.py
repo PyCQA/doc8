@@ -176,7 +176,8 @@ def setup_logging(verbose):
 
 
 def scan(cfg):
-    print("Scanning...")
+    if not cfg.get('quiet'):
+        print("Scanning...")
     files = collections.deque()
     ignored_paths = cfg.get('ignore_path', [])
     files_ignored = 0
@@ -200,7 +201,8 @@ def scan(cfg):
 
 
 def validate(cfg, files):
-    print("Validating...")
+    if not cfg.get('quiet'):
+        print("Validating...")
     error_counts = {}
     ignoreables = frozenset(cfg.get('ignore', []))
     ignore_targeted = cfg.get('ignore_path_errors', {})
@@ -325,6 +327,8 @@ def main():
                         help="check file extensions of the given type"
                              " (default: %s)." % ", ".join(FILE_PATTERNS),
                         default=list(FILE_PATTERNS))
+    parser.add_argument("-q", "--quiet", action='store_true',
+                        help="only print violations", default=False)
     parser.add_argument("-v", "--verbose", dest="verbose", action='store_true',
                         help="run in verbose mode.", default=False)
     parser.add_argument("--version", dest="version", action='store_true',
@@ -358,15 +362,17 @@ def main():
     error_counts = validate(args, files)
     total_errors = sum(six.itervalues(error_counts))
 
-    print("=" * 8)
-    print("Total files scanned = %s" % (files_selected))
-    print("Total files ignored = %s" % (files_ignored))
-    print("Total accumulated errors = %s" % (total_errors))
-    if error_counts:
-        print("Detailed error counts:")
-        for check_name in sorted(six.iterkeys(error_counts)):
-            check_errors = error_counts[check_name]
-            print("    - %s = %s" % (check_name, check_errors))
+    if not args.get('quiet'):
+        print("=" * 8)
+        print("Total files scanned = %s" % (files_selected))
+        print("Total files ignored = %s" % (files_ignored))
+        print("Total accumulated errors = %s" % (total_errors))
+        if error_counts:
+            print("Detailed error counts:")
+            for check_name in sorted(six.iterkeys(error_counts)):
+                check_errors = error_counts[check_name]
+                print("    - %s = %s" % (check_name, check_errors))
+
     if total_errors:
         return 1
     else:

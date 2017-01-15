@@ -73,6 +73,7 @@ Command line usage
       -e extension, --extension extension
                             check file extensions of the given type (default:
                             .rst, .txt).
+      -q, --quiet           only print violations
       -v, --verbose         run in verbose mode.
       --version             show the version and exit.
 

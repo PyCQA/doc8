@@ -342,13 +342,12 @@ def main():
     args['ignore_path'].extend(cfg.pop('ignore_path', []))
 
     cfg.setdefault('ignore_path_errors', {})
-    for tmp_ignore_path_error in args.pop('ignore_path_errors', []):
-        tmp_ignores = parse_ignore_path_errors(tmp_ignore_path_error)
-        for path, ignores in six.iteritems(tmp_ignores):
-            if path in cfg['ignore_path_errors']:
-                cfg['ignore_path_errors'][path].update(ignores)
-            else:
-                cfg['ignore_path_errors'][path] = set(ignores)
+    tmp_ignores = parse_ignore_path_errors(args.pop('ignore_path_errors', []))
+    for path, ignores in six.iteritems(tmp_ignores):
+        if path in cfg['ignore_path_errors']:
+            cfg['ignore_path_errors'][path].update(ignores)
+        else:
+            cfg['ignore_path_errors'][path] = set(ignores)
 
     args.update(cfg)
     setup_logging(args.get('verbose'))

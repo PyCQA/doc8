@@ -64,13 +64,6 @@ def split_set_type(text, delimiter=","):
     return set([i.strip() for i in text.split(delimiter) if i.strip()])
 
 
-def merge_sets(sets):
-    m = set()
-    for s in sets:
-        m.update(s)
-    return m
-
-
 def parse_ignore_path_errors(entries):
     ignore_path_errors = collections.defaultdict(set)
     for path in entries:
@@ -333,7 +326,6 @@ def main():
     if args.get('version'):
         print(version.version_string())
         return 0
-    args['ignore'] = merge_sets(args['ignore'])
     cfg = extract_config(args)
     args['ignore'].update(cfg.pop("ignore", set()))
     if 'sphinx' in cfg:

@@ -75,7 +75,7 @@ def parse_ignore_path_errors(entries):
     ignore_path_errors = collections.defaultdict(set)
     for path in entries:
         path, ignored_errors = path.split(";", 1)
-        path = os.path.abspath(path.strip())
+        path = path.strip()
         ignored_errors = split_set_type(ignored_errors, delimiter=";")
         ignore_path_errors[path].update(ignored_errors)
     return dict(ignore_path_errors)

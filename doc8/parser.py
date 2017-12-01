@@ -116,7 +116,7 @@ class ParsedFile(object):
             if not encoding:
                 encoding = self.FALLBACK_ENCODING
             self._encoding = encoding
-        return self._encoding
+        return self.FALLBACK_ENCODING
 
     @property
     def raw_contents(self):

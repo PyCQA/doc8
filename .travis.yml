@@ -18,9 +18,12 @@ before_install:
 jobs:
   fast_finish: true
   include:
-    - name: pep8
-      env: TOXENV=pep8
-      python: "3.5"
+    - name: pep8,docs,py37
+      env: TOXENV=pep8,docs
+      python: "3.7"
+    - name: py36
+      python: "3.6"
+      env: TOXENV=py36
     - name: py35
       python: "3.5"
       env: TOXENV=py35

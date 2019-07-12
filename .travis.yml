@@ -1,0 +1,39 @@
+---
+dist: xenial
+language: python
+
+branches:
+  only:
+    - master
+    - /[0-9]+\.[0-9]+\.[0-9]+(.*)?$/
+
+cache:
+  - pip
+  - directories:
+      - $HOME/.cache
+os:
+  - linux
+before_install:
+  - which tox >/dev/null || if [ -z ${VIRTUAL_ENV+x} ]; then python -m pip install --user tox tox-pyenv; else python -m pip install tox tox-pyenv; fi
+jobs:
+  fast_finish: true
+  include:
+    - name: pep8
+      env: TOXENV=pep8
+      python: "3.5"
+    - name: py35
+      python: "3.5"
+      env: TOXENV=py35
+    - name: py27
+      python: "2.7"
+      env: TOXENV=py27
+    - stage: deploy
+      name: deploy
+      if: tag IS present AND type != cron
+      env: TOXENV=upload
+script:
+  - python -m tox
+
+env:
+  global:
+    - PIP_DISABLE_PIP_VERSION_CHECK=1

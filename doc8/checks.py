@@ -1,7 +1,5 @@
 # Copyright (C) 2014 Ivan Melnikov <iv at altlinux dot org>
 #
-# Author: Joshua Harlow <harlowja@yahoo-inc.com>
-#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -45,7 +43,7 @@ class LineCheck(object):
 
 
 class CheckTrailingWhitespace(LineCheck):
-    _TRAILING_WHITESPACE_REGEX = re.compile('\s$')
+    _TRAILING_WHITESPACE_REGEX = re.compile(r'\s$')
     REPORTS = frozenset(["D002"])
 
     def report_iter(self, line):
@@ -54,7 +52,7 @@ class CheckTrailingWhitespace(LineCheck):
 
 
 class CheckIndentationNoTab(LineCheck):
-    _STARTING_WHITESPACE_REGEX = re.compile('^(\s+)')
+    _STARTING_WHITESPACE_REGEX = re.compile(r'^(\s+)')
     REPORTS = frozenset(["D003"])
 
     def report_iter(self, line):

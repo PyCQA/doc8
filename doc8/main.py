@@ -36,11 +36,6 @@ import logging
 import os
 import sys
 
-if __name__ == '__main__':
-    # Only useful for when running directly (for dev/debugging).
-    sys.path.insert(0, os.path.abspath(os.getcwd()))
-    sys.path.insert(0, os.path.abspath(os.path.join(os.pardir, os.getcwd())))
-
 import six
 from six.moves import configparser
 from stevedore import extension

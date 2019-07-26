@@ -1,15 +1,8 @@
-If you would like to contribute to the development of OpenStack,
-you must follow the steps in this page:
+Before contributing to *doc8* or any other PyCQA project, we suggest you read
+the PyCQA meta documentation:
 
-   http://docs.openstack.org/infra/manual/developers.html
+   http://meta.pycqa.org/en/latest/
 
-Once those steps have been completed, changes to OpenStack
-should be submitted for review via the Gerrit tool, following
-the workflow documented at:
+Patches for *doc8* should be submitted to GitHub, as should bugs:
 
-   http://docs.openstack.org/infra/manual/developers.html#development-workflow
-
-Pull requests submitted through GitHub will be ignored.
-You can report the bugs at launchpad.
-
-   https://bugs.launchpad.net/doc8
+   https://github.com/pycqa/doc8

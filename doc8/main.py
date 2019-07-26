@@ -1,7 +1,5 @@
 # Copyright (C) 2014 Ivan Melnikov <iv at altlinux dot org>
 #
-# Author: Joshua Harlow <harlowja@yahoo-inc.com>
-#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -330,7 +328,7 @@ def main():
                         help="show the version and exit.", default=False)
     args = vars(parser.parse_args())
     if args.get('version'):
-        print(version.version_string())
+        print(version.version_string)
         return 0
     args['ignore'] = merge_sets(args['ignore'])
     cfg = extract_config(args)

@@ -1,0 +1,2 @@
+sphinx>=1.8.0 # BSD
+sphinx_rtd_theme>=0.4.0 # MIT

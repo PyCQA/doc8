@@ -1,8 +1,15 @@
-sudo: false
+---
+dist: xenial
 language: python
-cache: pip
+cache:
+  - pip
+  - directories:
+      - $HOME/.cache
+os:
+  - linux
+# tox 3.8.0 is the first version that can boostrap itself
 before_script:
-  - pip install tox
+  - pip install tox>=3.8.0
 
 # test script
 script:  tox
@@ -10,19 +17,22 @@ notifications:
   on_success: change
   on_failure: always
 
-matrix:
+jobs:
+  fast_finish: true
   include:
-    - python: 2.7
-      env: TOXENV=py27
-    - python: 3.5
-      env: TOXENV=py35
-    - python: 3.6
+    - name: pep8,docs,py37
+      env: TOXENV=pep8,docs
+      python: "3.7"
+    - name: py36
+      python: "3.6"
       env: TOXENV=py36
-    - python: 3.7
-      env: TOXENV=py37
-    - python: pypy
-      env: TOXENV=pypy
-    - python: 3.5
-      env: TOXENV=style
-    - python: 3.5
-      env: TOXENV=docs
+    - name: py35
+      python: "3.5"
+      env: TOXENV=py35
+    - name: py27
+      python: "2.7"
+      env: TOXENV=py27
+
+env:
+  global:
+    - PIP_DISABLE_PIP_VERSION_CHECK=1

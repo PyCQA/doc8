@@ -1,3 +1,13 @@
+.. image:: https://travis-ci.com/PyCQA/doc8.svg?branch=master
+    :target: https://travis-ci.com/PyCQA/doc8
+.. image:: https://img.shields.io/pypi/v/doc8
+    :alt: PyPI
+    :target: https://pypi.org/project/doc8/
+.. image:: https://img.shields.io/pypi/l/doc8
+    :alt: PyPI - License
+.. image:: https://img.shields.io/github/last-commit/pycqa/doc8
+    :alt: GitHub last commit
+
 ====
 Doc8
 ====

@@ -17,4 +17,4 @@ import sys
 from doc8 import main
 
 
-sys.exit(main())
+sys.exit(main.main())

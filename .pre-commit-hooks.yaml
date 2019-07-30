@@ -3,9 +3,9 @@
 # For use with pre-commit.
 # See usage instructions at http://pre-commit.com
 
--   id: doc8
-    name: doc8
-    description: This hook runs doc8 for linting docs
-    entry: python -m doc8
-    language: python
-    files: \.rst$
+- id: doc8
+  name: doc8
+  description: This hook runs doc8 for linting docs
+  entry: python -m doc8
+  language: python
+  files: \.rst$

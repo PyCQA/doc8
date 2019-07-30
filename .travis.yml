@@ -20,8 +20,8 @@ notifications:
 jobs:
   fast_finish: true
   include:
-    - name: pep8,docs,py37
-      env: TOXENV=pep8,docs
+    - name: lint,docs,py37
+      env: TOXENV=lint,docs
       python: "3.7"
     - name: py36
       python: "3.6"

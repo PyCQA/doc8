@@ -1,11 +1,19 @@
 ---
-
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v2.2.3  # Use the ref you want to point at
-  hooks:
-  - id: trailing-whitespace
-  - id: check-yaml
-  - id: end-of-file-fixer
-  - id: flake8
-  - id: trailing-whitespace
-  - id: check-executables-have-shebangs
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks.git
+    rev: v2.3.0  # Use the ref you want to point at
+    hooks:
+    - id: trailing-whitespace
+    - id: check-yaml
+    - id: end-of-file-fixer
+    - id: flake8
+    - id: trailing-whitespace
+    - id: check-executables-have-shebangs
+  - repo: https://github.com/python/black
+    rev: 19.3b0
+    hooks:
+      - id: black
+  - repo: https://gitlab.com/pycqa/flake8.git
+    rev: 3.7.8
+    hooks:
+      - id: flake8

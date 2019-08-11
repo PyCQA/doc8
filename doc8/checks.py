@@ -43,24 +43,24 @@ class LineCheck(object):
 
 
 class CheckTrailingWhitespace(LineCheck):
-    _TRAILING_WHITESPACE_REGEX = re.compile(r'\s$')
+    _TRAILING_WHITESPACE_REGEX = re.compile(r"\s$")
     REPORTS = frozenset(["D002"])
 
     def report_iter(self, line):
         if self._TRAILING_WHITESPACE_REGEX.search(line):
-            yield ('D002', 'Trailing whitespace')
+            yield ("D002", "Trailing whitespace")
 
 
 class CheckIndentationNoTab(LineCheck):
-    _STARTING_WHITESPACE_REGEX = re.compile(r'^(\s+)')
+    _STARTING_WHITESPACE_REGEX = re.compile(r"^(\s+)")
     REPORTS = frozenset(["D003"])
 
     def report_iter(self, line):
         match = self._STARTING_WHITESPACE_REGEX.search(line)
         if match:
             spaces = match.group(1)
-            if '\t' in spaces:
-                yield ('D003', 'Tabulation used for indentation')
+            if "\t" in spaces:
+                yield ("D003", "Tabulation used for indentation")
 
 
 class CheckCarriageReturn(LineCheck):
@@ -68,7 +68,7 @@ class CheckCarriageReturn(LineCheck):
 
     def report_iter(self, line):
         if "\r" in line:
-            yield ('D004', 'Found literal carriage return')
+            yield ("D004", "Found literal carriage return")
 
 
 class CheckNewlineEndOfFile(ContentCheck):
@@ -78,8 +78,8 @@ class CheckNewlineEndOfFile(ContentCheck):
         super(CheckNewlineEndOfFile, self).__init__(cfg)
 
     def report_iter(self, parsed_file):
-        if parsed_file.lines and not parsed_file.lines[-1].endswith(b'\n'):
-            yield (len(parsed_file.lines), 'D005', 'No newline at end of file')
+        if parsed_file.lines and not parsed_file.lines[-1].endswith(b"\n"):
+            yield (len(parsed_file.lines), "D005", "No newline at end of file")
 
 
 class CheckValidity(ContentCheck):
@@ -96,15 +96,15 @@ class CheckValidity(ContentCheck):
 
     # Only used when running in sphinx mode.
     SPHINX_IGNORES_REGEX = [
-        re.compile(r'^Unknown interpreted text'),
-        re.compile(r'^Unknown directive type'),
-        re.compile(r'^Undefined substitution'),
-        re.compile(r'^Substitution definition contains illegal element'),
+        re.compile(r"^Unknown interpreted text"),
+        re.compile(r"^Unknown directive type"),
+        re.compile(r"^Undefined substitution"),
+        re.compile(r"^Substitution definition contains illegal element"),
     ]
 
     def __init__(self, cfg):
         super(CheckValidity, self).__init__(cfg)
-        self._sphinx_mode = cfg.get('sphinx')
+        self._sphinx_mode = cfg.get("sphinx")
 
     def report_iter(self, parsed_file):
         for error in parsed_file.errors:
@@ -117,7 +117,7 @@ class CheckValidity(ContentCheck):
                         ignore = True
                         break
             if not ignore:
-                yield (error.line, 'D000', error.message)
+                yield (error.line, "D000", error.message)
 
 
 class CheckMaxLineLength(ContentCheck):
@@ -125,11 +125,10 @@ class CheckMaxLineLength(ContentCheck):
 
     def __init__(self, cfg):
         super(CheckMaxLineLength, self).__init__(cfg)
-        self._max_line_length = self._cfg['max_line_length']
-        self._allow_long_titles = self._cfg['allow_long_titles']
+        self._max_line_length = self._cfg["max_line_length"]
+        self._allow_long_titles = self._cfg["allow_long_titles"]
 
     def _extract_node_lines(self, doc):
-
         def extract_lines(node, start_line):
             lines = [start_line]
             if isinstance(node, (docutils_nodes.title)):
@@ -169,12 +168,10 @@ class CheckMaxLineLength(ContentCheck):
             if first_line == -1:
                 first_line = line
             contained_lines = set(gather_lines(n))
-            nodes_lines.append((n, (min(contained_lines),
-                                    max(contained_lines))))
+            nodes_lines.append((n, (min(contained_lines), max(contained_lines))))
         return (nodes_lines, first_line)
 
     def _extract_directives(self, lines):
-
         def starting_whitespace(line):
             m = re.match(r"^(\s+)(.*)$", line)
             if not m:
@@ -185,7 +182,7 @@ class CheckMaxLineLength(ContentCheck):
             return bool(re.match(r"^(\s*)$", line))
 
         def find_directive_end(start, lines):
-            after_lines = collections.deque(lines[start + 1:])
+            after_lines = collections.deque(lines[start + 1 :])
             k = 0
             while after_lines:
                 line = after_lines.popleft()
@@ -218,8 +215,9 @@ class CheckMaxLineLength(ContentCheck):
             # if line is a list, line is checked as normal line
             if re.match(listspattern, line):
                 continue
-            if (len(re.search(lwhitespaces, line).group()) <
-                    len(re.search(lwhitespaces, next_line).group())):
+            if len(re.search(lwhitespaces, line).group()) < len(
+                re.search(lwhitespaces, next_line).group()
+            ):
                 directives.append((i, i))
 
         return directives
@@ -228,7 +226,7 @@ class CheckMaxLineLength(ContentCheck):
         for i, line in enumerate(parsed_file.lines_iter()):
             if len(line) > self._max_line_length:
                 if not utils.contains_url(line):
-                    yield (i + 1, 'D001', 'Line too long')
+                    yield (i + 1, "D001", "Line too long")
 
     def _rst_checker(self, parsed_file):
         lines = list(parsed_file.lines_iter())
@@ -260,10 +258,7 @@ class CheckMaxLineLength(ContentCheck):
         def any_types(nodes, types):
             return any([isinstance(n, types) for n in nodes])
 
-        skip_types = (
-            docutils_nodes.target,
-            docutils_nodes.literal_block,
-        )
+        skip_types = (docutils_nodes.target, docutils_nodes.literal_block)
         title_types = (
             docutils_nodes.title,
             docutils_nodes.subtitle,
@@ -279,7 +274,7 @@ class CheckMaxLineLength(ContentCheck):
                 if in_directive:
                     continue
                 stripped = line.lstrip()
-                if ' ' not in stripped:
+                if " " not in stripped:
                     # No room to split even if we could.
                     continue
                 if utils.contains_url(stripped):
@@ -289,10 +284,10 @@ class CheckMaxLineLength(ContentCheck):
                     continue
                 if self._allow_long_titles and any_types(nodes, title_types):
                     continue
-                yield (i + 1, 'D001', 'Line too long')
+                yield (i + 1, "D001", "Line too long")
 
     def report_iter(self, parsed_file):
-        if parsed_file.extension.lower() != '.rst':
+        if parsed_file.extension.lower() != ".rst":
             checker_func = self._txt_checker
         else:
             checker_func = self._rst_checker

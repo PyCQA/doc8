@@ -16,9 +16,11 @@
 
 try:
     from pbr import version as pbr_version
-    _version_info = pbr_version.VersionInfo('doc8')
+
+    _version_info = pbr_version.VersionInfo("doc8")
     version_string = _version_info.version_string()
 except ImportError:
     import pkg_resources
-    _version_info = pkg_resources.get_distribution('doc8')
+
+    _version_info = pkg_resources.get_distribution("doc8")
     version_string = _version_info.version

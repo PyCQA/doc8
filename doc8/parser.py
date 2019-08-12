@@ -25,9 +25,9 @@ import six
 
 
 class ParsedFile(object):
-    FALLBACK_ENCODING = 'utf-8'
+    FALLBACK_ENCODING = "utf-8"
 
-    def __init__(self, filename, encoding=None, default_extension=''):
+    def __init__(self, filename, encoding=None, default_extension=""):
         self._filename = filename
         self._content = None
         self._raw_content = None
@@ -58,19 +58,20 @@ class ParsedFile(object):
             parser_cls = docutils_parser.get_parser_class("rst")
             parser = parser_cls()
             defaults = {
-                'halt_level': 5,
-                'report_level': 5,
-                'quiet': True,
-                'file_insertion_enabled': False,
-                'traceback': True,
+                "halt_level": 5,
+                "report_level": 5,
+                "quiet": True,
+                "file_insertion_enabled": False,
+                "traceback": True,
                 # Development use only.
-                'dump_settings': False,
-                'dump_internals': False,
-                'dump_transforms': False,
+                "dump_settings": False,
+                "dump_internals": False,
+                "dump_transforms": False,
             }
             opt = frontend.OptionParser(components=[parser], defaults=defaults)
-            doc = utils.new_document(source_path=self.filename,
-                                     settings=opt.get_default_values())
+            doc = utils.new_document(
+                source_path=self.filename, settings=opt.get_default_values()
+            )
             parser.parse(self.contents, doc)
             self._doc = doc
         return self._doc
@@ -80,7 +81,7 @@ class ParsedFile(object):
             return
         with self._read_lock:
             if not self._has_read:
-                with open(self.filename, 'rb') as fh:
+                with open(self.filename, "rb") as fh:
                     self._lines = list(fh)
                     fh.seek(0)
                     self._raw_content = fh.read()
@@ -110,7 +111,7 @@ class ParsedFile(object):
     @property
     def encoding(self):
         if not self._encoding:
-            encoding = chardet.detect(self.raw_contents)['encoding']
+            encoding = chardet.detect(self.raw_contents)["encoding"]
             if not encoding:
                 encoding = self.FALLBACK_ENCODING
             self._encoding = encoding
@@ -124,19 +125,19 @@ class ParsedFile(object):
     @property
     def contents(self):
         if self._content is None:
-            self._content = six.text_type(self.raw_contents,
-                                          encoding=self.encoding)
+            self._content = six.text_type(self.raw_contents, encoding=self.encoding)
         return self._content
 
     def __str__(self):
         return "%s (%s, %s chars, %s lines)" % (
-            self.filename, self.encoding, len(self.contents),
-            len(list(self.lines_iter())))
+            self.filename,
+            self.encoding,
+            len(self.contents),
+            len(list(self.lines_iter())),
+        )
 
 
-def parse(filename, encoding=None, default_extension=''):
+def parse(filename, encoding=None, default_extension=""):
     if not os.path.isfile(filename):
-        raise IOError(errno.ENOENT, 'File not found', filename)
-    return ParsedFile(filename,
-                      encoding=encoding,
-                      default_extension=default_extension)
+        raise IOError(errno.ENOENT, "File not found", filename)
+    return ParsedFile(filename, encoding=encoding, default_extension=default_extension)

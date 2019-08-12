@@ -73,11 +73,8 @@ test
         content += b"\n\n"
         content += (b"a" * 60) + b" " + (b"b" * 60)
         content += b"\n"
-        conf = {
-            'max_line_length': 79,
-            'allow_long_titles': True,
-        }
-        for ext in ['.rst', '.txt']:
+        conf = {"max_line_length": 79, "allow_long_titles": True}
+        for ext in [".rst", ".txt"]:
             with tempfile.NamedTemporaryFile(suffix=ext) as fh:
                 fh.write(content)
                 fh.flush()
@@ -90,36 +87,34 @@ test
                 self.assertIn(code, check.REPORTS)
 
     def test_correct_length(self):
-        conf = {
-            'max_line_length': 79,
-            'allow_long_titles': True,
-        }
-        with tempfile.NamedTemporaryFile(suffix='.rst') as fh:
-            fh.write(b'known exploit in the wild, for example'
-                     b' \xe2\x80\x93 the time'
-                     b' between advance notification')
+        conf = {"max_line_length": 79, "allow_long_titles": True}
+        with tempfile.NamedTemporaryFile(suffix=".rst") as fh:
+            fh.write(
+                b"known exploit in the wild, for example"
+                b" \xe2\x80\x93 the time"
+                b" between advance notification"
+            )
             fh.flush()
 
-            parsed_file = parser.ParsedFile(fh.name, encoding='utf-8')
+            parsed_file = parser.ParsedFile(fh.name, encoding="utf-8")
             check = checks.CheckMaxLineLength(conf)
             errors = list(check.report_iter(parsed_file))
             self.assertEqual(0, len(errors))
 
     def test_ignore_code_block(self):
-        conf = {
-            'max_line_length': 79,
-            'allow_long_titles': True,
-        }
-        with tempfile.NamedTemporaryFile(suffix='.rst') as fh:
-            fh.write(b'List which contains items with code-block\n'
-                     b'- this is a list item\n\n'
-                     b'  .. code-block:: ini\n\n'
-                     b'     this line exceeds 80 chars but should be ignored'
-                     b'this line exceeds 80 chars but should be ignored'
-                     b'this line exceeds 80 chars but should be ignored')
+        conf = {"max_line_length": 79, "allow_long_titles": True}
+        with tempfile.NamedTemporaryFile(suffix=".rst") as fh:
+            fh.write(
+                b"List which contains items with code-block\n"
+                b"- this is a list item\n\n"
+                b"  .. code-block:: ini\n\n"
+                b"     this line exceeds 80 chars but should be ignored"
+                b"this line exceeds 80 chars but should be ignored"
+                b"this line exceeds 80 chars but should be ignored"
+            )
             fh.flush()
 
-            parsed_file = parser.ParsedFile(fh.name, encoding='utf-8')
+            parsed_file = parser.ParsedFile(fh.name, encoding="utf-8")
             check = checks.CheckMaxLineLength(conf)
             errors = list(check.report_iter(parsed_file))
             self.assertEqual(0, len(errors))
@@ -138,14 +133,11 @@ test
         content += b"\n\n"
         content += b"a" * 100
         content += b"\n"
-        conf = {
-            'max_line_length': 79,
-            'allow_long_titles': True,
-        }
+        conf = {"max_line_length": 79, "allow_long_titles": True}
         # This number is different since rst parsing is aware that titles
         # are allowed to be over-length, while txt parsing is not aware of
         # this fact (since it has no concept of title sections).
-        extensions = [(0, '.rst'), (1, '.txt')]
+        extensions = [(0, ".rst"), (1, ".txt")]
         for expected_errors, ext in extensions:
             with tempfile.NamedTemporaryFile(suffix=ext) as fh:
                 fh.write(content)
@@ -157,18 +149,17 @@ test
                 self.assertEqual(expected_errors, len(errors))
 
     def test_definition_term_length(self):
-        conf = {
-            'max_line_length': 79,
-            'allow_long_titles': True,
-        }
-        with tempfile.NamedTemporaryFile(suffix='.rst') as fh:
-            fh.write(b'Definition List which contains long term.\n\n'
-                     b'looooooooooooooooooooooooooooooong definition term'
-                     b'this line exceeds 80 chars but should be ignored\n'
-                     b' this is a definition\n')
+        conf = {"max_line_length": 79, "allow_long_titles": True}
+        with tempfile.NamedTemporaryFile(suffix=".rst") as fh:
+            fh.write(
+                b"Definition List which contains long term.\n\n"
+                b"looooooooooooooooooooooooooooooong definition term"
+                b"this line exceeds 80 chars but should be ignored\n"
+                b" this is a definition\n"
+            )
             fh.flush()
 
-            parsed_file = parser.ParsedFile(fh.name, encoding='utf-8')
+            parsed_file = parser.ParsedFile(fh.name, encoding="utf-8")
             check = checks.CheckMaxLineLength(conf)
             errors = list(check.report_iter(parsed_file))
             self.assertEqual(0, len(errors))
@@ -176,10 +167,12 @@ test
 
 class TestNewlineEndOfFile(testtools.TestCase):
     def test_newline(self):
-        tests = [(1, b"testing"),
-                 (1, b"testing\ntesting"),
-                 (0, b"testing\n"),
-                 (0, b"testing\ntesting\n")]
+        tests = [
+            (1, b"testing"),
+            (1, b"testing\ntesting"),
+            (0, b"testing\n"),
+            (0, b"testing\ntesting\n"),
+        ]
 
         for expected_errors, line in tests:
             with tempfile.NamedTemporaryFile() as fh:

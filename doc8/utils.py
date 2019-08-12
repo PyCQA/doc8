@@ -53,7 +53,7 @@ def find_files(paths, extensions, ignored_paths):
                     if extension_matches(path):
                         yield (path, path_ignorable(path))
         else:
-            raise IOError('Invalid path: %s' % path)
+            raise IOError("Invalid path: %s" % path)
 
 
 def filtered_traverse(document, filter_func):

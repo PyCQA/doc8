@@ -7,7 +7,7 @@ import shutil
 import sys
 import testtools
 
-from doc8.main import main
+from doc8.main import main, doc8
 
 
 # Location to create test files
@@ -62,6 +62,21 @@ Detailed error counts:
     - doc8.checks.CheckTrailingWhitespace = 1
     - doc8.checks.CheckValidity = 0
 """
+
+OUTPUT_API_REPORT = """\
+{path}/invalid.rst:1: D002 Trailing whitespace
+{path}/invalid.rst:1: D005 No newline at end of file
+========
+Total files scanned = 1
+Total files ignored = 0
+Total accumulated errors = 2
+Detailed error counts:
+    - doc8.checks.CheckCarriageReturn = 0
+    - doc8.checks.CheckIndentationNoTab = 0
+    - doc8.checks.CheckMaxLineLength = 0
+    - doc8.checks.CheckNewlineEndOfFile = 1
+    - doc8.checks.CheckTrailingWhitespace = 1
+    - doc8.checks.CheckValidity = 0"""
 
 
 class Capture(object):
@@ -166,6 +181,51 @@ class TestCommandLine(testtools.TestCase):
         self.assertEqual(state, 1)
 
 
+class TestApi(testtools.TestCase):
+    """
+    Test direct code invocation
+    """
+
+    def test_doc8__defaults__no_output_and_report_as_expected(self):
+        with TmpFs() as tmpfs, Capture() as (out, err):
+            tmpfs.mock()
+            result = doc8(paths=[tmpfs.path])
+
+            self.assertEqual(result.report(), tmpfs.expected(OUTPUT_API_REPORT))
+            self.assertEqual(
+                result.errors,
+                [
+                    (
+                        "doc8.checks.CheckTrailingWhitespace",
+                        "{}/invalid.rst".format(tmpfs.path),
+                        1,
+                        "D002",
+                        "Trailing whitespace",
+                    ),
+                    (
+                        "doc8.checks.CheckNewlineEndOfFile",
+                        "{}/invalid.rst".format(tmpfs.path),
+                        1,
+                        "D005",
+                        "No newline at end of file",
+                    ),
+                ],
+            )
+            self.assertEqual(out.getvalue(), "")
+            self.assertEqual(err.getvalue(), "")
+        self.assertEqual(result.total_errors, 2)
+
+    def test_doc8__verbose__verbose_overridden(self):
+        with TmpFs() as tmpfs, Capture() as (out, err):
+            tmpfs.mock()
+            result = doc8(paths=[tmpfs.path], verbose=True)
+
+            self.assertEqual(result.report(), tmpfs.expected(OUTPUT_API_REPORT))
+            self.assertEqual(out.getvalue(), "")
+            self.assertEqual(err.getvalue(), "")
+        self.assertEqual(result.total_errors, 2)
+
+
 class TestArguments(testtools.TestCase):
     """
     Test that arguments are parsed correctly
@@ -192,30 +252,9 @@ class TestArguments(testtools.TestCase):
         args.update(kwargs)
         return args
 
-    def test_get_args__get_defaults__correct_characteristics(self):
-        # Just checking a dict is a dict, but confirms nothing silly has happened so we can make assumptions about get_args in other tests
-        self.assertEqual(
-            self.get_args(),
-            {
-                "paths": [os.getcwd()],
-                "config": [],
-                "allow_long_titles": False,
-                "ignore": set(),
-                "sphinx": True,
-                "ignore_path": [],
-                "ignore_path_errors": {},
-                "default_extension": "",
-                "file_encoding": "",
-                "max_line_length": 79,
-                "extension": [".rst", ".txt"],
-                "quiet": False,
-                "verbose": False,
-                "version": False,
-            },
-        )
-
     def test_get_args__override__value_overridden(self):
-        # Again, just confirm nothing silly happening
+        # Just checking a dict is a dict, but confirms nothing silly has happened
+        # so we can make assumptions about get_args in other tests
         self.assertEqual(
             self.get_args(paths=["/tmp/does/not/exist"]),
             {
@@ -256,7 +295,7 @@ class TestArguments(testtools.TestCase):
         mock_scan = MagicMock(return_value=([], 0))
         mock_config = MagicMock(return_value={})
         with patch("doc8.main.scan", mock_scan), patch(
-            "doc8.main.extract_config", mock_config,
+            "doc8.main.extract_config", mock_config
         ), patch(
             "argparse._sys.argv", ["doc8", "--config", "path1", "--config", "path2"]
         ):

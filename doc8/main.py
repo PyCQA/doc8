@@ -186,7 +186,7 @@ def scan(cfg):
     return (files, files_ignored)
 
 
-def validate(cfg, files):
+def validate(cfg, files, result=None):
     if not cfg.get("quiet"):
         print("Validating...")
     error_counts = {}
@@ -239,8 +239,9 @@ def validate(cfg, files):
                         print(
                             "    - %s:%s: %s %s" % (f.filename, line_num, code, message)
                         )
-                    else:
+                    elif not result.capture:
                         print("%s:%s: %s %s" % (f.filename, line_num, code, message))
+                    result.error(check_name, f.filename, line_num, code, message)
                     error_counts[check_name] += 1
             elif isinstance(c, checks.LineCheck):
                 for line_num, line in enumerate(f.lines_iter(), 1):
@@ -252,136 +253,90 @@ def validate(cfg, files):
                                 "    - %s:%s: %s %s"
                                 % (f.filename, line_num, code, message)
                             )
-                        else:
+                        elif not result.capture:
                             print(
                                 "%s:%s: %s %s" % (f.filename, line_num, code, message)
                             )
+                        result.error(check_name, f.filename, line_num, code, message)
                         error_counts[check_name] += 1
             else:
                 raise TypeError("Unknown check type: %s, %s" % (type(c), c))
     return error_counts
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        prog="doc8",
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    default_configs = ", ".join(CONFIG_FILENAMES)
-    parser.add_argument(
-        "paths",
-        metavar="path",
-        type=str,
-        nargs="*",
-        help=("path to scan for doc files" " (default: current directory)."),
-        default=[os.getcwd()],
-    )
-    parser.add_argument(
-        "--config",
-        metavar="path",
-        action="append",
-        help="user config file location" " (default: %s)." % default_configs,
-        default=[],
-    )
-    parser.add_argument(
-        "--allow-long-titles",
-        action="store_true",
-        help="allow long section titles (default: false).",
-        default=False,
-    )
-    parser.add_argument(
-        "--ignore",
-        action="append",
-        metavar="code",
-        help="ignore the given error code(s).",
-        type=split_set_type,
-        default=[],
-    )
-    parser.add_argument(
-        "--no-sphinx",
-        action="store_false",
-        help="do not ignore sphinx specific false positives.",
-        default=True,
-        dest="sphinx",
-    )
-    parser.add_argument(
-        "--ignore-path",
-        action="append",
-        default=[],
-        help="ignore the given directory or file (globs" " are supported).",
-        metavar="path",
-    )
-    parser.add_argument(
-        "--ignore-path-errors",
-        action="append",
-        default=[],
-        help="ignore the given specific errors in the" " provided file.",
-        metavar="path",
-    )
-    parser.add_argument(
-        "--default-extension",
-        action="store",
-        help="default file extension to use when a file is"
-        " found without a file extension.",
-        default="",
-        dest="default_extension",
-        metavar="extension",
-    )
-    parser.add_argument(
-        "--file-encoding",
-        action="store",
-        help="override encoding to use when attempting"
-        " to determine an input files text encoding "
-        "(providing this avoids using `chardet` to"
-        " automatically detect encoding/s)",
-        default="",
-        dest="file_encoding",
-        metavar="encoding",
-    )
-    parser.add_argument(
-        "--max-line-length",
-        action="store",
-        metavar="int",
-        type=int,
-        help="maximum allowed line" " length (default: %s)." % MAX_LINE_LENGTH,
-        default=MAX_LINE_LENGTH,
-    )
-    parser.add_argument(
-        "-e",
-        "--extension",
-        action="append",
-        metavar="extension",
-        help="check file extensions of the given type"
-        " (default: %s)." % ", ".join(FILE_PATTERNS),
-        default=list(FILE_PATTERNS),
-    )
-    parser.add_argument(
-        "-q",
-        "--quiet",
-        action="store_true",
-        help="only print violations",
-        default=False,
-    )
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        dest="verbose",
-        action="store_true",
-        help="run in verbose mode.",
-        default=False,
-    )
-    parser.add_argument(
-        "--version",
-        dest="version",
-        action="store_true",
-        help="show the version and exit.",
-        default=False,
-    )
-    args = vars(parser.parse_args())
-    if args.get("version"):
-        print(version.version_string)
-        return 0
+def get_defaults():
+    return {
+        "paths": [os.getcwd()],
+        "config": [],
+        "allow_long_titles": False,
+        "ignore": [],
+        "sphinx": True,
+        "ignore_path": [],
+        "ignore_path_errors": [],
+        "default_extension": "",
+        "file_encoding": "",
+        "max_line_length": MAX_LINE_LENGTH,
+        "extension": list(FILE_PATTERNS),
+        "quiet": False,
+        "verbose": False,
+        "version": False,
+    }
+
+
+class Result(object):
+    def __init__(self):
+        self.files_selected = 0
+        self.files_ignored = 0
+        self.error_counts = {}
+        self.errors = []
+        self.capture = False
+
+    @property
+    def total_errors(self):
+        return len(self.errors)
+
+    def error(self, check_name, filename, line_num, code, message):
+        self.errors.append((check_name, filename, line_num, code, message))
+
+    def finish(self, files_selected, files_ignored, error_counts):
+        self.files_selected = files_selected
+        self.files_ignored = files_ignored
+        self.error_counts = error_counts
+
+    def report(self):
+        lines = []
+        if self.capture:
+            for error in self.errors:
+                lines.append("%s:%s: %s %s" % error[1:])
+
+        lines.extend(
+            [
+                "=" * 8,
+                "Total files scanned = %s" % (self.files_selected),
+                "Total files ignored = %s" % (self.files_ignored),
+                "Total accumulated errors = %s" % (self.total_errors),
+            ]
+        )
+
+        if self.error_counts:
+            lines.append("Detailed error counts:")
+            for check_name in sorted(six.iterkeys(self.error_counts)):
+                check_errors = self.error_counts[check_name]
+                lines.append("    - %s = %s" % (check_name, check_errors))
+
+        return "\n".join(lines)
+
+
+def doc8(args=None, **kwargs):
+    result = Result()
+    if args is None:
+        args = get_defaults()
+
+        # Force reporting to suppress all output
+        kwargs["quiet"] = True
+        kwargs["verbose"] = False
+        result.capture = True
+
     args["ignore"] = merge_sets(args["ignore"])
     cfg = extract_config(args)
     args["ignore"].update(cfg.pop("ignore", set()))
@@ -399,25 +354,148 @@ def main():
             cfg["ignore_path_errors"][path] = set(ignores)
 
     args.update(cfg)
+
+    # Override args with any kwargs
+    args.update(kwargs.items())
     setup_logging(args.get("verbose"))
 
     files, files_ignored = scan(args)
     files_selected = len(files)
-    error_counts = validate(args, files)
-    total_errors = sum(six.itervalues(error_counts))
+
+    error_counts = validate(args, files, result=result)
+    result.finish(files_selected, files_ignored, error_counts)
+    return result
+
+
+def main():
+    defaults = get_defaults()
+    parser = argparse.ArgumentParser(
+        prog="doc8",
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "paths",
+        metavar="path",
+        type=str,
+        nargs="*",
+        help=("path to scan for doc files (default: current directory)."),
+        default=defaults["paths"],
+    )
+    parser.add_argument(
+        "--config",
+        metavar="path",
+        action="append",
+        help="user config file location"
+        " (default: %s)." % ", ".join(CONFIG_FILENAMES),
+        default=defaults["config"],
+    )
+    parser.add_argument(
+        "--allow-long-titles",
+        action="store_true",
+        help="allow long section titles (default: false).",
+        default=defaults["allow_long_titles"],
+    )
+    parser.add_argument(
+        "--ignore",
+        action="append",
+        metavar="code",
+        help="ignore the given error code(s).",
+        type=split_set_type,
+        default=defaults["ignore"],
+    )
+    parser.add_argument(
+        "--no-sphinx",
+        action="store_false",
+        help="do not ignore sphinx specific false positives.",
+        default=defaults["sphinx"],
+        dest="sphinx",
+    )
+    parser.add_argument(
+        "--ignore-path",
+        action="append",
+        default=defaults["ignore_path"],
+        help="ignore the given directory or file (globs are supported).",
+        metavar="path",
+    )
+    parser.add_argument(
+        "--ignore-path-errors",
+        action="append",
+        default=defaults["ignore_path_errors"],
+        help="ignore the given specific errors in the provided file.",
+        metavar="path",
+    )
+    parser.add_argument(
+        "--default-extension",
+        action="store",
+        help="default file extension to use when a file is"
+        " found without a file extension.",
+        default=defaults["default_extension"],
+        dest="default_extension",
+        metavar="extension",
+    )
+    parser.add_argument(
+        "--file-encoding",
+        action="store",
+        help="override encoding to use when attempting"
+        " to determine an input files text encoding "
+        "(providing this avoids using `chardet` to"
+        " automatically detect encoding/s)",
+        default=defaults["file_encoding"],
+        dest="file_encoding",
+        metavar="encoding",
+    )
+    parser.add_argument(
+        "--max-line-length",
+        action="store",
+        metavar="int",
+        type=int,
+        help="maximum allowed line"
+        " length (default: %s)." % defaults["max_line_length"],
+        default=defaults["max_line_length"],
+    )
+    parser.add_argument(
+        "-e",
+        "--extension",
+        action="append",
+        metavar="extension",
+        help="check file extensions of the given type"
+        " (default: %s)." % ", ".join(defaults["extension"]),
+        default=defaults["extension"],
+    )
+    parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help="only print violations",
+        default=defaults["quiet"],
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        dest="verbose",
+        action="store_true",
+        help="run in verbose mode.",
+        default=defaults["verbose"],
+    )
+    parser.add_argument(
+        "--version",
+        dest="version",
+        action="store_true",
+        help="show the version and exit.",
+        default=defaults["version"],
+    )
+    args = vars(parser.parse_args())
+    if args.get("version"):
+        print(version.version_string)
+        return 0
+
+    result = doc8(args)
 
     if not args.get("quiet"):
-        print("=" * 8)
-        print("Total files scanned = %s" % (files_selected))
-        print("Total files ignored = %s" % (files_ignored))
-        print("Total accumulated errors = %s" % (total_errors))
-        if error_counts:
-            print("Detailed error counts:")
-            for check_name in sorted(six.iterkeys(error_counts)):
-                check_errors = error_counts[check_name]
-                print("    - %s = %s" % (check_name, check_errors))
+        print(result.report())
 
-    if total_errors:
+    if result.total_errors:
         return 1
     else:
         return 0

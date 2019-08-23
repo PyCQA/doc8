@@ -114,6 +114,29 @@ An example section that can be placed into one of these files::
 only variation of this being the ``no-sphinx`` option which from
 configuration file will be ``sphinx`` instead).
 
+Python Usage
+************
+
+To call doc8 from a Python project::
+
+    from doc8 import doc8
+
+    result = doc8(allow_long_titles=True, max_line_length=99)
+
+The returned ``result`` will have the following attributes and methods:
+
+* ``result.files_selected`` - number of files selected
+* ``result.files_ignored`` - number of files ignored
+* ``result.error_counts`` - ``dict`` of ``{check_name: error_count}``
+* ``result.total_errors`` - total number of errors found
+* ``result.errors`` - list of
+  ``(check_name, filename, line_num, code, message)`` tuples
+* ``result.report()`` - returns a human-readable report as a string
+
+Note that calling ``doc8`` in this way will not write to stdout, so the
+``quiet`` and ``verbose`` options are ignored.
+
+
 Option conflict resolution
 **************************
 

@@ -199,11 +199,7 @@ def validate(cfg, files):
         targeted_ignoreables = set(ignore_targeted.get(f.filename, set()))
         targeted_ignoreables.update(ignoreables)
         for c in fetch_checks(cfg):
-            try:
-                # http://legacy.python.org/dev/peps/pep-3155/
-                check_name = c.__class__.__qualname__
-            except AttributeError:
-                check_name = ".".join([c.__class__.__module__, c.__class__.__name__])
+            check_name = ".".join([c.__class__.__module__, c.__class__.__name__])
             error_counts.setdefault(check_name, 0)
             try:
                 extension_matcher = c.EXT_MATCHER

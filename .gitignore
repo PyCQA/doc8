@@ -55,3 +55,4 @@ doc/build/
 # pbr stuff
 AUTHORS
 ChangeLog
+.eggs

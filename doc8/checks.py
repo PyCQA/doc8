@@ -101,6 +101,10 @@ class CheckValidity(ContentCheck):
         re.compile(r"^Undefined substitution"),
         re.compile(r"^Substitution definition contains illegal element"),
         re.compile(
+            r'^Error in \"code-block\" directive\:\nunknown option: "caption".',
+            re.MULTILINE,
+        ),
+        re.compile(
             r'^Error in "code-block" directive:\nunknown option: "emphasize-lines"'
         ),
         re.compile(r'^Error in "math" directive:\nunknown option: "label"'),

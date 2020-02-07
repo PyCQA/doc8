@@ -10,6 +10,8 @@ os:
 # tox 3.8.0 is the first version that can boostrap itself
 before_script:
   - pip install tox>=3.8.0
+  # needed by pre-commit:
+  - gem install travis --no-rdoc --no-ri
 
 # test script
 script: tox
@@ -19,6 +21,8 @@ notifications:
 
 jobs:
   fast_finish: true
+  exclude:
+    if: tag IS present
   include:
     - name: lint,docs,py37
       env: TOXENV=lint,docs

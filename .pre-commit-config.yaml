@@ -17,3 +17,11 @@ repos:
     rev: 3.7.8
     hooks:
       - id: flake8
+  - repo: local
+    hooks:
+      - id: travis-lint
+        name: Travis YAML linter
+        description: This hook lints .travis.yml files.
+        entry: travis lint --skip-completion-check --skip-version-check --exit-code --
+        language: ruby
+        files: \.travis\.yml$

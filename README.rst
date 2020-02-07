@@ -1,12 +1,17 @@
-.. image:: https://travis-ci.com/PyCQA/doc8.svg?branch=master
-    :target: https://travis-ci.com/PyCQA/doc8
 .. image:: https://img.shields.io/pypi/v/doc8
-    :alt: PyPI
-    :target: https://pypi.org/project/doc8/
+   :alt: PyPI
+   :target: https://pypi.org/project/doc8/
+
+.. image:: https://travis-ci.com/PyCQA/doc8.svg?branch=master
+   :target: https://travis-ci.com/PyCQA/doc8
+   :alt: CI
+
 .. image:: https://img.shields.io/pypi/l/doc8
-    :alt: PyPI - License
+   :alt: PyPI - License
+
 .. image:: https://img.shields.io/github/last-commit/pycqa/doc8
-    :alt: GitHub last commit
+   :alt: GitHub last commit
+
 
 ====
 Doc8
@@ -24,7 +29,7 @@ QuickStart
 
 To run doc8 just invoke it against any doc directory::
 
-    $ doc8 coolproject/docs
+    $ doc8 cool-project/docs
 
 Usage
 =====
@@ -45,7 +50,7 @@ Command line usage
     Check documentation for simple style requirements.
 
     What is checked:
-        - invalid rst format - D000
+        - invalid RST format - D000
         - lines should not be longer than 79 characters - D001
           - RST exception: line with no whitespace except in the beginning
           - RST exception: lines with http or https urls
@@ -91,8 +96,8 @@ Ini file usage
 **************
 
 Instead of using the CLI for options the following files will also be examined
-for ``[doc8]`` sections that can also provided the same set of options. If
-the ``--config path`` option is used these files will **not** be scanned for
+for ``[doc8]`` sections that can also provide the same set of options. If
+the ``--config path`` option is used, these files will **not** be scanned for
 the current working directory and that configuration path will be used
 instead.
 
@@ -111,13 +116,13 @@ An example section that can be placed into one of these files::
     ignore-path-errors=/tmp/other_thing.rst;D001;D002
 
 **Note:** The option names are the same as the command line ones (with the
-only variation of this being the ``no-sphinx`` option which from
+only variation of this being the ``no-sphinx`` option which from the
 configuration file will be ``sphinx`` instead).
 
 Python Usage
 ************
 
-To call doc8 from a Python project::
+To call doc8 from a Python project do::
 
     from doc8 import doc8
 

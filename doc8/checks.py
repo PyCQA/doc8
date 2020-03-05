@@ -108,6 +108,7 @@ class CheckValidity(ContentCheck):
             r'^Error in "code-block" directive:\nunknown option: "emphasize-lines"'
         ),
         re.compile(r'^Error in "math" directive:\nunknown option: "label"'),
+        re.compile(r'^Error in "math" directive:\nunknown option: "nowrap"'),
     ]
 
     def __init__(self, cfg):

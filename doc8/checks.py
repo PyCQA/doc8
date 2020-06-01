@@ -109,6 +109,10 @@ class CheckValidity(ContentCheck):
         ),
         re.compile(r'^Error in "math" directive:\nunknown option: "label"'),
         re.compile(r'^Error in "math" directive:\nunknown option: "nowrap"'),
+        re.compile(
+            r'^Error in \"code-block\" directive\:\nunknown option: "substitutions".',
+            re.MULTILINE,
+        ),
     ]
 
     def __init__(self, cfg):

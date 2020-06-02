@@ -1,36 +1,39 @@
-.. image:: https://travis-ci.com/PyCQA/doc8.svg?branch=master
-    :target: https://travis-ci.com/PyCQA/doc8
 .. image:: https://img.shields.io/pypi/v/doc8
-    :alt: PyPI
-    :target: https://pypi.org/project/doc8/
+   :alt: PyPI
+   :target: https://pypi.org/project/doc8/
+
+.. image:: https://travis-ci.com/PyCQA/doc8.svg?branch=master
+   :target: https://travis-ci.com/PyCQA/doc8
+   :alt: CI
+
 .. image:: https://img.shields.io/pypi/l/doc8
-    :alt: PyPI - License
+   :alt: PyPI - License
+
 .. image:: https://img.shields.io/github/last-commit/pycqa/doc8
-    :alt: GitHub last commit
+   :alt: GitHub last commit
 
 ====
-Doc8
+doc8
 ====
 
-Doc8 is an *opinionated* style checker for `rst`_ (with basic support for
+*doc8* is an *opinionated* style checker for rst__ (with basic support for
 plain text) styles of documentation.
 
-QuickStart
-==========
+__ http://docutils.sourceforge.net/docs/ref/rst/introduction.html
+
+Quick start
+-----------
 
 ::
 
     pip install doc8
 
-To run doc8 just invoke it against any doc directory::
+To run *doc8*, just invoke it against any documentation directory::
 
-    $ doc8 coolproject/docs
+    $ doc8 cool-project/docs
 
 Usage
-=====
-
-Command line usage
-******************
+-----
 
 ::
 
@@ -45,7 +48,7 @@ Command line usage
     Check documentation for simple style requirements.
 
     What is checked:
-        - invalid rst format - D000
+        - invalid RST format - D000
         - lines should not be longer than 79 characters - D001
           - RST exception: line with no whitespace except in the beginning
           - RST exception: lines with http or https urls
@@ -87,12 +90,12 @@ Command line usage
       -v, --verbose         run in verbose mode.
       --version             show the version and exit.
 
-Ini file usage
-**************
+INI file usage
+~~~~~~~~~~~~~~
 
 Instead of using the CLI for options the following files will also be examined
-for ``[doc8]`` sections that can also provided the same set of options. If
-the ``--config path`` option is used these files will **not** be scanned for
+for ``[doc8]`` sections that can also provide the same set of options. If
+the ``--config path`` option is used, these files will **not** be scanned for
 the current working directory and that configuration path will be used
 instead.
 
@@ -111,38 +114,14 @@ An example section that can be placed into one of these files::
     ignore-path-errors=/tmp/other_thing.rst;D001;D002
 
 **Note:** The option names are the same as the command line ones (with the
-only variation of this being the ``no-sphinx`` option which from
+only variation of this being the ``no-sphinx`` option which from the
 configuration file will be ``sphinx`` instead).
 
-Python Usage
-************
-
-To call doc8 from a Python project::
-
-    from doc8 import doc8
-
-    result = doc8(allow_long_titles=True, max_line_length=99)
-
-The returned ``result`` will have the following attributes and methods:
-
-* ``result.files_selected`` - number of files selected
-* ``result.files_ignored`` - number of files ignored
-* ``result.error_counts`` - ``dict`` of ``{check_name: error_count}``
-* ``result.total_errors`` - total number of errors found
-* ``result.errors`` - list of
-  ``(check_name, filename, line_num, code, message)`` tuples
-* ``result.report()`` - returns a human-readable report as a string
-
-Note that calling ``doc8`` in this way will not write to stdout, so the
-``quiet`` and ``verbose`` options are ignored.
-
-
 Option conflict resolution
-**************************
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When the same option is passed on the command line and also via configuration
-files the following strategies are applied to resolve these types
-of conflicts.
+files the following strategies are applied to resolve these types of conflicts.
 
 ======================   ===========  ========
 Option                   Overrides    Merges
@@ -165,4 +144,29 @@ option (for example by becoming a larger list or set of values that contains
 the values passed on the command line *and* the values passed via
 configuration).
 
-.. _rst: http://docutils.sourceforge.net/docs/ref/rst/introduction.html
+
+API
+---
+
+It is also possible to use *doc8* programmatically. To call *doc8* from a
+Python project, use::
+
+    from doc8 import doc8
+
+    result = doc8(allow_long_titles=True, max_line_length=99)
+
+The returned ``result`` will have the following attributes and methods:
+
+* ``result.files_selected`` - number of files selected
+* ``result.files_ignored`` - number of files ignored
+* ``result.error_counts`` - ``dict`` of ``{check_name: error_count}``
+* ``result.total_errors`` - total number of errors found
+* ``result.errors`` - list of
+  ``(check_name, filename, line_num, code, message)`` tuples
+* ``result.report()`` - returns a human-readable report as a string
+
+The ``doc8`` method accepts the same arguments as the executable. Simply
+replace hyphens with underscores.
+
+**Note:** Calling ``doc8`` in this way will not write to stdout, so the
+``quiet`` and ``verbose`` options are ignored.

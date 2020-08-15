@@ -16,7 +16,6 @@ import errno
 import os
 import threading
 
-import chardet
 from docutils import frontend
 from docutils import parsers as docutils_parser
 from docutils import utils
@@ -110,10 +109,7 @@ class ParsedFile(object):
     @property
     def encoding(self):
         if not self._encoding:
-            encoding = chardet.detect(self.raw_contents)["encoding"]
-            if not encoding:
-                encoding = self.FALLBACK_ENCODING
-            self._encoding = encoding
+            self._encoding = self.FALLBACK_ENCODING
         return self._encoding
 
     @property

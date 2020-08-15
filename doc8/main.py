@@ -437,10 +437,7 @@ def main():
     parser.add_argument(
         "--file-encoding",
         action="store",
-        help="override encoding to use when attempting"
-        " to determine an input files text encoding "
-        "(providing this avoids using `chardet` to"
-        " automatically detect encoding/s)",
+        help="set input files text encoding",
         default=defaults["file_encoding"],
         dest="file_encoding",
         metavar="encoding",

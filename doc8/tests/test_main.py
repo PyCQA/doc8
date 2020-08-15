@@ -41,7 +41,7 @@ OUTPUT_CMD_VERBOSE = """\
 Scanning...
   Selecting '{path}/invalid.rst'
 Validating...
-Validating {path}/invalid.rst (ascii, 10 chars, 1 lines)
+Validating {path}/invalid.rst (utf-8, 10 chars, 1 lines)
   Running check 'doc8.checks.CheckValidity'
   Running check 'doc8.checks.CheckTrailingWhitespace'
     - {path}/invalid.rst:1: D002 Trailing whitespace

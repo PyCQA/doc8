@@ -26,6 +26,7 @@ jobs:
           "py27",
           "py36",
           "py37",
+          "py38",
           "lint",
           "packaging",
         ]
@@ -51,6 +52,10 @@ jobs:
             python: "3.7"
             os: ubuntu-latest
             tox_env: py37
+          - name: py38
+            python: "3.8"
+            os: ubuntu-latest
+            tox_env: py38
 
           - name: "lint"
             python: "3.7"

@@ -2,8 +2,8 @@
    :alt: PyPI
    :target: https://pypi.org/project/doc8/
 
-.. image:: https://travis-ci.com/PyCQA/doc8.svg?branch=master
-   :target: https://travis-ci.com/PyCQA/doc8
+.. image:: https://github.com/PyCQA/doc8/workflows/tox/badge.svg
+   :target: https://github.com/PyCQA/doc8/actions
    :alt: CI
 
 .. image:: https://img.shields.io/pypi/l/doc8

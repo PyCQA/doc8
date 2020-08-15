@@ -30,12 +30,12 @@ What is checked:
 
 import argparse
 import collections
+import configparser
 import logging
 import os
 import sys
 
-import six
-from six.moves import configparser
+
 from stevedore import extension
 
 from doc8 import checks
@@ -320,7 +320,7 @@ class Result(object):
 
         if self.error_counts:
             lines.append("Detailed error counts:")
-            for check_name in sorted(six.iterkeys(self.error_counts)):
+            for check_name in sorted(self.error_counts.keys()):
                 check_errors = self.error_counts[check_name]
                 lines.append("    - %s = %s" % (check_name, check_errors))
 
@@ -347,7 +347,7 @@ def doc8(args=None, **kwargs):
 
     cfg.setdefault("ignore_path_errors", {})
     tmp_ignores = parse_ignore_path_errors(args.pop("ignore_path_errors", []))
-    for path, ignores in six.iteritems(tmp_ignores):
+    for path, ignores in tmp_ignores.items():
         if path in cfg["ignore_path_errors"]:
             cfg["ignore_path_errors"][path].update(ignores)
         else:

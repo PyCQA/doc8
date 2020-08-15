@@ -17,13 +17,11 @@ import collections
 import re
 
 from docutils import nodes as docutils_nodes
-import six
 
 from doc8 import utils
 
 
-@six.add_metaclass(abc.ABCMeta)
-class ContentCheck(object):
+class ContentCheck(metaclass=abc.ABCMeta):
     def __init__(self, cfg):
         self._cfg = cfg
 
@@ -32,8 +30,7 @@ class ContentCheck(object):
         pass
 
 
-@six.add_metaclass(abc.ABCMeta)
-class LineCheck(object):
+class LineCheck(metaclass=abc.ABCMeta):
     def __init__(self, cfg):
         self._cfg = cfg
 

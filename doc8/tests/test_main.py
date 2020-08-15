@@ -2,7 +2,7 @@
 
 from mock import patch, MagicMock
 import os
-import six
+from io import StringIO
 import shutil
 import sys
 import testtools
@@ -87,8 +87,8 @@ class Capture(object):
     def __enter__(self):
         self.old_out = sys.stdout
         self.old_err = sys.stderr
-        self.out = six.StringIO()
-        self.err = six.StringIO()
+        self.out = StringIO()
+        self.err = StringIO()
 
         sys.stdout = self.out
         sys.stderr = self.err

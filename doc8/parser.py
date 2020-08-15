@@ -21,7 +21,6 @@ from docutils import frontend
 from docutils import parsers as docutils_parser
 from docutils import utils
 import restructuredtext_lint as rl
-import six
 
 
 class ParsedFile(object):
@@ -90,7 +89,7 @@ class ParsedFile(object):
     def lines_iter(self, remove_trailing_newline=True):
         self._read()
         for line in self._lines:
-            line = six.text_type(line, encoding=self.encoding)
+            line = str(line, encoding=self.encoding)
             if remove_trailing_newline and line.endswith("\n"):
                 line = line[0:-1]
             yield line
@@ -125,7 +124,7 @@ class ParsedFile(object):
     @property
     def contents(self):
         if self._content is None:
-            self._content = six.text_type(self.raw_contents, encoding=self.encoding)
+            self._content = str(self.raw_contents, encoding=self.encoding)
         return self._content
 
     def __str__(self):

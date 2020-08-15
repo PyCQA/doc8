@@ -23,7 +23,6 @@ jobs:
       matrix:
         name: [
           "docs",
-          "py27",
           "py36",
           "py37",
           "py38",
@@ -40,10 +39,6 @@ jobs:
             python: "3.6"
             os: ubuntu-latest
             tox_env: docs
-          - name: py27
-            python: "2.7"
-            os: ubuntu-latest
-            tox_env: py27
           - name: py36
             python: "3.6"
             os: ubuntu-latest

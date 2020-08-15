@@ -9,3 +9,4 @@
   entry: python -m doc8
   language: python
   files: \.rst$
+  require_serial: true

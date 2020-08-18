@@ -78,9 +78,7 @@ Usage
                             default file extension to use when a file is found
                             without a file extension.
       --file-encoding encoding
-                            override encoding to use when attempting to determine
-                            an input files text encoding (providing this avoids
-                            using `chardet` to automatically detect encoding/s)
+                            set input files text encoding
       --max-line-length int
                             maximum allowed line length (default: 79).
       -e extension, --extension extension

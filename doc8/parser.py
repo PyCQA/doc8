@@ -80,9 +80,8 @@ class ParsedFile(object):
         with self._read_lock:
             if not self._has_read:
                 with open(self.filename, "rb") as fh:
-                    self._lines = list(fh)
-                    fh.seek(0)
                     self._raw_content = fh.read()
+                    self._lines = self._raw_content.splitlines(True)
                 self._has_read = True
 
     def lines_iter(self, remove_trailing_newline=True):

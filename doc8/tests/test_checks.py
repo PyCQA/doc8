@@ -48,14 +48,18 @@ class TestTabIndentation(testtools.TestCase):
 
 class TestCarriageReturn(testtools.TestCase):
     def test_cr(self):
-        lines = ["\tabc", "efg", "\r\n"]
-        check = checks.CheckCarriageReturn({})
-        errors = []
-        for line in lines:
-            errors.extend(check.report_iter(line))
-        self.assertEqual(1, len(errors))
-        (code, msg) = errors[0]
-        self.assertIn(code, check.REPORTS)
+        content = b"Windows line ending\r\nLegacy Mac line ending\r"
+        content += (b"a" * 79) + b"\r\n" + b"\r"
+        conf = {"max_line_length": 79}
+        with tempfile.NamedTemporaryFile as fh:
+            fh.write(content)
+            fh.flush()
+            parsed_file = parser.ParsedFile(fh.name)
+            check = checks.CheckCarriageReturn(conf)
+            errors = list(check.report_iter(parsed_file))
+            self.assertEqual(4, len(errors))
+            (line, code, msg) = errors[0]
+            self.assertIn(code, check.REPORTS)
 
 
 class TestLineLength(testtools.TestCase):
@@ -172,6 +176,8 @@ class TestNewlineEndOfFile(testtools.TestCase):
             (1, b"testing\ntesting"),
             (0, b"testing\n"),
             (0, b"testing\ntesting\n"),
+            (0, b"testing\r\n"),
+            (0, b"testing\r"),
         ]
 
         for expected_errors, line in tests:

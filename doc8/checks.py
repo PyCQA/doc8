@@ -63,9 +63,6 @@ class CheckIndentationNoTab(LineCheck):
 class CheckCarriageReturn(ContentCheck):
     REPORTS = frozenset(["D004"])
 
-    def __init__(self, cfg):
-        super(CheckCarriageReturn, self).__init__(cfg)
-
     def report_iter(self, parsed_file):
         for i, line in enumerate(parsed_file.lines):
             if b"\r" in line:

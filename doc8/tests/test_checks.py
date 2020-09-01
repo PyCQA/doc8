@@ -51,7 +51,7 @@ class TestCarriageReturn(testtools.TestCase):
         content = b"Windows line ending\r\nLegacy Mac line ending\r"
         content += (b"a" * 79) + b"\r\n" + b"\r"
         conf = {"max_line_length": 79}
-        with tempfile.NamedTemporaryFile as fh:
+        with tempfile.NamedTemporaryFile() as fh:
             fh.write(content)
             fh.flush()
             parsed_file = parser.ParsedFile(fh.name)

@@ -80,17 +80,20 @@ class ParsedFile(object):
         with self._read_lock:
             if not self._has_read:
                 with open(self.filename, "rb") as fh:
-                    self._lines = list(fh)
-                    fh.seek(0)
                     self._raw_content = fh.read()
+                    self._lines = self._raw_content.splitlines(True)
                 self._has_read = True
 
     def lines_iter(self, remove_trailing_newline=True):
         self._read()
         for line in self._lines:
             line = str(line, encoding=self.encoding)
-            if remove_trailing_newline and line.endswith("\n"):
-                line = line[0:-1]
+            if remove_trailing_newline:
+                # Cope with various OS new line conventions
+                if line.endswith("\n"):
+                    line = line[:-1]
+                if line.endswith("\r"):
+                    line = line[:-1]
             yield line
 
     @property

@@ -60,12 +60,13 @@ class CheckIndentationNoTab(LineCheck):
                 yield ("D003", "Tabulation used for indentation")
 
 
-class CheckCarriageReturn(LineCheck):
+class CheckCarriageReturn(ContentCheck):
     REPORTS = frozenset(["D004"])
 
-    def report_iter(self, line):
-        if "\r" in line:
-            yield ("D004", "Found literal carriage return")
+    def report_iter(self, parsed_file):
+        for i, line in enumerate(parsed_file.lines):
+            if b"\r" in line:
+                yield (i + 1, "D004", "Found literal carriage return")
 
 
 class CheckNewlineEndOfFile(ContentCheck):
@@ -75,7 +76,10 @@ class CheckNewlineEndOfFile(ContentCheck):
         super(CheckNewlineEndOfFile, self).__init__(cfg)
 
     def report_iter(self, parsed_file):
-        if parsed_file.lines and not parsed_file.lines[-1].endswith(b"\n"):
+        if parsed_file.lines and not (
+            parsed_file.lines[-1].endswith(b"\n")
+            or parsed_file._lines[-1].endswith(b"\r")
+        ):
             yield (len(parsed_file.lines), "D005", "No newline at end of file")
 
 

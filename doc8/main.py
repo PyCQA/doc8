@@ -75,6 +75,7 @@ def parse_ignore_path_errors(entries):
         ignore_path_errors[path].update(ignored_errors)
     return dict(ignore_path_errors)
 
+
 def from_ini(fp):
     parser = configparser.RawConfigParser()
     with open(fp, "r") as fh:

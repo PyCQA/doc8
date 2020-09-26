@@ -37,6 +37,7 @@ import sys
 
 try:
     import toml
+
     HAVE_TOML = True
 except ImportError:
     HAVE_TOML = False
@@ -139,13 +140,12 @@ def from_toml(fp):
 
 def extract_config(args):
     cfg = {}
-    for cfg_file in (args["config"] or CONFIG_FILENAMES):
+    for cfg_file in args["config"] or CONFIG_FILENAMES:
         if not os.path.isfile(cfg_file):
             if args["config"]:
                 print(
-                    "Configuration file %s does not exist...ignoring"
-                    % (args["config"])
-                    )
+                    "Configuration file %s does not exist...ignoring" % (args["config"])
+                )
             continue
         if cfg_file.endswith((".ini", ".cfg")):
             cfg = from_ini(cfg_file)

@@ -35,6 +35,12 @@ import logging
 import os
 import sys
 
+try:
+    import toml
+
+    HAVE_TOML = True
+except ImportError:
+    HAVE_TOML = False
 
 from stevedore import extension
 
@@ -46,6 +52,8 @@ from doc8 import version
 FILE_PATTERNS = [".rst", ".txt"]
 MAX_LINE_LENGTH = 79
 CONFIG_FILENAMES = ["doc8.ini", "tox.ini", "pep8.ini", "setup.cfg"]
+if HAVE_TOML:
+    CONFIG_FILENAMES.extend(["pyproject.toml"])
 
 
 def split_set_type(text, delimiter=","):
@@ -69,18 +77,11 @@ def parse_ignore_path_errors(entries):
     return dict(ignore_path_errors)
 
 
-def extract_config(args):
+def from_ini(fp):
     parser = configparser.RawConfigParser()
-    read_files = []
-    if args["config"]:
-        for fn in args["config"]:
-            with open(fn, "r") as fh:
-                parser.readfp(fh, filename=fn)
-                read_files.append(fn)
-    else:
-        read_files.extend(parser.read(CONFIG_FILENAMES))
-    if not read_files:
-        return {}
+    with open(fp, "r") as fh:
+        parser.read_file(fh)
+
     cfg = {}
     try:
         cfg["max_line_length"] = parser.getint("doc8", "max-line-length")
@@ -129,6 +130,29 @@ def extract_config(args):
             cfg["extension"] = extensions
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
+    return cfg
+
+
+def from_toml(fp):
+    cfg = toml.load(fp).get("tool", {}).get("doc8", {})
+    return cfg
+
+
+def extract_config(args):
+    cfg = {}
+    for cfg_file in args["config"] or CONFIG_FILENAMES:
+        if not os.path.isfile(cfg_file):
+            if args["config"]:
+                print(
+                    "Configuration file %s does not exist...ignoring" % (args["config"])
+                )
+            continue
+        if cfg_file.endswith((".ini", ".cfg")):
+            cfg = from_ini(cfg_file)
+        elif cfg_file.endswith(".toml") and HAVE_TOML:
+            cfg = from_toml(cfg_file)
+        if cfg:
+            break
     return cfg
 
 

@@ -130,6 +130,10 @@ def from_ini(fp):
             cfg["extension"] = extensions
     except (configparser.NoSectionError, configparser.NoOptionError):
         pass
+    try:
+        cfg["write_violations"] = parser.get("doc8", "write-violations")
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        pass
     return cfg
 
 
@@ -265,6 +269,11 @@ def validate(cfg, files, result=None):
                         )
                     elif not result.capture:
                         print("%s:%s: %s %s" % (f.filename, line_num, code, message))
+                    if cfg.get("write_violations"):
+                        with open(cfg.get("write_violations"), "a+") as out:
+                            out.write(
+                                "%s:%s: %s %s\n" % (f.filename, line_num, code, message)
+                            )
                     result.error(check_name, f.filename, line_num, code, message)
                     error_counts[check_name] += 1
             elif isinstance(c, checks.LineCheck):
@@ -281,6 +290,12 @@ def validate(cfg, files, result=None):
                             print(
                                 "%s:%s: %s %s" % (f.filename, line_num, code, message)
                             )
+                        if cfg.get("write_violations"):
+                            with open(cfg.get("write_violations"), "a+") as out:
+                                out.write(
+                                    "%s:%s: %s %s\n"
+                                    % (f.filename, line_num, code, message)
+                                )
                         result.error(check_name, f.filename, line_num, code, message)
                         error_counts[check_name] += 1
             else:
@@ -302,6 +317,7 @@ def get_defaults():
         "max_line_length": MAX_LINE_LENGTH,
         "extension": list(FILE_PATTERNS),
         "quiet": False,
+        "write_violations": "",
         "verbose": False,
         "version": False,
     }
@@ -378,6 +394,11 @@ def doc8(args=None, **kwargs):
             cfg["ignore_path_errors"][path] = set(ignores)
 
     args.update(cfg)
+
+    # Remove file for violations before reporting new violations.
+    write_violations = args.get("write_violations")
+    if write_violations and os.path.isfile(write_violations):
+        os.remove(write_violations)
 
     # Override args with any kwargs
     args.update(kwargs.items())
@@ -490,6 +511,14 @@ def main():
         action="store_true",
         help="only print violations",
         default=defaults["quiet"],
+    )
+    parser.add_argument(
+        "-w",
+        "--write-violations",
+        action="store",
+        metavar="path",
+        help="write violations to the provided file",
+        default=defaults["write_violations"],
     )
     parser.add_argument(
         "-v",

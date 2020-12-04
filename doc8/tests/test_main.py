@@ -78,6 +78,11 @@ Detailed error counts:
     - doc8.checks.CheckTrailingWhitespace = 1
     - doc8.checks.CheckValidity = 0"""
 
+OUTPUT_VIOLATIONS_FILE = """\
+{path}/invalid.rst:1: D002 Trailing whitespace
+{path}/invalid.rst:1: D005 No newline at end of file
+"""
+
 
 class Capture(object):
     """
@@ -180,6 +185,24 @@ class TestCommandLine(testtools.TestCase):
             self.assertEqual(err.getvalue(), "")
         self.assertEqual(state, 1)
 
+    def test_main__write_violations__output_violations_are_written_to_file(self):
+        with TmpFs() as tmpfs, Capture() as (out, err), patch(
+            "argparse._sys.argv",
+            [
+                "doc8",
+                "--write-violations",
+                os.path.join(tmpfs.path, "out.txt"),
+                tmpfs.path,
+            ],
+        ):
+            tmpfs.mock()
+            state = main()
+            with open(os.path.join(tmpfs.path, "out.txt"), "r") as in_file:
+                file_content = in_file.read()
+            self.assertEqual(file_content, tmpfs.expected(OUTPUT_VIOLATIONS_FILE))
+            self.assertEqual(err.getvalue(), "")
+        self.assertEqual(state, 1)
+
 
 class TestApi(testtools.TestCase):
     """
@@ -246,6 +269,7 @@ class TestArguments(testtools.TestCase):
             "max_line_length": 79,
             "extension": list([".rst", ".txt"]),
             "quiet": False,
+            "write_violations": "",
             "verbose": False,
             "version": False,
         }
@@ -270,6 +294,7 @@ class TestArguments(testtools.TestCase):
                 "max_line_length": 79,
                 "extension": [".rst", ".txt"],
                 "quiet": False,
+                "write_violations": "",
                 "verbose": False,
                 "version": False,
             },
@@ -408,6 +433,15 @@ class TestArguments(testtools.TestCase):
             state = main()
             self.assertEqual(state, 0)
             mock_scan.assert_called_once_with(self.get_args(quiet=True))
+
+    def test_args__write_violations__overrides_default(self):
+        mock_scan = MagicMock(return_value=([], 0))
+        with patch("doc8.main.scan", mock_scan), patch(
+            "argparse._sys.argv", ["doc8", "--write-violations", "file"]
+        ):
+            state = main()
+            self.assertEqual(state, 0)
+            mock_scan.assert_called_once_with(self.get_args(write_violations="file"))
 
     def test_args__verbose__overrides_default(self):
         mock_scan = MagicMock(return_value=([], 0))

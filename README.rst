@@ -42,7 +42,8 @@ Usage
     usage: doc8 [-h] [--config path] [--allow-long-titles] [--ignore code]
                 [--no-sphinx] [--ignore-path path] [--ignore-path-errors path]
                 [--default-extension extension] [--file-encoding encoding]
-                [--max-line-length int] [-e extension] [-v] [--version]
+                [--max-line-length int] [-e extension] [--quiet]
+                [--write-violations] [--verbose] [--version]
                 [path [path ...]]
 
     Check documentation for simple style requirements.
@@ -85,6 +86,7 @@ Usage
                             check file extensions of the given type (default:
                             .rst, .txt).
       -q, --quiet           only print violations
+      --write-violations    write violations to the provided file
       -v, --verbose         run in verbose mode.
       --version             show the version and exit.
 
@@ -133,6 +135,7 @@ Option                   Overrides    Merges
 ``max-line-length``      Yes          No
 ``file-encoding``        Yes          No
 ``sphinx``               Yes          No
+``write-violations``     Yes          No
 ======================   ===========  ========
 
 **Note:** In the above table the configuration file option when specified as

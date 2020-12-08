@@ -108,6 +108,12 @@ class CheckValidity(ContentCheck):
         re.compile(
             r'^Error in "code-block" directive:\nunknown option: "emphasize-lines"'
         ),
+        re.compile(r'^Error in "code-block" directive:\nunknown option: "linenos"'),
+        re.compile(
+            r'^Error in "code-block" directive:\nunknown option: "lineno-start"'
+        ),
+        re.compile(r'^Error in "code-block" directive:\nunknown option: "dedent"'),
+        re.compile(r'^Error in "code-block" directive:\nunknown option: "force"'),
         re.compile(r'^Error in "math" directive:\nunknown option: "label"'),
         re.compile(r'^Error in "math" directive:\nunknown option: "nowrap"'),
         re.compile(

@@ -101,6 +101,7 @@ instead.
 * ``$CWD/tox.ini``
 * ``$CWD/pep8.ini``
 * ``$CWD/setup.cfg``
+* ``$CWD/pyproject.toml``
 
 An example section that can be placed into one of these files::
 

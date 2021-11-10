@@ -13,16 +13,14 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-
+import unittest
 import tempfile
-
-import testtools
 
 from doc8 import checks
 from doc8 import parser
 
 
-class TestTrailingWhitespace(testtools.TestCase):
+class TestTrailingWhitespace(unittest.TestCase):
     def test_trailing(self):
         lines = ["a b  ", "ab"]
         check = checks.CheckTrailingWhitespace({})
@@ -34,7 +32,7 @@ class TestTrailingWhitespace(testtools.TestCase):
         self.assertIn(code, check.REPORTS)
 
 
-class TestTabIndentation(testtools.TestCase):
+class TestTabIndentation(unittest.TestCase):
     def test_tabs(self):
         lines = ["    b", "\tabc", "efg", "\t\tc"]
         check = checks.CheckIndentationNoTab({})
@@ -46,7 +44,7 @@ class TestTabIndentation(testtools.TestCase):
         self.assertIn(code, check.REPORTS)
 
 
-class TestCarriageReturn(testtools.TestCase):
+class TestCarriageReturn(unittest.TestCase):
     def test_cr(self):
         content = b"Windows line ending\r\nLegacy Mac line ending\r"
         content += (b"a" * 79) + b"\r\n" + b"\r"
@@ -62,7 +60,7 @@ class TestCarriageReturn(testtools.TestCase):
             self.assertIn(code, check.REPORTS)
 
 
-class TestLineLength(testtools.TestCase):
+class TestLineLength(unittest.TestCase):
     def test_over_length(self):
         content = b"""
 ===
@@ -169,7 +167,7 @@ test
             self.assertEqual(0, len(errors))
 
 
-class TestNewlineEndOfFile(testtools.TestCase):
+class TestNewlineEndOfFile(unittest.TestCase):
     def test_newline(self):
         tests = [
             (1, b"testing"),

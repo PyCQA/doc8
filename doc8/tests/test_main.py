@@ -3,9 +3,9 @@
 from mock import patch, MagicMock
 import os
 from io import StringIO
+import unittest
 import shutil
 import sys
-import testtools
 
 from doc8.main import main, doc8
 
@@ -145,7 +145,7 @@ class FakeResult(object):
         return ""
 
 
-class TestCommandLine(testtools.TestCase):
+class TestCommandLine(unittest.TestCase):
     """
     Test command line invocation
     """
@@ -181,7 +181,7 @@ class TestCommandLine(testtools.TestCase):
         self.assertEqual(state, 1)
 
 
-class TestApi(testtools.TestCase):
+class TestApi(unittest.TestCase):
     """
     Test direct code invocation
     """
@@ -226,7 +226,7 @@ class TestApi(testtools.TestCase):
         self.assertEqual(result.total_errors, 2)
 
 
-class TestArguments(testtools.TestCase):
+class TestArguments(unittest.TestCase):
     """
     Test that arguments are parsed correctly
     """

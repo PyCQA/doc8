@@ -29,9 +29,11 @@ repos:
           - types-setuptools
           - types-docutils
           - types-toml
-  # TODO: activate pylint
-  # - repo: https://github.com/PyCQA/pylint
-  #   rev: v2.9.3
-  #   hooks:
-  #     - id: pylint
-  #       additional_dependencies: []
+  - repo: https://github.com/PyCQA/pylint
+    rev: v2.11.1
+    hooks:
+      - id: pylint
+        additional_dependencies:
+          - docutils
+          - restructuredtext-lint
+          - stevedore

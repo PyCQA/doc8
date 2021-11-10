@@ -21,8 +21,9 @@ extensions = ["sphinx.ext.autodoc"]
 master_doc = "index"
 
 # General information about the project.
-project = u"doc8"
-copyright = u"2013, OpenStack Foundation"
+project = "doc8"
+# pylint: disable=redefined-builtin
+copyright = "2013, OpenStack Foundation"
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"

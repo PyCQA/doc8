@@ -57,7 +57,7 @@ if HAVE_TOML:
 
 
 def split_set_type(text, delimiter=","):
-    return set([i.strip() for i in text.split(delimiter) if i.strip()])
+    return {i.strip() for i in text.split(delimiter) if i.strip()}
 
 
 def merge_sets(sets):
@@ -79,7 +79,7 @@ def parse_ignore_path_errors(entries):
 
 def from_ini(fp):
     parser = configparser.RawConfigParser()
-    with open(fp, "r") as fh:
+    with open(fp, "r", encoding="utf-8") as fh:
         parser.read_file(fh)
 
     cfg = {}
@@ -518,8 +518,7 @@ def main():
 
     if result.total_errors:
         return 1
-    else:
-        return 0
+    return 0
 
 
 if __name__ == "__main__":

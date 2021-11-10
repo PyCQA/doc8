@@ -72,10 +72,8 @@ class CheckCarriageReturn(ContentCheck):
 class CheckNewlineEndOfFile(ContentCheck):
     REPORTS = frozenset(["D005"])
 
-    def __init__(self, cfg):
-        super(CheckNewlineEndOfFile, self).__init__(cfg)
-
     def report_iter(self, parsed_file):
+        # pylint: disable=protected-access
         if parsed_file.lines and not (
             parsed_file.lines[-1].endswith(b"\n")
             or parsed_file._lines[-1].endswith(b"\r")
@@ -123,7 +121,7 @@ class CheckValidity(ContentCheck):
     ]
 
     def __init__(self, cfg):
-        super(CheckValidity, self).__init__(cfg)
+        super().__init__(cfg)
         self._sphinx_mode = cfg.get("sphinx")
 
     def report_iter(self, parsed_file):
@@ -144,7 +142,7 @@ class CheckMaxLineLength(ContentCheck):
     REPORTS = frozenset(["D001"])
 
     def __init__(self, cfg):
-        super(CheckMaxLineLength, self).__init__(cfg)
+        super().__init__(cfg)
         self._max_line_length = self._cfg["max_line_length"]
         self._allow_long_titles = self._cfg["allow_long_titles"]
 
@@ -255,11 +253,11 @@ class CheckMaxLineLength(ContentCheck):
         directives = self._extract_directives(lines)
 
         def find_containing_nodes(num):
-            if num < first_line and len(nodes_lines):
+            if num < first_line and nodes_lines:
                 return [nodes_lines[0][0]]
             contained_in = []
             for (n, (line_min, line_max)) in nodes_lines:
-                if num >= line_min and num <= line_max:
+                if line_min <= num <= line_max:
                     contained_in.append((n, (line_min, line_max)))
             smallest_span = None
             best_nodes = []
@@ -276,6 +274,7 @@ class CheckMaxLineLength(ContentCheck):
             return best_nodes
 
         def any_types(nodes, types):
+            # pylint: disable=use-a-generator
             return any([isinstance(n, types) for n in nodes])
 
         skip_types = (docutils_nodes.target, docutils_nodes.literal_block)
@@ -288,7 +287,7 @@ class CheckMaxLineLength(ContentCheck):
             if len(line) > self._max_line_length:
                 in_directive = False
                 for (start, end) in directives:
-                    if i >= start and i <= end:
+                    if start <= i <= end:
                         in_directive = True
                         break
                 if in_directive:

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from mock import patch, MagicMock
 import os
 from io import StringIO
 import unittest
+from unittest.mock import patch, MagicMock
 import shutil
 import sys
 
@@ -118,7 +118,7 @@ class TmpFs(object):
         shutil.rmtree(self.path)
 
     def create_file(self, filename, content):
-        with open(os.path.join(self.path, filename), "w") as file:
+        with open(os.path.join(self.path, filename), "w", encoding="utf-8") as file:
             file.write(content)
 
     def mock(self):

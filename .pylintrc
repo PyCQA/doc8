@@ -1,0 +1,23 @@
+[MESSAGES CONTROL]
+
+disable =
+    # TODO(ssbarnea): remove temporary skips adding during initial adoption:
+    attribute-defined-outside-init,
+    consider-using-f-string,
+    invalid-name,
+    missing-class-docstring,
+    missing-function-docstring,
+    missing-module-docstring,
+    no-self-use,
+    too-few-public-methods,
+    too-many-arguments,
+    too-many-branches,
+    too-many-instance-attributes,
+    too-many-locals,
+    too-many-nested-blocks,
+    too-many-statements,
+    unused-variable,
+    useless-object-inheritance,
+
+[REPORTS]
+output-format = colorized

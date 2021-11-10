@@ -1,0 +1,31 @@
+prune .github
+exclude .gitignore
+exclude .gitreview
+exclude .pre-commit-config.yaml
+exclude .pre-commit-hooks.yaml
+include *.md
+include *.py
+include *.txt
+include .coveragerc
+include .pylintrc
+include .yamllint
+include mypy.ini
+include tox.ini
+recursive-include docs *.ico
+recursive-include docs *.png
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include src *.flake8
+recursive-include src *.j2
+recursive-include src *.json
+recursive-include src *.md
+recursive-include src *.py
+recursive-include src *.rst
+recursive-include src *.typed
+recursive-include src *.yaml
+recursive-include src *.yamllint
+recursive-include src *.yml
+recursive-include tools *.sh
+recursive-exclude .mypy_cache *.*
+recursive-exclude docs/docstree/html *.*
+recursive-exclude zuul.d *.*

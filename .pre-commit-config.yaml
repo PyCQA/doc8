@@ -22,7 +22,7 @@ repos:
       - id: mypy
         # empty args needed in order to match mypy cli behavior
         args: []
-        entry: mypy doc8/
+        entry: mypy src/
         pass_filenames: false
         additional_dependencies:
           - types-mock

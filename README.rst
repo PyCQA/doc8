@@ -65,7 +65,7 @@ Usage
 
     optional arguments:
       -h, --help            show this help message and exit
-      --config path         user config file location (default: doc8.ini, tox.ini,
+      --config path         user config file location (default: .config/doc8.ini, doc8.ini, tox.ini,
                             pep8.ini, setup.cfg).
       --allow-long-titles   allow long section titles (default: false).
       --ignore code         ignore the given error code(s).
@@ -98,6 +98,7 @@ the current working directory and that configuration path will be used
 instead.
 
 * ``$CWD/doc8.ini``
+* ``$CWD/.config/doc8.ini``
 * ``$CWD/tox.ini``
 * ``$CWD/pep8.ini``
 * ``$CWD/setup.cfg``

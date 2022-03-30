@@ -51,7 +51,7 @@ from doc8 import version
 
 FILE_PATTERNS = [".rst", ".txt"]
 MAX_LINE_LENGTH = 79
-CONFIG_FILENAMES = ["doc8.ini", "tox.ini", "pep8.ini", "setup.cfg"]
+CONFIG_FILENAMES = ["doc8.ini", ".config/doc8.ini", "tox.ini", "pep8.ini", "setup.cfg"]
 if HAVE_TOML:
     CONFIG_FILENAMES.extend(["pyproject.toml"])
 

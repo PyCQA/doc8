@@ -102,7 +102,7 @@ instead.
 * ``$CWD/tox.ini``
 * ``$CWD/pep8.ini``
 * ``$CWD/setup.cfg``
-* ``$CWD/pyproject.toml`` in section ``[tool.doc8]`` if ``toml`` is installed
+* ``$CWD/pyproject.toml`` in section ``[tool.doc8]`` if ``tomli`` is installed
 
 An example section that can be placed into one of these files::
 

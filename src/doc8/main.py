@@ -36,7 +36,7 @@ import os
 import sys
 
 try:
-    import toml
+    import tomli
 
     HAVE_TOML = True
 except ImportError:
@@ -134,7 +134,8 @@ def from_ini(fp):
 
 
 def from_toml(fp):
-    cfg = toml.load(fp).get("tool", {}).get("doc8", {})
+    with open(fp, "rb") as f:
+        cfg = tomli.load(f).get("tool", {}).get("doc8", {})
     return cfg
 
 

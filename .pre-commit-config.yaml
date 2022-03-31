@@ -28,7 +28,6 @@ repos:
           - types-mock
           - types-setuptools
           - types-docutils
-          - types-toml
   - repo: https://github.com/PyCQA/pylint
     rev: v2.13.3
     hooks:

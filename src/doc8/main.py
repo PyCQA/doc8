@@ -138,51 +138,11 @@ def from_toml(fp):
         parsed = tomli.load(f).get("tool", {}).get("doc8", {})
 
     cfg = {}
-    try:
-        cfg["max_line_length"] = parsed["max-line-length"]
-    except KeyError:
-        pass
-    try:
-        cfg["ignore"] = parsed["ignore"]
-    except KeyError:
-        pass
-    try:
-        cfg["ignore_path"] = parsed["ignore-path"]
-    except KeyError:
-        pass
-    try:
-        ignore_path_errors = parsed["ignore-path-errors"]
-        ignore_path_errors = parse_ignore_path_errors(ignore_path_errors)
-        cfg["ignore_path_errors"] = ignore_path_errors
-    except KeyError:
-        pass
-    try:
-        cfg["allow_long_titles"] = parsed["allow-long-titles"]
-    except KeyError:
-        pass
-    try:
-        cfg["sphinx"] = parsed["sphinx"]
-    except KeyError:
-        pass
-    try:
-        cfg["verbose"] = parsed["verbose"]
-    except KeyError:
-        pass
-    try:
-        cfg["file_encoding"] = parsed["file-encoding"]
-    except KeyError:
-        pass
-    try:
-        cfg["default_extension"] = parsed["default-extension"]
-    except KeyError:
-        pass
-    try:
-        extensions = parsed["extensions"]
-        extensions = [s.strip() for s in extensions if s.strip()]
-        if extensions:
-            cfg["extensions"] = extensions
-    except KeyError:
-        pass
+    for key, value in parsed.items():
+        if key == "ignore-path-errors":
+            value = parse_ignore_path_errors(value)
+        cfg[key.replace("-", "_")] = value
+
     return cfg
 
 

@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 import shutil
 import sys
 
-from doc8.main import main, doc8
+from doc8.main import main, doc8, from_toml
 
 
 # Location to create test files
@@ -426,3 +426,43 @@ class TestArguments(unittest.TestCase):
             state = main()
             self.assertEqual(state, 0)
             mock_scan.assert_not_called()
+
+
+CONFIG_TOML = """\
+[tool.doc8]
+allow-long-titles = true
+ignore-path-errors = ["foo.rst;D001;D002", "bar.rst;D002"]
+default-extension = ".rst"
+extension = [".rst", ".rST", ".txt", ".TXT"]
+ignore-path = ["baz.rst", "boff.rst"]
+ignore = ["D002", "D005"]
+max-line-length = 80
+file-encoding = "utf8"
+sphinx = false"""
+
+
+class TestConfig(unittest.TestCase):
+    """
+    Test that configuration file is loaded correctly
+    """
+
+    def test_config__from_toml(self):
+        with TmpFs() as tmpfs:
+            tmpfs.create_file("pyproject.toml", CONFIG_TOML)
+            cfg = from_toml(os.path.join(tmpfs.path, "pyproject.toml"))
+
+        self.assertEqual(cfg["allow_long_titles"], True)
+        self.assertEqual(
+            cfg["ignore_path_errors"],
+            {
+                "foo.rst": {"D001", "D002"},
+                "bar.rst": {"D002"},
+            },
+        )
+        self.assertEqual(cfg["default_extension"], ".rst")
+        self.assertEqual(cfg["extension"], [".rst", ".rST", ".txt", ".TXT"])
+        self.assertEqual(cfg["ignore_path"], ["baz.rst", "boff.rst"])
+        self.assertEqual(cfg["ignore"], ["D002", "D005"])
+        self.assertEqual(cfg["max_line_length"], 80)
+        self.assertEqual(cfg["file_encoding"], "utf8")
+        self.assertEqual(cfg["sphinx"], False)

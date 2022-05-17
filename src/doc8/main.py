@@ -135,7 +135,14 @@ def from_ini(fp):
 
 def from_toml(fp):
     with open(fp, "rb") as f:
-        cfg = tomli.load(f).get("tool", {}).get("doc8", {})
+        parsed = tomli.load(f).get("tool", {}).get("doc8", {})
+
+    cfg = {}
+    for key, value in parsed.items():
+        if key == "ignore-path-errors":
+            value = parse_ignore_path_errors(value)
+        cfg[key.replace("-", "_")] = value
+
     return cfg
 
 

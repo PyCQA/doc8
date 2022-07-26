@@ -31,16 +31,20 @@ What is checked:
 import argparse
 import collections
 import configparser
+import importlib
 import logging
 import os
 import sys
 
-try:
-    import tomli
 
-    HAVE_TOML = True
-except ImportError:
-    HAVE_TOML = False
+HAVE_TOML = False
+for module_name in ("tomllib", "tomli"):
+    try:
+        toml_module = importlib.import_module(module_name)
+        HAVE_TOML = True
+        break
+    except ModuleNotFoundError:
+        pass
 
 from stevedore import extension
 
@@ -135,7 +139,7 @@ def from_ini(fp):
 
 def from_toml(fp):
     with open(fp, "rb") as f:
-        parsed = tomli.load(f).get("tool", {}).get("doc8", {})
+        parsed = toml_module.load(f).get("tool", {}).get("doc8", {})
 
     cfg = {}
     for key, value in parsed.items():

@@ -12,64 +12,40 @@ on:
 jobs:
   build:
     name: ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
 
     strategy:
       fail-fast: false
       matrix:
-        name: [
-          "docs",
-          "py36",
-          "py37",
-          "py38",
-          "py39",
-          "py310",
-          "lint",
-          "packaging",
-        ]
-        os: [
-          "ubuntu-latest",
-        ]
-
         include:
-
           - name: docs
-            python: "3.6"
-            os: ubuntu-latest
+            python: "3.10"
             tox_env: docs
+          - name: "lint"
+            python: "3.10"
+            tox_env: "lint"
+          - name: "packaging"
+            python: "3.10"
+            tox_env: "packaging"
+
           - name: py36
             python: "3.6"
-            os: ubuntu-latest
             tox_env: py36
           - name: py37
             python: "3.7"
-            os: ubuntu-latest
             tox_env: py37
           - name: py38
             python: "3.8"
-            os: ubuntu-latest
             tox_env: py38
           - name: py39
             python: "3.9"
-            os: ubuntu-latest
             tox_env: py39
           - name: py310
             python: "3.10"
-            os: ubuntu-latest
             tox_env: py310
           - name: py311
             python: "~3.11.0-0" # see https://github.com/actions/setup-python/issues/213#issuecomment-1146676713
-            os: ubuntu-latest
             tox_env: py311
-
-          - name: "lint"
-            python: "3.7"
-            os: ubuntu-latest
-            tox_env: "lint"
-          - name: "packaging"
-            python: "3.7"
-            os: ubuntu-latest
-            tox_env: "packaging"
 
     steps:
       - uses: actions/checkout@v3

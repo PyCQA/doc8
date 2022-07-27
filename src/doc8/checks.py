@@ -160,7 +160,7 @@ class CheckMaxLineLength(ContentCheck):
 
         def gather_lines(node):
             lines = []
-            for n in node.traverse(include_self=True):
+            for n in node.findall(include_self=True):
                 lines.extend(extract_lines(n, find_line(n)))
             return lines
 

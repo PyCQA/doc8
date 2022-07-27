@@ -57,7 +57,7 @@ def find_files(paths, extensions, ignored_paths):
 
 
 def filtered_traverse(document, filter_func):
-    for n in document.traverse(include_self=True):
+    for n in document.findall(include_self=True):
         if filter_func(n):
             yield n
 

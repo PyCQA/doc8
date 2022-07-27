@@ -57,6 +57,10 @@ jobs:
             python: "3.10"
             os: ubuntu-latest
             tox_env: py310
+          - name: py311
+            python: "~3.11.0-0" # see https://github.com/actions/setup-python/issues/213#issuecomment-1146676713
+            os: ubuntu-latest
+            tox_env: py311
 
           - name: "lint"
             python: "3.7"
@@ -70,7 +74,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
       - name: Install dependencies

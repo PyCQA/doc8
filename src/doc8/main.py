@@ -35,12 +35,13 @@ import logging
 import os
 import sys
 
-try:
-    import tomli
 
-    HAVE_TOML = True
+try:
+    # py3.11+
+    from tomllib import load as toml_load  # type: ignore
 except ImportError:
-    HAVE_TOML = False
+    # py3.10 or older
+    from tomli import load as toml_load
 
 from stevedore import extension
 
@@ -51,9 +52,14 @@ from doc8 import version
 
 FILE_PATTERNS = [".rst", ".txt"]
 MAX_LINE_LENGTH = 79
-CONFIG_FILENAMES = ["doc8.ini", ".config/doc8.ini", "tox.ini", "pep8.ini", "setup.cfg"]
-if HAVE_TOML:
-    CONFIG_FILENAMES.extend(["pyproject.toml"])
+CONFIG_FILENAMES = [
+    "doc8.ini",
+    ".config/doc8.ini",
+    "tox.ini",
+    "pep8.ini",
+    "setup.cfg",
+    "pyproject.toml",
+]
 
 
 def split_set_type(text, delimiter=","):
@@ -135,7 +141,7 @@ def from_ini(fp):
 
 def from_toml(fp):
     with open(fp, "rb") as f:
-        parsed = tomli.load(f).get("tool", {}).get("doc8", {})
+        parsed = toml_load(f).get("tool", {}).get("doc8", {})
 
     cfg = {}
     for key, value in parsed.items():
@@ -157,7 +163,7 @@ def extract_config(args):
             continue
         if cfg_file.endswith((".ini", ".cfg")):
             cfg = from_ini(cfg_file)
-        elif cfg_file.endswith(".toml") and HAVE_TOML:
+        elif cfg_file.endswith(".toml"):
             cfg = from_toml(cfg_file)
         if cfg:
             break

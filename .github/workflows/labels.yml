@@ -10,7 +10,7 @@ jobs:
     name: verify
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Verify PR label action
         uses: jesusvasquez333/verify-pr-label-action@v1.4.0
         with:

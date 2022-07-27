@@ -57,6 +57,10 @@ jobs:
             python: "3.10"
             os: ubuntu-latest
             tox_env: py310
+          - name: py311
+            python: "~3.11.0-0" # see https://github.com/actions/setup-python/issues/213#issuecomment-1146676713
+            os: ubuntu-latest
+            tox_env: py311
 
           - name: "lint"
             python: "3.7"
@@ -68,9 +72,9 @@ jobs:
             tox_env: "packaging"
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
       - name: Install dependencies
@@ -79,3 +83,14 @@ jobs:
           pip install tox
       - name: Test
         run: "tox -e ${{ matrix.tox_env }}"
+
+  check: # This job does nothing and is only used for the branch protection
+    if: always()
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}

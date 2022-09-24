@@ -1,0 +1,8 @@
+[flake8]
+builtins = _
+show_source = True
+exclude=.venv,.git,.tox,dist,doc,*openstack/common*,*lib/python*,*egg,build
+# Minimal config needed to make flake8 compatible with black output:
+max_line_length=160
+# See https://github.com/PyCQA/pycodestyle/issues/373
+extend_ignore = E203

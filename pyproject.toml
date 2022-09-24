@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-  "setuptools >= 42",
+  "setuptools>=61.2",
   "setuptools_scm[toml] >= 3.5.0",
   "setuptools_scm_git_archive >= 1.1",
   "wheel >= 0.33.6",
@@ -9,3 +9,71 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
+
+[project]
+name = "doc8"
+description = "Style checker for Sphinx (or other) RST documentation"
+authors = [{name = "OpenStack", email = "openstack-discuss@lists.openstack.org"}]
+maintainers = [{name = "PyCQA", email = "code-quality@python.org"}]
+license = {text = "Apache 2.0"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities",
+]
+keywords = [
+    "doc8",
+    "rst",
+    "linter",
+]
+requires-python = ">=3.7"
+dependencies = [
+    # Ceiled due to DeprecationWarning: The frontend.OptionParser class will be
+    # replaced by a subclass of argparse.ArgumentParser in Docutils 0.21 or later.
+    "docutils>=0.19,<0.21",
+    "restructuredtext-lint>=0.7",
+    "stevedore",
+    "tomli; python_version < '3.11'",
+    "Pygments",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/pycqa/doc8"
+"Bug Tracker" = "https://github.com/pycqa/doc8/issues"
+"Release Management" = "https://github.com/pycqa/doc8/releases"
+CI = "https://github.com/pycqa/doc8/actions"
+Documentation = "https://doc8.readthedocs.io"
+Discussions = "https://github.com/pycqa/doc8/discussions"
+
+[project.readme]
+file = "README.rst"
+content-type = "text/x-rst"
+
+[project.scripts]
+doc8 = "doc8.main:main"
+
+[tool.setuptools]
+# use-scm-version = "True"  # Does not pass validate-pyproject
+package-dir = {"" = "src"}
+include-package-data = true
+zip-safe = false
+# These are required in actual runtime:
+license-files = ["LICENSE"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false

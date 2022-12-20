@@ -118,7 +118,9 @@ class CheckValidity(ContentCheck):
             r'^Error in \"code-block\" directive\:\nunknown option: "substitutions".',
             re.MULTILINE,
         ),
-        re.compile(r'^PEP number must be a number from 0 to 9999; "\d{1,4}#[^"]*" is invalid.'),
+        re.compile(
+            r'^PEP number must be a number from 0 to 9999; "\d{1,4}#[^"]*" is invalid.'
+        ),
     ]
 
     def __init__(self, cfg):

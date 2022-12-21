@@ -14,13 +14,18 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""doc8 version information."""
 try:
-    from pbr import version as pbr_version
+    from ._version import version as __version__
+except ImportError:  # pragma: no branch
 
-    _version_info = pbr_version.VersionInfo("doc8")
-    version_string = _version_info.version_string()
-except ImportError:
-    import pkg_resources
+    try:
+        import pkg_resources
 
-    _version_info = pkg_resources.get_distribution("doc8")
-    version_string = _version_info.version
+        __version__ = pkg_resources.get_distribution("doc8").version
+    except Exception:  # pylint: disable=broad-except
+        # this is the fallback SemVer version picked by setuptools_scm when tag
+        # information is not available.
+        __version__ = "0.1.dev1"
+
+__all__ = ("__version__",)

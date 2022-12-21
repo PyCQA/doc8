@@ -522,7 +522,7 @@ def main():
     )
     args = vars(parser.parse_args())
     if args.get("version"):
-        print(version.version_string)
+        print(version.__version__)
         return 0
 
     result = doc8(args)

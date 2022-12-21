@@ -66,6 +66,46 @@ content-type = "text/x-rst"
 [project.scripts]
 doc8 = "doc8.main:main"
 
+[tool.pytest]
+filterwarnings = [
+    "error",
+    # docutils planned change in 0.21 without clear solution yet
+    "ignore:The frontend.*:DeprecationWarning"
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "pbr",
+    "restructuredtext_lint",
+    "stevedore",
+]
+ignore_missing_imports = true
+
+[tool.pylint."MESSAGES CONTROL"]
+
+disable = [
+    # TODO(ssbarnea): remove temporary skips adding during initial adoption:
+    "attribute-defined-outside-init",
+    "consider-using-f-string",
+    "invalid-name",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "missing-module-docstring",
+    "no-self-use",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-branches",
+    "too-many-instance-attributes",
+    "too-many-locals",
+    "too-many-nested-blocks",
+    "too-many-statements",
+    "unused-variable",
+    "useless-object-inheritance",
+]
+
+[tool.pylint.REPORTS]
+output-format = "colorized"
+
 [tool.setuptools]
 # use-scm-version = "True"  # Does not pass validate-pyproject
 package-dir = {"" = "src"}

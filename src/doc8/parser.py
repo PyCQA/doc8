@@ -22,7 +22,7 @@ from docutils import utils
 import restructuredtext_lint as rl
 
 
-class ParsedFile(object):
+class ParsedFile:
     FALLBACK_ENCODING = "utf-8"
 
     def __init__(self, filename, encoding=None, default_extension=""):
@@ -127,7 +127,7 @@ class ParsedFile(object):
         return self._content
 
     def __str__(self):
-        return "%s (%s, %s chars, %s lines)" % (
+        return "{} ({}, {} chars, {} lines)".format(
             self.filename,
             self.encoding,
             len(self.contents),
@@ -137,5 +137,5 @@ class ParsedFile(object):
 
 def parse(filename, encoding=None, default_extension=""):
     if not os.path.isfile(filename):
-        raise IOError(errno.ENOENT, "File not found", filename)
+        raise OSError(errno.ENOENT, "File not found", filename)
     return ParsedFile(filename, encoding=encoding, default_extension=default_extension)

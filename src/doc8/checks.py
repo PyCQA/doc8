@@ -313,5 +313,4 @@ class CheckMaxLineLength(ContentCheck):
             checker_func = self._txt_checker
         else:
             checker_func = self._rst_checker
-        for issue in checker_func(parsed_file):
-            yield issue
+        yield from checker_func(parsed_file)

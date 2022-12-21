@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 from io import StringIO
 import unittest
@@ -79,7 +77,7 @@ Detailed error counts:
     - doc8.checks.CheckValidity = 0"""
 
 
-class Capture(object):
+class Capture:
     """
     Context manager to capture output on stdout and stderr
     """
@@ -100,7 +98,7 @@ class Capture(object):
         sys.stderr = self.err
 
 
-class TmpFs(object):
+class TmpFs:
     """
     Context manager to create and clean a temporary file area for testing
     """
@@ -134,7 +132,7 @@ class TmpFs(object):
         return template.format(path=self.path)
 
 
-class FakeResult(object):
+class FakeResult:
     """
     Minimum valid result returned from doc8
     """

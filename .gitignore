@@ -51,8 +51,4 @@ coverage.xml
 
 # Sphinx documentation
 doc/build/
-
-# pbr stuff
-AUTHORS
-ChangeLog
-.eggs
+src/doc8/_version.py

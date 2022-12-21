@@ -85,7 +85,7 @@ def parse_ignore_path_errors(entries):
 
 def from_ini(fp):
     parser = configparser.RawConfigParser()
-    with open(fp, "r", encoding="utf-8") as fh:
+    with open(fp, encoding="utf-8") as fh:
         parser.read_file(fh)
 
     cfg = {}
@@ -275,10 +275,14 @@ def validate(cfg, files, result=None):
                         line_num = "?"
                     if cfg.get("verbose"):
                         print(
-                            "    - %s:%s: %s %s" % (f.filename, line_num, code, message)
+                            "    - {}:{}: {} {}".format(
+                                f.filename, line_num, code, message
+                            )
                         )
                     elif not result.capture:
-                        print("%s:%s: %s %s" % (f.filename, line_num, code, message))
+                        print(
+                            "{}:{}: {} {}".format(f.filename, line_num, code, message)
+                        )
                     result.error(check_name, f.filename, line_num, code, message)
                     error_counts[check_name] += 1
             elif isinstance(c, checks.LineCheck):
@@ -293,12 +297,14 @@ def validate(cfg, files, result=None):
                             )
                         elif not result.capture:
                             print(
-                                "%s:%s: %s %s" % (f.filename, line_num, code, message)
+                                "{}:{}: {} {}".format(
+                                    f.filename, line_num, code, message
+                                )
                             )
                         result.error(check_name, f.filename, line_num, code, message)
                         error_counts[check_name] += 1
             else:
-                raise TypeError("Unknown check type: %s, %s" % (type(c), c))
+                raise TypeError("Unknown check type: {}, {}".format(type(c), c))
     return error_counts
 
 
@@ -321,7 +327,7 @@ def get_defaults():
     }
 
 
-class Result(object):
+class Result:
     def __init__(self):
         self.files_selected = 0
         self.files_ignored = 0
@@ -360,7 +366,7 @@ class Result(object):
             lines.append("Detailed error counts:")
             for check_name in sorted(self.error_counts.keys()):
                 check_errors = self.error_counts[check_name]
-                lines.append("    - %s = %s" % (check_name, check_errors))
+                lines.append("    - {} = {}".format(check_name, check_errors))
 
         return "\n".join(lines)
 

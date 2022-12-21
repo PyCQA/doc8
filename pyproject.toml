@@ -23,11 +23,11 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: System :: Systems Administration",
     "Topic :: Utilities",
 ]
@@ -36,7 +36,7 @@ keywords = [
     "rst",
     "linter",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
     # Ceiled due to DeprecationWarning: The frontend.OptionParser class will be
     # replaced by a subclass of argparse.ArgumentParser in Docutils 0.21 or later.
@@ -71,12 +71,16 @@ filterwarnings = [
 ]
 
 [[tool.mypy.overrides]]
+python_version = "3.8"
 module = [
     "doc8._version",
     "restructuredtext_lint",
     "stevedore",
 ]
 ignore_missing_imports = true
+
+[tool.pylint.MAIN]
+py-version = "3.8.0"
 
 [tool.pylint."MESSAGES CONTROL"]
 

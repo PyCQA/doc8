@@ -37,7 +37,7 @@ repos:
           - types-setuptools
           - types-docutils
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.15.10
+    rev: v2.16.0b1
     hooks:
       - id: pylint
         additional_dependencies:

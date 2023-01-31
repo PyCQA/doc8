@@ -1,16 +1,22 @@
-.. image:: https://img.shields.io/pypi/v/doc8
-   :alt: PyPI
+.. image:: https://img.shields.io/pypi/v/doc8?logo=python&logoColor=white
    :target: https://pypi.org/project/doc8/
-
-.. image:: https://github.com/PyCQA/doc8/workflows/tox/badge.svg
+   :alt: PyPI
+   
+.. image:: https://img.shields.io/github/actions/workflow/status/PyCQA/doc8/tox.yml?label=tox&logo=github&logoColor=white
    :target: https://github.com/PyCQA/doc8/actions
    :alt: CI
 
 .. image:: https://img.shields.io/pypi/l/doc8
+   :target: https://github.com/PyCQA/doc8/blob/main/LICENSE
    :alt: PyPI - License
 
 .. image:: https://img.shields.io/github/last-commit/pycqa/doc8
+   :target: https://github.com/PyCQA/doc8/commits/main 
    :alt: GitHub last commit
+   
+.. image:: https://img.shields.io/readthedocs/doc8/stable?logo=readthedocs&logoColor=white
+   :target: https://doc8.readthedocs.io/en/stable/index.html
+   :alt: Read the Docs (stable)
 
 ====
 doc8

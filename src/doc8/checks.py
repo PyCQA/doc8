@@ -259,12 +259,12 @@ class CheckMaxLineLength(ContentCheck):
             if num < first_line and nodes_lines:
                 return [nodes_lines[0][0]]
             contained_in = []
-            for (n, (line_min, line_max)) in nodes_lines:
+            for n, (line_min, line_max) in nodes_lines:
                 if line_min <= num <= line_max:
                     contained_in.append((n, (line_min, line_max)))
             smallest_span = None
             best_nodes = []
-            for (n, (line_min, line_max)) in contained_in:
+            for n, (line_min, line_max) in contained_in:
                 span = line_max - line_min
                 if smallest_span is None:
                     smallest_span = span
@@ -289,7 +289,7 @@ class CheckMaxLineLength(ContentCheck):
         for i, line in enumerate(lines):
             if len(line) > self._max_line_length:
                 in_directive = False
-                for (start, end) in directives:
+                for start, end in directives:
                     if start <= i <= end:
                         in_directive = True
                         break

@@ -61,7 +61,7 @@ class CheckIndentationNoTab(LineCheck):
 
 
 class CheckCarriageReturn(ContentCheck):
-    _CARRIAGE_RETURN_REGEX = re.compile(r"\r(?!\n)")
+    _CARRIAGE_RETURN_REGEX = re.compile(rb"\r(?!\n)")
     REPORTS = frozenset(["D004"])
 
     def report_iter(self, parsed_file):

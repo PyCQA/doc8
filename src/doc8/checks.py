@@ -61,11 +61,13 @@ class CheckIndentationNoTab(LineCheck):
 
 
 class CheckCarriageReturn(ContentCheck):
+    _CARRIAGE_RETURN_REGEX = re.compile(r'\r(?!\n)')
     REPORTS = frozenset(["D004"])
 
     def report_iter(self, parsed_file):
         for i, line in enumerate(parsed_file.lines):
-            if b"\r" in line:
+            matches = self._CARRIAGE_RETURN_REGEX.findall(line)
+            if len(matches) != 0:
                 yield (i + 1, "D004", "Found literal carriage return")
 
 

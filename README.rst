@@ -119,6 +119,14 @@ An example section that can be placed into one of these files::
     verbose=1
     ignore-path-errors=/tmp/other_thing.rst;D001;D002
 
+
+An example for the ``pyproject.toml`` file:
+
+    [tool.doc8]
+
+    ignore = ["D001"]
+    allow-long-titles = true
+
 **Note:** The option names are the same as the command line ones (with the
 only variation of this being the ``no-sphinx`` option which from the
 configuration file will be ``sphinx`` instead).

@@ -120,7 +120,7 @@ An example section that can be placed into one of these files::
     ignore-path-errors=/tmp/other_thing.rst;D001;D002
 
 
-An example for the ``pyproject.toml`` file:
+An example for the ``pyproject.toml`` file::
 
     [tool.doc8]
 

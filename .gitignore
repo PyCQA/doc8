@@ -52,3 +52,7 @@ coverage.xml
 # Sphinx documentation
 doc/build/
 src/doc8/_version.py
+
+# IDE caches
+.idea/
+.vscode/

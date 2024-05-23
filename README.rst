@@ -18,6 +18,10 @@
    :target: https://doc8.readthedocs.io/en/stable/index.html
    :alt: Read the Docs (stable)
 
+.. image:: https://assets.piptrends.com/get-last-month-downloads-badge/doc8.svg
+    :target: https://piptrends.com/package/doc8
+    :alt: doc8 Downloads Last Month by pip Trends
+
 ====
 doc8
 ====

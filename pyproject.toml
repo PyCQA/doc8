@@ -75,6 +75,7 @@ module = [
     "doc8._version",
     "restructuredtext_lint",
     "stevedore",
+    "tomli",
 ]
 ignore_missing_imports = true
 

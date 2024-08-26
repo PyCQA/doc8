@@ -71,7 +71,6 @@ filterwarnings = [
 ]
 
 [[tool.mypy.overrides]]
-python_version = "3.8"
 module = [
     "doc8._version",
     "restructuredtext_lint",

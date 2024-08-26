@@ -48,7 +48,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install tox>=4.0
 
-      - name: ${{ matrix.command }}
+      - name: ${{ matrix.name }}
         run: ${{ matrix.command }}
 
   check: # This job does nothing and is only used for the branch protection

@@ -43,7 +43,7 @@ dependencies = [
     "docutils>=0.19,<0.21",
     "restructuredtext-lint>=0.7",
     "stevedore",
-    "tomli",
+    "tomli; python_version < '3.11'",
     "Pygments",
 ]
 dynamic = ["version"]

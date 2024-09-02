@@ -41,7 +41,7 @@ try:
     from tomllib import load as toml_load  # type: ignore
 except ImportError:
     # py3.10 or older
-    from tomli import load as toml_load
+    from tomli import load as toml_load  # type: ignore[no-redef]
 
 from stevedore import extension
 

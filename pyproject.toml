@@ -40,7 +40,7 @@ requires-python = ">=3.8"
 dependencies = [
     # Ceiled due to DeprecationWarning: The frontend.OptionParser class will be
     # replaced by a subclass of argparse.ArgumentParser in Docutils 0.21 or later.
-    "docutils>=0.19,<0.21",
+    "docutils>=0.19,<=0.21.2",
     "restructuredtext-lint>=0.7",
     "stevedore",
     "tomli; python_version < '3.11'",
@@ -71,11 +71,11 @@ filterwarnings = [
 ]
 
 [[tool.mypy.overrides]]
-python_version = "3.8"
 module = [
     "doc8._version",
     "restructuredtext_lint",
     "stevedore",
+    "tomli",
 ]
 ignore_missing_imports = true
 

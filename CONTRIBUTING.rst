@@ -1,7 +1,7 @@
 Before contributing to *doc8* or any other PyCQA project, we suggest you read
 the PyCQA meta documentation:
 
-   http://meta.pycqa.org/en/latest/
+   http://meta.pycqa.org/
 
 Patches for *doc8* should be submitted to GitHub, as should bugs:
 

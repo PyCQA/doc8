@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Determine matrix
         id: generate_matrix
-        uses: coactions/matrix@main
+        uses: coactions/matrix@v3
         with:
           other_names: |
             lint
@@ -34,12 +34,12 @@ jobs:
       matrix: ${{ fromJson(needs.pre.outputs.matrix) }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # needed by setuptools-scm
 
       - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python_version }}
 
@@ -48,8 +48,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install tox>=4.0
 
-      - name: tox run -e ${{ matrix.passed_name }}
-        run: tox run -e ${{ matrix.passed_name }}
+      - name: ${{ matrix.name }}
+        run: ${{ matrix.command }}
 
   check: # This job does nothing and is only used for the branch protection
     if: always()

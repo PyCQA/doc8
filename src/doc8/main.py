@@ -41,7 +41,7 @@ try:
     from tomllib import load as toml_load  # type: ignore
 except ImportError:
     # py3.10 or older
-    from tomli import load as toml_load
+    from tomli import load as toml_load  # type: ignore[no-redef]
 
 from stevedore import extension
 
@@ -230,6 +230,10 @@ def validate(cfg, files, result=None):
     error_counts = {}
     ignoreables = frozenset(cfg.get("ignore", []))
     ignore_targeted = cfg.get("ignore_path_errors", {})
+    ignore_targeted = {
+        os.path.abspath(file_path): ignore_codes
+        for file_path, ignore_codes in ignore_targeted.items()
+    }
     while files:
         f = files.popleft()
         if cfg.get("verbose"):

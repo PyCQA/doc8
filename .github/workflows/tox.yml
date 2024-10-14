@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Determine matrix
         id: generate_matrix
-        uses: coactions/matrix@v3
+        uses: coactions/matrix@v4
         with:
           other_names: |
             lint

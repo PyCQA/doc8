@@ -238,7 +238,7 @@ def validate(cfg, files, result=None):
         f = files.popleft()
         if cfg.get("verbose"):
             print("Validating %s" % f)
-        targeted_ignoreables = set(ignore_targeted.get(f.filename, set()))
+        targeted_ignoreables = set(ignore_targeted.get(os.path.abspath(f.filename), set()))
         targeted_ignoreables.update(ignoreables)
         for c in fetch_checks(cfg):
             check_name = ".".join([c.__class__.__module__, c.__class__.__name__])

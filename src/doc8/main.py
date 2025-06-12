@@ -343,6 +343,7 @@ class Result:
     def total_errors(self):
         return len(self.errors)
 
+    # pylint: disable=too-many-positional-arguments
     def error(self, check_name, filename, line_num, code, message):
         self.errors.append((check_name, filename, line_num, code, message))
 
@@ -357,14 +358,12 @@ class Result:
             for error in self.errors:
                 lines.append("%s:%s: %s %s" % error[1:])
 
-        lines.extend(
-            [
-                "=" * 8,
-                "Total files scanned = %s" % (self.files_selected),
-                "Total files ignored = %s" % (self.files_ignored),
-                "Total accumulated errors = %s" % (self.total_errors),
-            ]
-        )
+        lines.extend([
+            "=" * 8,
+            "Total files scanned = %s" % (self.files_selected),
+            "Total files ignored = %s" % (self.files_ignored),
+            "Total accumulated errors = %s" % (self.total_errors),
+        ])
 
         if self.error_counts:
             lines.append("Detailed error counts:")
@@ -434,8 +433,7 @@ def main():
         "--config",
         metavar="path",
         action="append",
-        help="user config file location"
-        " (default: %s)." % ", ".join(CONFIG_FILENAMES),
+        help="user config file location (default: %s)." % ", ".join(CONFIG_FILENAMES),
         default=defaults["config"],
     )
     parser.add_argument(
@@ -495,8 +493,7 @@ def main():
         action="store",
         metavar="int",
         type=int,
-        help="maximum allowed line"
-        " length (default: %s)." % defaults["max_line_length"],
+        help="maximum allowed line length (default: %s)." % defaults["max_line_length"],
         default=defaults["max_line_length"],
     )
     parser.add_argument(

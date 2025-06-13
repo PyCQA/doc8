@@ -13,13 +13,14 @@
 # under the License.
 
 """doc8 version information."""
+
 try:
     from ._version import version as __version__
 except ImportError:  # pragma: no branch
     try:
-        import pkg_resources
+        from importlib.metadata import version
 
-        __version__ = pkg_resources.get_distribution("doc8").version
+        __version__ = version("doc8")
     except Exception:  # pylint: disable=broad-except
         # this is the fallback SemVer version picked by setuptools_scm when tag
         # information is not available.

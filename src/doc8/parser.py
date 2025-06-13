@@ -16,10 +16,9 @@ import errno
 import os
 import threading
 
-from docutils import frontend
-from docutils import parsers as docutils_parser
-from docutils import utils
 import restructuredtext_lint as rl
+from docutils import frontend, utils
+from docutils import parsers as docutils_parser
 
 
 class ParsedFile:
@@ -68,7 +67,8 @@ class ParsedFile:
             }
             opt = frontend.OptionParser(components=[parser], defaults=defaults)
             doc = utils.new_document(
-                source_path=self.filename, settings=opt.get_default_values()
+                source_path=self.filename,
+                settings=opt.get_default_values(),
             )
             parser.parse(self.contents, doc)
             self._doc = doc
@@ -90,10 +90,8 @@ class ParsedFile:
             line = str(line, encoding=self.encoding)
             if remove_trailing_newline:
                 # Cope with various OS new line conventions
-                if line.endswith("\n"):
-                    line = line[:-1]
-                if line.endswith("\r"):
-                    line = line[:-1]
+                line = line.removesuffix("\n")
+                line = line.removesuffix("\r")
             yield line
 
     @property
@@ -127,12 +125,7 @@ class ParsedFile:
         return self._content
 
     def __str__(self):
-        return "{} ({}, {} chars, {} lines)".format(
-            self.filename,
-            self.encoding,
-            len(self.contents),
-            len(list(self.lines_iter())),
-        )
+        return f"{self.filename} ({self.encoding}, {len(self.contents)} chars, {len(list(self.lines_iter()))} lines)"
 
 
 def parse(filename, encoding=None, default_extension=""):

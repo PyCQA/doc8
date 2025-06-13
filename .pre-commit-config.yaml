@@ -12,6 +12,17 @@ repos:
     rev: v3.20.0
     hooks:
       - id: pyupgrade
+  - repo: https://github.com/pappasam/toml-sort
+    rev: v0.24.2
+    hooks:
+      - id: toml-sort-fix
+        alias: toml
+
+  - repo: https://github.com/tox-dev/tox-ini-fmt
+    rev: 1.5.0
+    hooks:
+      - id: tox-ini-fmt
+
   - repo: https://github.com/psf/black
     rev: 25.1.0
     hooks:

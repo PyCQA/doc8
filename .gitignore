@@ -56,3 +56,4 @@ src/doc8/_version.py
 # IDE caches
 .idea/
 .vscode/
+junit.xml

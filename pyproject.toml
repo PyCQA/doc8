@@ -1,121 +1,159 @@
 [build-system]
-requires = [
-  "setuptools>=61.2",
-  "setuptools_scm[toml] >= 3.5.0",
-]
 build-backend = "setuptools.build_meta"
+requires = [
+  "setuptools>=77.0.0",
+  "setuptools_scm[toml] >= 3.5.0"
+]
 
 [project]
-name = "doc8"
-description = "Style checker for Sphinx (or other) RST documentation"
-authors = [{name = "OpenStack", email = "openstack-discuss@lists.openstack.org"}]
-maintainers = [{name = "PyCQA", email = "code-quality@python.org"}]
-license = {text = "Apache 2.0"}
+authors = [{email = "openstack-discuss@lists.openstack.org", name = "OpenStack"}]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Environment :: Console",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Information Technology",
-    "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: Apache Software License",
-    "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: System :: Systems Administration",
-    "Topic :: Utilities",
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: System Administrators",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: System :: Systems Administration",
+  "Topic :: Utilities"
 ]
-keywords = [
-    "doc8",
-    "rst",
-    "linter",
-]
-requires-python = ">=3.8"
 dependencies = [
-    # Ceiled due to DeprecationWarning: The frontend.OptionParser class will be
-    # replaced by a subclass of argparse.ArgumentParser in Docutils 0.21 or later.
-    "docutils>=0.19,<=0.21.2",
-    "restructuredtext-lint>=0.7",
-    "stevedore",
-    "tomli; python_version < '3.11'",
-    "Pygments",
+  # Ceiled due to DeprecationWarning: The frontend.OptionParser class will be
+  # replaced by a subclass of argparse.ArgumentParser in Docutils 0.21 or later.
+  "docutils>=0.19,<=0.21.2",
+  "restructuredtext-lint>=0.7",
+  "stevedore",
+  "tomli; python_version < '3.11'",
+  "Pygments"
 ]
+description = "Style checker for Sphinx (or other) RST documentation"
 dynamic = ["version"]
-
-[project.urls]
-Homepage = "https://github.com/pycqa/doc8"
-"Bug Tracker" = "https://github.com/pycqa/doc8/issues"
-"Release Management" = "https://github.com/pycqa/doc8/releases"
-CI = "https://github.com/pycqa/doc8/actions"
-Documentation = "https://doc8.readthedocs.io"
-Discussions = "https://github.com/pycqa/doc8/discussions"
+keywords = [
+  "doc8",
+  "rst",
+  "linter"
+]
+license = "Apache-2.0"
+maintainers = [{email = "code-quality@python.org", name = "PyCQA"}]
+name = "doc8"
+requires-python = ">=3.10"
 
 [project.readme]
-file = "README.rst"
 content-type = "text/x-rst"
+file = "README.rst"
 
 [project.scripts]
 doc8 = "doc8.main:main"
 
-[tool.pytest]
-filterwarnings = [
-    "error",
-    # docutils planned change in 0.21 without clear solution yet
-    "ignore:The frontend.*:DeprecationWarning"
-]
+[project.urls]
+"Bug Tracker" = "https://github.com/pycqa/doc8/issues"
+CI = "https://github.com/pycqa/doc8/actions"
+Discussions = "https://github.com/pycqa/doc8/discussions"
+Documentation = "https://doc8.readthedocs.io"
+Homepage = "https://github.com/pycqa/doc8"
+"Release Management" = "https://github.com/pycqa/doc8/releases"
+
+# Keep this default because xml/report do not know to use load it from config file:
+# data_file = ".coverage"
+[tool.coverage.paths]
+source = ["src", ".tox/*/site-packages"]
+
+[tool.coverage.report]
+exclude_also = ["pragma: no cover", "if TYPE_CHECKING:"]
+# Increase it just so it would pass on any single-python run
+fail_under = 89
+# During development we might remove code (files) with coverage data, and we dont want to fail:
+ignore_errors = true
+omit = ["test/*"]
+partial_branches = ["pragma: no cover", "if TYPE_CHECKING:"]
+show_missing = true
+skip_covered = true
+skip_empty = true
+
+[tool.coverage.run]
+# branch is more reliable than lines, protects against false positives
+branch = true
+concurrency = ["multiprocessing", "thread"]
+parallel = true
+source = ["src"]
 
 [[tool.mypy.overrides]]
-module = [
-    "doc8._version",
-    "restructuredtext_lint",
-    "stevedore",
-    "tomli",
-]
 ignore_missing_imports = true
+module = [
+  "doc8._version",
+  "restructuredtext_lint",
+  "stevedore",
+  "tomli"
+]
 
 [tool.pylint.MAIN]
-py-version = "3.8.0"
+py-version = "3.10.0"
 
 [tool.pylint."MESSAGES CONTROL"]
-
 disable = [
-    # TODO(ssbarnea): remove temporary skips adding during initial adoption:
-    "attribute-defined-outside-init",
-    "consider-using-f-string",
-    "invalid-name",
-    "missing-class-docstring",
-    "missing-function-docstring",
-    "missing-module-docstring",
-    "too-few-public-methods",
-    "too-many-arguments",
-    "too-many-branches",
-    "too-many-instance-attributes",
-    "too-many-locals",
-    "too-many-nested-blocks",
-    "too-many-statements",
-    "unused-variable",
-    "useless-object-inheritance",
+  # TODO(ssbarnea): remove temporary skips adding during initial adoption:
+  "attribute-defined-outside-init",
+  "consider-using-f-string",
+  "invalid-name",
+  "missing-class-docstring",
+  "missing-function-docstring",
+  "missing-module-docstring",
+  "too-few-public-methods",
+  "too-many-arguments",
+  "too-many-branches",
+  "too-many-instance-attributes",
+  "too-many-locals",
+  "too-many-nested-blocks",
+  "too-many-statements",
+  "unused-variable",
+  "useless-object-inheritance"
 ]
 
 [tool.pylint.REPORTS]
 output-format = "colorized"
 
+[tool.pytest]
+filterwarnings = [
+  "error",
+  # docutils planned change in 0.21 without clear solution yet
+  "ignore:The frontend.*:DeprecationWarning"
+]
+
 [tool.setuptools]
-# use-scm-version = "True"  # Does not pass validate-pyproject
-package-dir = {"" = "src"}
 include-package-data = true
-zip-safe = false
 # These are required in actual runtime:
 license-files = ["LICENSE"]
+# use-scm-version = "True"  # Does not pass validate-pyproject
+package-dir = {"" = "src"}
+zip-safe = false
 
 [tool.setuptools.packages.find]
-where = ["src"]
 namespaces = false
+where = ["src"]
 
 [tool.setuptools_scm]
+# To prevent accidental pick of mobile version tags such 'v6'
+git_describe_command = [
+  "git",
+  "describe",
+  "--dirty",
+  "--long",
+  "--tags",
+  "--match",
+  "v*.*"
+]
 local_scheme = "no-local-version"
+tag_regex = "^(?P<prefix>v)?(?P<version>\\d+[^\\+]*)(?P<suffix>.*)?$"
 write_to = "src/doc8/_version.py"
+
+[tool.tomlsort]
+in_place = true
+sort_inline_tables = true
+sort_table_keys = true

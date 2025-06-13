@@ -98,6 +98,7 @@ py-version = "3.10.0"
 
 [tool.pylint."MESSAGES CONTROL"]
 disable = [
+  "line-too-long",
   # TODO(ssbarnea): remove temporary skips adding during initial adoption:
   "attribute-defined-outside-init",
   "consider-using-f-string",
@@ -125,6 +126,66 @@ filterwarnings = [
   # docutils planned change in 0.21 without clear solution yet
   "ignore:The frontend.*:DeprecationWarning"
 ]
+
+[tool.ruff]
+fix = true
+# Same as Black.
+line-length = 88
+preview = true
+target-version = "py310"
+
+[tool.ruff.lint]
+ignore = [
+  "E501",
+  # temporary disabled until we fix them:
+  "A001",
+  "ANN",
+  "B007",
+  "BLE001",
+  "C410",
+  "C419",
+  "C901",
+  "CPY001",
+  "D",
+  "DOC",
+  "EM102",
+  "ERA001",
+  "FBT002",
+  "FBT003",
+  "FLY002",
+  "FURB101",
+  "FURB103",
+  "INP001",
+  "PERF401",
+  "PGH003",
+  "PGH004",
+  "PLR0912",
+  "PLR0915",
+  "PLR1702",
+  "PLR6104",
+  "PLR6301",
+  "PLW2901",
+  "PT009",
+  "PTH",
+  "RUF012",
+  "RUF059",
+  "S108",
+  "SIM102",
+  "SIM103",
+  "SIM105",
+  "SIM108",
+  "SLF001",
+  "T201",
+  "TRY003",
+  "UP031"
+]
+select = ["ALL"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.setuptools]
 include-package-data = true

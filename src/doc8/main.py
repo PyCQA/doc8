@@ -35,7 +35,6 @@ import logging
 import os
 import sys
 
-
 try:
     # py3.11+
     from tomllib import load as toml_load  # type: ignore
@@ -45,10 +44,8 @@ except ImportError:
 
 from stevedore import extension
 
-from doc8 import checks
+from doc8 import checks, utils, version
 from doc8 import parser as file_parser
-from doc8 import utils
-from doc8 import version
 
 FILE_PATTERNS = [".rst", ".txt"]
 MAX_LINE_LENGTH = 79
@@ -158,7 +155,8 @@ def extract_config(args):
         if not os.path.isfile(cfg_file):
             if args["config"]:
                 print(
-                    "Configuration file %s does not exist...ignoring" % (args["config"])
+                    "Configuration file %s does not exist...ignoring"
+                    % (args["config"]),
                 )
             continue
         if cfg_file.endswith((".ini", ".cfg")):
@@ -180,7 +178,9 @@ def fetch_checks(cfg):
         checks.CheckNewlineEndOfFile(cfg),
     ]
     mgr = extension.ExtensionManager(
-        namespace="doc8.extension.check", invoke_on_load=True, invoke_args=(cfg.copy(),)
+        namespace="doc8.extension.check",
+        invoke_on_load=True,
+        invoke_args=(cfg.copy(),),
     )
     addons = []
     for e in mgr:
@@ -194,7 +194,9 @@ def setup_logging(verbose):
     else:
         level = logging.ERROR
     logging.basicConfig(
-        level=level, format="%(levelname)s: %(message)s", stream=sys.stdout
+        level=level,
+        format="%(levelname)s: %(message)s",
+        stream=sys.stdout,
     )
 
 
@@ -205,7 +207,9 @@ def scan(cfg):
     ignored_paths = cfg.get("ignore_path", [])
     files_ignored = 0
     file_iter = utils.find_files(
-        cfg.get("paths", []), cfg.get("extension", []), ignored_paths
+        cfg.get("paths", []),
+        cfg.get("extension", []),
+        ignored_paths,
     )
     default_extension = cfg.get("default_extension")
     file_encoding = cfg.get("file_encoding")
@@ -216,7 +220,9 @@ def scan(cfg):
                 print("  Ignoring '%s'" % (filename))
         else:
             f = file_parser.parse(
-                filename, default_extension=default_extension, encoding=file_encoding
+                filename,
+                default_extension=default_extension,
+                encoding=file_encoding,
             )
             files.append(f)
             if cfg.get("verbose"):
@@ -253,7 +259,7 @@ def validate(cfg, files, result=None):
                         print(
                             "  Skipping check '%s' since it does not"
                             " understand parsing a file with extension '%s'"
-                            % (check_name, f.extension)
+                            % (check_name, f.extension),
                         )
                     continue
             try:
@@ -266,7 +272,7 @@ def validate(cfg, files, result=None):
                     if cfg.get("verbose"):
                         print(
                             "  Skipping check '%s', determined to only"
-                            " check ignoreable codes" % check_name
+                            " check ignoreable codes" % check_name,
                         )
                     continue
             if cfg.get("verbose"):
@@ -279,13 +285,11 @@ def validate(cfg, files, result=None):
                         line_num = "?"
                     if cfg.get("verbose"):
                         print(
-                            "    - {}:{}: {} {}".format(
-                                f.filename, line_num, code, message
-                            )
+                            f"    - {f.filename}:{line_num}: {code} {message}",
                         )
                     elif not result.capture:
                         print(
-                            "{}:{}: {} {}".format(f.filename, line_num, code, message)
+                            f"{f.filename}:{line_num}: {code} {message}",
                         )
                     result.error(check_name, f.filename, line_num, code, message)
                     error_counts[check_name] += 1
@@ -297,18 +301,16 @@ def validate(cfg, files, result=None):
                         if cfg.get("verbose"):
                             print(
                                 "    - %s:%s: %s %s"
-                                % (f.filename, line_num, code, message)
+                                % (f.filename, line_num, code, message),
                             )
                         elif not result.capture:
                             print(
-                                "{}:{}: {} {}".format(
-                                    f.filename, line_num, code, message
-                                )
+                                f"{f.filename}:{line_num}: {code} {message}",
                             )
                         result.error(check_name, f.filename, line_num, code, message)
                         error_counts[check_name] += 1
             else:
-                raise TypeError("Unknown check type: {}, {}".format(type(c), c))
+                raise TypeError(f"Unknown check type: {type(c)}, {c}")
     return error_counts
 
 
@@ -358,20 +360,18 @@ class Result:
             for error in self.errors:
                 lines.append("%s:%s: %s %s" % error[1:])
 
-        lines.extend(
-            [
-                "=" * 8,
-                "Total files scanned = %s" % (self.files_selected),
-                "Total files ignored = %s" % (self.files_ignored),
-                "Total accumulated errors = %s" % (self.total_errors),
-            ]
-        )
+        lines.extend([
+            "=" * 8,
+            "Total files scanned = %s" % (self.files_selected),
+            "Total files ignored = %s" % (self.files_ignored),
+            "Total accumulated errors = %s" % (self.total_errors),
+        ])
 
         if self.error_counts:
             lines.append("Detailed error counts:")
             for check_name in sorted(self.error_counts.keys()):
                 check_errors = self.error_counts[check_name]
-                lines.append("    - {} = {}".format(check_name, check_errors))
+                lines.append(f"    - {check_name} = {check_errors}")
 
         return "\n".join(lines)
 

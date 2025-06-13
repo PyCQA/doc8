@@ -11,11 +11,10 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import unittest
 import tempfile
+import unittest
 
-from doc8 import checks
-from doc8 import parser
+from doc8 import checks, parser
 
 
 class TestTrailingWhitespace(unittest.TestCase):
@@ -92,7 +91,7 @@ test
             fh.write(
                 b"known exploit in the wild, for example"
                 b" \xe2\x80\x93 the time"
-                b" between advance notification"
+                b" between advance notification",
             )
             fh.flush()
 
@@ -110,7 +109,7 @@ test
                 b"  .. code-block:: ini\n\n"
                 b"     this line exceeds 80 chars but should be ignored"
                 b"this line exceeds 80 chars but should be ignored"
-                b"this line exceeds 80 chars but should be ignored"
+                b"this line exceeds 80 chars but should be ignored",
             )
             fh.flush()
 
@@ -155,7 +154,7 @@ test
                 b"Definition List which contains long term.\n\n"
                 b"looooooooooooooooooooooooooooooong definition term"
                 b"this line exceeds 80 chars but should be ignored\n"
-                b" this is a definition\n"
+                b" this is a definition\n",
             )
             fh.flush()
 

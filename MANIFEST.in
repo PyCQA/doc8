@@ -15,7 +15,6 @@ recursive-include docs *.ico
 recursive-include docs *.png
 recursive-include docs *.py
 recursive-include docs *.rst
-recursive-include src *.flake8
 recursive-include src *.j2
 recursive-include src *.json
 recursive-include src *.md

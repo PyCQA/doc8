@@ -358,12 +358,14 @@ class Result:
             for error in self.errors:
                 lines.append("%s:%s: %s %s" % error[1:])
 
-        lines.extend([
-            "=" * 8,
-            "Total files scanned = %s" % (self.files_selected),
-            "Total files ignored = %s" % (self.files_ignored),
-            "Total accumulated errors = %s" % (self.total_errors),
-        ])
+        lines.extend(
+            [
+                "=" * 8,
+                "Total files scanned = %s" % (self.files_selected),
+                "Total files ignored = %s" % (self.files_ignored),
+                "Total accumulated errors = %s" % (self.total_errors),
+            ]
+        )
 
         if self.error_counts:
             lines.append("Detailed error counts:")

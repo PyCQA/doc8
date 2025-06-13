@@ -345,6 +345,7 @@ class Result:
     def total_errors(self):
         return len(self.errors)
 
+    # pylint: disable=too-many-positional-arguments
     def error(self, check_name, filename, line_num, code, message):
         self.errors.append((check_name, filename, line_num, code, message))
 
@@ -436,8 +437,7 @@ def main():
         "--config",
         metavar="path",
         action="append",
-        help="user config file location"
-        " (default: %s)." % ", ".join(CONFIG_FILENAMES),
+        help="user config file location (default: %s)." % ", ".join(CONFIG_FILENAMES),
         default=defaults["config"],
     )
     parser.add_argument(
@@ -497,8 +497,7 @@ def main():
         action="store",
         metavar="int",
         type=int,
-        help="maximum allowed line"
-        " length (default: %s)." % defaults["max_line_length"],
+        help="maximum allowed line length (default: %s)." % defaults["max_line_length"],
         default=defaults["max_line_length"],
     )
     parser.add_argument(

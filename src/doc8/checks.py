@@ -21,7 +21,7 @@ from docutils import nodes as docutils_nodes
 from doc8 import utils
 
 
-class ContentCheck(metaclass=abc.ABCMeta):
+class ContentCheck(abc.ABC):
     def __init__(self, cfg):
         self._cfg = cfg
 
@@ -30,7 +30,7 @@ class ContentCheck(metaclass=abc.ABCMeta):
         pass
 
 
-class LineCheck(metaclass=abc.ABCMeta):
+class LineCheck(abc.ABC):
     def __init__(self, cfg):
         self._cfg = cfg
 
@@ -83,7 +83,7 @@ class CheckNewlineEndOfFile(ContentCheck):
 
 class CheckValidity(ContentCheck):
     REPORTS = frozenset(["D000"])
-    EXT_MATCHER = re.compile(r"(.*)[.]rst", re.I)
+    EXT_MATCHER = re.compile(r"(.*)[.]rst", re.IGNORECASE)
 
     # From docutils docs:
     #
@@ -104,11 +104,11 @@ class CheckValidity(ContentCheck):
             re.MULTILINE,
         ),
         re.compile(
-            r'^Error in "code-block" directive:\nunknown option: "emphasize-lines"'
+            r'^Error in "code-block" directive:\nunknown option: "emphasize-lines"',
         ),
         re.compile(r'^Error in "code-block" directive:\nunknown option: "linenos"'),
         re.compile(
-            r'^Error in "code-block" directive:\nunknown option: "lineno-start"'
+            r'^Error in "code-block" directive:\nunknown option: "lineno-start"',
         ),
         re.compile(r'^Error in "code-block" directive:\nunknown option: "dedent"'),
         re.compile(r'^Error in "code-block" directive:\nunknown option: "force"'),
@@ -119,7 +119,7 @@ class CheckValidity(ContentCheck):
             re.MULTILINE,
         ),
         re.compile(
-            r'^PEP number must be a number from 0 to 9999; "\d{1,4}#[^"]*" is invalid.'
+            r'^PEP number must be a number from 0 to 9999; "\d{1,4}#[^"]*" is invalid.',
         ),
     ]
 
@@ -218,16 +218,14 @@ class CheckMaxLineLength(ContentCheck):
         # for unknown directives, so we have to do it manually).
         directives = []
         for i, line in enumerate(lines):
-            if re.match(r"^\s*..\s(.*?)::\s*", line):
-                directives.append((i, find_directive_end(i, lines)))
-            elif re.match(r"^::\s*$", line):
+            if re.match(r"^\s*..\s(.*?)::\s*", line) or re.match(r"^::\s*$", line):
                 directives.append((i, find_directive_end(i, lines)))
 
         # Find definition terms in definition lists
         # This check may match the code, which is already appended
         lwhitespaces = r"^\s*"
         listspattern = r"^\s*(\* |- |#\. |\d+\. )"
-        for i in range(0, len(lines) - 1):
+        for i in range(len(lines) - 1):
             line = lines[i]
             next_line = lines[i + 1]
             # if line is a blank, line is not a definition term
@@ -237,7 +235,7 @@ class CheckMaxLineLength(ContentCheck):
             if re.match(listspattern, line):
                 continue
             if len(re.search(lwhitespaces, line).group()) < len(
-                re.search(lwhitespaces, next_line).group()
+                re.search(lwhitespaces, next_line).group(),
             ):
                 directives.append((i, i))
 
@@ -266,10 +264,7 @@ class CheckMaxLineLength(ContentCheck):
             best_nodes = []
             for n, (line_min, line_max) in contained_in:
                 span = line_max - line_min
-                if smallest_span is None:
-                    smallest_span = span
-                    best_nodes = [n]
-                elif span < smallest_span:
+                if smallest_span is None or span < smallest_span:
                     smallest_span = span
                     best_nodes = [n]
                 elif span == smallest_span:

@@ -16,16 +16,17 @@
 """Check documentation for simple style requirements.
 
 What is checked:
-    - invalid rst format - D000
-    - lines should not be longer than 79 characters - D001
-      - RST exception: line with no whitespace except in the beginning
-      - RST exception: lines with http or https urls
-      - RST exception: literal blocks
-      - RST exception: rst target directives
-    - no trailing whitespace - D002
-    - no tabulation for indentation - D003
-    - no carriage returns (use unix newlines) - D004
-    - no newline at end of file - D005
+   -  invalid RST format - D000
+   -  lines should not be longer than 79 characters - D001
+      -  RST exception: line with no whitespace except in the beginning
+      -  RST exception: lines with http or https urls
+      -  RST exception: literal blocks
+      -  RST exception: rst target directives
+   -  no trailing whitespace - D002
+   -  no tabulation for indentation - D003
+      -  All RST files use an indentation of 3 spaces
+   -  no carriage returns (use unix newlines) - D004
+   -  no newline at end of file - D005
 """
 
 import argparse
@@ -172,7 +173,7 @@ def fetch_checks(cfg):
     base = [
         checks.CheckValidity(cfg),
         checks.CheckTrailingWhitespace(cfg),
-        checks.CheckIndentationNoTab(cfg),
+        checks.CheckIndentation(cfg),
         checks.CheckCarriageReturn(cfg),
         checks.CheckMaxLineLength(cfg),
         checks.CheckNewlineEndOfFile(cfg),

@@ -22,7 +22,7 @@ Total files ignored = 0
 Total accumulated errors = 2
 Detailed error counts:
     - doc8.checks.CheckCarriageReturn = 0
-    - doc8.checks.CheckIndentationNoTab = 0
+    - doc8.checks.CheckIndentation = 0
     - doc8.checks.CheckMaxLineLength = 0
     - doc8.checks.CheckNewlineEndOfFile = 1
     - doc8.checks.CheckTrailingWhitespace = 1
@@ -42,7 +42,7 @@ Validating {path}/invalid.rst (utf-8, 10 chars, 1 lines)
   Running check 'doc8.checks.CheckValidity'
   Running check 'doc8.checks.CheckTrailingWhitespace'
     - {path}/invalid.rst:1: D002 Trailing whitespace
-  Running check 'doc8.checks.CheckIndentationNoTab'
+  Running check 'doc8.checks.CheckIndentation'
   Running check 'doc8.checks.CheckCarriageReturn'
   Running check 'doc8.checks.CheckMaxLineLength'
   Running check 'doc8.checks.CheckNewlineEndOfFile'
@@ -53,7 +53,7 @@ Total files ignored = 0
 Total accumulated errors = 2
 Detailed error counts:
     - doc8.checks.CheckCarriageReturn = 0
-    - doc8.checks.CheckIndentationNoTab = 0
+    - doc8.checks.CheckIndentation = 0
     - doc8.checks.CheckMaxLineLength = 0
     - doc8.checks.CheckNewlineEndOfFile = 1
     - doc8.checks.CheckTrailingWhitespace = 1
@@ -69,7 +69,7 @@ Total files ignored = 0
 Total accumulated errors = 2
 Detailed error counts:
     - doc8.checks.CheckCarriageReturn = 0
-    - doc8.checks.CheckIndentationNoTab = 0
+    - doc8.checks.CheckIndentation = 0
     - doc8.checks.CheckMaxLineLength = 0
     - doc8.checks.CheckNewlineEndOfFile = 1
     - doc8.checks.CheckTrailingWhitespace = 1

@@ -48,7 +48,7 @@ class CheckTrailingWhitespace(LineCheck):
             yield ("D002", "Trailing whitespace")
 
 
-class CheckIndentationNoTab(LineCheck):
+class CheckIndentation(LineCheck):
     _STARTING_WHITESPACE_REGEX = re.compile(r"^(\s+)")
     REPORTS = frozenset(["D003"])
 
@@ -58,6 +58,8 @@ class CheckIndentationNoTab(LineCheck):
             spaces = match.group(1)
             if "\t" in spaces:
                 yield ("D003", "Tabulation used for indentation")
+            elif " " in spaces and len(spaces) % 3:
+                yield ("D003", "All RST files use an indentation of 3 spaces")
 
 
 class CheckCarriageReturn(ContentCheck):

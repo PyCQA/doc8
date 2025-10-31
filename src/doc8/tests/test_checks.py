@@ -29,14 +29,14 @@ class TestTrailingWhitespace(unittest.TestCase):
         self.assertIn(code, check.REPORTS)
 
 
-class TestTabIndentation(unittest.TestCase):
-    def test_tabs(self):
-        lines = ["    b", "\tabc", "efg", "\t\tc"]
-        check = checks.CheckIndentationNoTab({})
+class TestIndentation(unittest.TestCase):
+    def test_indentation(self):
+        lines = ["   b", "\tabc", "efg", "\t\tc", "  b", "    b"]
+        check = checks.CheckIndentation({})
         errors = []
         for line in lines:
             errors.extend(check.report_iter(line))
-        self.assertEqual(2, len(errors))
+        self.assertEqual(4, len(errors))
         (code, msg) = errors[0]
         self.assertIn(code, check.REPORTS)
 

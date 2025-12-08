@@ -119,6 +119,10 @@ class CheckValidity(ContentCheck):
             re.MULTILINE,
         ),
         re.compile(
+            r'^Error in \"include\" directive\:\nunknown option: "path-substitutions".',
+            re.MULTILINE,
+        ),
+        re.compile(
             r'^PEP number must be a number from 0 to 9999; "\d{1,4}#[^"]*" is invalid.',
         ),
     ]

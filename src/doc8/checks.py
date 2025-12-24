@@ -279,7 +279,6 @@ class CheckMaxLineLength(ContentCheck):
         title_types = (
             docutils_nodes.title,
             docutils_nodes.subtitle,
-            docutils_nodes.section,
         )
         for i, line in enumerate(lines):
             if len(line) > self._max_line_length:

@@ -2,10 +2,13 @@ import os
 import shutil
 import sys
 import unittest
+from collections import deque
 from io import StringIO
 from unittest.mock import MagicMock, patch
 
+from doc8.checks import ContentCheck
 from doc8.main import doc8, from_toml, main
+from doc8.parser import ParsedFile
 
 # Location to create test files
 TMPFS_DIR_NAME = ".tmp"
@@ -364,6 +367,32 @@ class TestArguments(unittest.TestCase):
                     ignore_path_errors={"path1": {"D002"}, "path2": {"D005"}},
                 ),
             )
+
+    def test_args__ignore_path_errors__resolves_path(self):
+        mock_check = MagicMock(spec=ContentCheck)
+        mock_check.report_iter.return_value = [(40, "D002", "Testing")]
+        mock_fetch_checks = MagicMock(return_value=[mock_check])
+        mock_parsed_file = MagicMock(spec=ParsedFile)
+        mock_parsed_file.filename = "path"
+        mock_scan = MagicMock(return_value=(deque([mock_parsed_file]), 0))
+        with (
+            patch("doc8.main.fetch_checks", mock_fetch_checks),
+            patch("doc8.main.scan", mock_scan),
+            patch(
+                "argparse._sys.argv",
+                ["doc8", "--ignore-path-errors", "path;D002"],
+            ),
+        ):
+            state = main()
+            self.assertEqual(state, 0)
+            mock_scan.assert_called_once_with(
+                self.get_args(
+                    ignore_path_errors={"path": {"D002"}},
+                ),
+            )
+            mock_fetch_checks.assert_called_once()
+            mock_check.report_iter.assert_called()
+            mock_check.assert_not_called()
 
     def test_args__default_extension__overrides_default(self):
         mock_scan = MagicMock(return_value=([], 0))

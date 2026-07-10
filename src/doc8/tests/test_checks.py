@@ -147,6 +147,36 @@ test
                 errors = list(check.report_iter(parsed_file))
                 self.assertEqual(expected_errors, len(errors))
 
+    def test_allow_long_titles_only_skips_title_lines(self):
+        content = b"""\
+.. title:: clang-tidy - misc-anonymous-namespace-in-header
+
+misc-anonymous-namespace-in-header
+==================================
+
+Finds anonymous namespaces in headers.
+
+Anonymous namespaces in headers can lead to One Definition Rule (ODR) violations
+because each translation unit including the header will get its own unique version
+of the symbols. This increases binary size and can cause confusing link-time errors.
+"""
+        conf = {"max_line_length": 40, "allow_long_titles": True}
+        with tempfile.NamedTemporaryFile(suffix=".rst") as fh:
+            fh.write(content)
+            fh.flush()
+
+            parsed_file = parser.ParsedFile(fh.name)
+            check = checks.CheckMaxLineLength(conf)
+
+            self.assertEqual(
+                [
+                    (8, "D001", "Line too long"),
+                    (9, "D001", "Line too long"),
+                    (10, "D001", "Line too long"),
+                ],
+                list(check.report_iter(parsed_file)),
+            )
+
     def test_definition_term_length(self):
         conf = {"max_line_length": 79, "allow_long_titles": True}
         with tempfile.NamedTemporaryFile(suffix=".rst") as fh:

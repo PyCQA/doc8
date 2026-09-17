@@ -57,3 +57,4 @@ src/doc8/_version.py
 .idea/
 .vscode/
 junit.xml
+uv.lock

@@ -183,3 +183,26 @@ class TestNewlineEndOfFile(unittest.TestCase):
                 check = checks.CheckNewlineEndOfFile({})
                 errors = list(check.report_iter(parsed_file))
                 self.assertEqual(expected_errors, len(errors))
+
+
+class TestValidity(unittest.TestCase):
+    def test_collapsible_admonition_ignored_in_sphinx_mode(self):
+        content = b".. note::\n   :collapsible:\n\n   Collapsible note.\n"
+        with tempfile.NamedTemporaryFile(suffix=".rst") as fh:
+            fh.write(content)
+            fh.flush()
+            parsed_file = parser.ParsedFile(fh.name)
+            check = checks.CheckValidity({"sphinx": True})
+            errors = list(check.report_iter(parsed_file))
+            self.assertEqual(0, len(errors))
+
+    def test_collapsible_admonition_flagged_without_sphinx_mode(self):
+        content = b".. note::\n   :collapsible:\n\n   Collapsible note.\n"
+        with tempfile.NamedTemporaryFile(suffix=".rst") as fh:
+            fh.write(content)
+            fh.flush()
+            parsed_file = parser.ParsedFile(fh.name)
+            check = checks.CheckValidity({"sphinx": False})
+            errors = list(check.report_iter(parsed_file))
+            self.assertEqual(1, len(errors))
+            self.assertEqual("D000", errors[0][1])

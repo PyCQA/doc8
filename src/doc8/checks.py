@@ -121,6 +121,10 @@ class CheckValidity(ContentCheck):
         re.compile(
             r'^PEP number must be a number from 0 to 9999; "\d{1,4}#[^"]*" is invalid.',
         ),
+        re.compile(
+            r'^Error in "(?:admonition|attention|caution|danger|error|hint|important|note|tip|warning)" directive:\nunknown option: "collapsible"',
+            re.MULTILINE,
+        ),
     ]
 
     def __init__(self, cfg):

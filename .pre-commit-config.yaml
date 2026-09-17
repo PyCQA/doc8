@@ -9,7 +9,7 @@ repos:
     - id: trailing-whitespace
     - id: check-executables-have-shebangs
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.20.0
+    rev: v3.21.2
     hooks:
       - id: pyupgrade
   - repo: https://github.com/pappasam/toml-sort

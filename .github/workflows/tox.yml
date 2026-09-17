@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Determine matrix
         id: generate_matrix
-        uses: coactions/dynamic-matrix@v4
+        uses: ansible/actions/matrix@v1
         with:
           min_python: "3.10"
           max_python: "3.14"
@@ -95,9 +95,9 @@ jobs:
         if: ${{ matrix.command5 }}
 
       - name: Archive logs
-        uses: coactions/upload-artifact@v4
+        uses: actions/upload-artifact@v4
         with:
-          name: logs-${{ matrix.name }}.zip
+          name: logs-${{ matrix.name }}
           include-hidden-files: true
           if-no-files-found: ignore
           path: |
@@ -132,20 +132,12 @@ jobs:
 
       - run: pip3 install 'coverage>=7.5.1'
 
-      - name: Merge logs into a single archive
-        uses: actions/upload-artifact/merge@v4
-        with:
-          name: logs.zip
-          include-hidden-files: true
-          pattern: logs-*.zip
-          # artifacts like py312.zip and py312-macos do have overlapping files
-          separate-directories: true
-
       - name: Download artifacts
         uses: actions/download-artifact@v4
         continue-on-error: true # to allow rerunning this job
         with:
-          name: logs.zip
+          pattern: logs-*
+          merge-multiple: true
           path: .
 
 
@@ -154,7 +146,7 @@ jobs:
         with:
           name: ${{ matrix.name }}
           # verbose: true # optional (default = false)
-          fail_ci_if_error: true
+          fail_ci_if_error: false
           use_oidc: ${{ !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }} # cspell:ignore oidc
 
       - name: Decide whether the needed jobs succeeded or failed

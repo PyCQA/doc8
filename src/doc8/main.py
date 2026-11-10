@@ -236,6 +236,8 @@ def validate(cfg, files, result=None):
     error_counts = {}
     ignoreables = frozenset(cfg.get("ignore", []))
     ignore_targeted = cfg.get("ignore_path_errors", {})
+    if isinstance(ignore_targeted, list):
+        ignore_targeted = parse_ignore_path_errors(ignore_targeted)
     ignore_targeted = {
         os.path.abspath(file_path): ignore_codes
         for file_path, ignore_codes in ignore_targeted.items()
@@ -244,7 +246,9 @@ def validate(cfg, files, result=None):
         f = files.popleft()
         if cfg.get("verbose"):
             print("Validating %s" % f)
-        targeted_ignoreables = set(ignore_targeted.get(f.filename, set()))
+        targeted_ignoreables = set(
+            ignore_targeted.get(os.path.abspath(f.filename), set()),
+        )
         targeted_ignoreables.update(ignoreables)
         for c in fetch_checks(cfg):
             check_name = ".".join([c.__class__.__module__, c.__class__.__name__])

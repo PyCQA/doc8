@@ -175,6 +175,17 @@ class TestCommandLine(unittest.TestCase):
 class TestApi(unittest.TestCase):
     """Test direct code invocation"""
 
+    def test_doc8__ignore_path_errors__relative_path(self):
+        with TmpFs() as tmpfs, Capture() as (out, err):
+            tmpfs.mock()
+            rel_path = os.path.join(TMPFS_DIR_NAME, "invalid.rst")
+            result = doc8(
+                paths=[rel_path],
+                ignore_path_errors=[f"{rel_path};D002;D005"],
+            )
+            self.assertEqual(result.total_errors, 0)
+            self.assertEqual(result.errors, [])
+
     def test_doc8__defaults__no_output_and_report_as_expected(self):
         with TmpFs() as tmpfs, Capture() as (out, err):
             tmpfs.mock()

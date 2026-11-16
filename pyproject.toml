@@ -6,7 +6,7 @@ requires = [
 ]
 
 [project]
-authors = [{email = "openstack-discuss@lists.openstack.org", name = "OpenStack"}]
+authors = [{ email = "openstack-discuss@lists.openstack.org", name = "OpenStack" }]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Environment :: Console",
@@ -41,7 +41,7 @@ keywords = [
   "linter"
 ]
 license = "Apache-2.0"
-maintainers = [{email = "code-quality@python.org", name = "PyCQA"}]
+maintainers = [{ email = "code-quality@python.org", name = "PyCQA" }]
 name = "doc8"
 requires-python = ">=3.10"
 
@@ -192,7 +192,7 @@ include-package-data = true
 # These are required in actual runtime:
 license-files = ["LICENSE"]
 # use-scm-version = "True"  # Does not pass validate-pyproject
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 zip-safe = false
 
 [tool.setuptools.packages.find]

@@ -107,8 +107,8 @@ jobs:
       - name: Report failure if git reports dirty status
         run: |
           if [[ -n $(git status -s) ]]; then
-            # shellcheck disable=SC2016
             echo -n '::error file=git-status::'
+            # shellcheck disable=SC2016
             printf '### Failed as git reported modified and/or untracked files\n```\n%s\n```\n' "$(git status -s)" | tee -a "$GITHUB_STEP_SUMMARY"
             exit 99
           fi
@@ -142,11 +142,10 @@ jobs:
 
 
       - name: Upload coverage data
-        uses: codecov/codecov-action@v5.4.3
+        uses: codecov/codecov-action@v7.1.1
         with:
-          name: ${{ matrix.name }}
           # verbose: true # optional (default = false)
-          fail_ci_if_error: false
+          fail_ci_if_error: true
           use_oidc: ${{ !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }} # cspell:ignore oidc
 
       - name: Decide whether the needed jobs succeeded or failed

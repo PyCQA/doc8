@@ -183,3 +183,65 @@ class TestNewlineEndOfFile(unittest.TestCase):
                 check = checks.CheckNewlineEndOfFile({})
                 errors = list(check.report_iter(parsed_file))
                 self.assertEqual(expected_errors, len(errors))
+
+
+class TestValidity(unittest.TestCase):
+    def test_collapsible_admonition_ignored_in_sphinx_mode(self):
+        content = b".. note::\n   :collapsible:\n\n   Collapsible note.\n"
+        with tempfile.NamedTemporaryFile(suffix=".rst") as fh:
+            fh.write(content)
+            fh.flush()
+            parsed_file = parser.ParsedFile(fh.name)
+            check = checks.CheckValidity({"sphinx": True})
+            errors = list(check.report_iter(parsed_file))
+            self.assertEqual(0, len(errors))
+
+    def test_collapsible_admonition_flagged_without_sphinx_mode(self):
+        content = b".. note::\n   :collapsible:\n\n   Collapsible note.\n"
+        with tempfile.NamedTemporaryFile(suffix=".rst") as fh:
+            fh.write(content)
+            fh.flush()
+            parsed_file = parser.ParsedFile(fh.name)
+            check = checks.CheckValidity({"sphinx": False})
+            errors = list(check.report_iter(parsed_file))
+            self.assertEqual(1, len(errors))
+            self.assertEqual("D000", errors[0][1])
+
+
+class TestNestedInlineLiteral(unittest.TestCase):
+    def test_nested_inline_literal(self):
+        cases = [
+            (".. note:: **``event_id`` deduplication**\n", [1]),
+            ("*Use ``event_id`` for lookup.*\n", [1]),
+            ("``Standalone`` on the first line.\nThen **use ``event_id``**.\n", [2]),
+            ("First line.\n**Use\n``event_id`` here.**\n", [3]),
+            ("``ok``\n**``first``** and **``second``**\n", [2, 2]),
+            ("**``first`` and ``second``**\n", [1]),
+            ("**Use ``event\nid`` here.**\n", [1]),
+            ("**Documentation** and ``event_id``.\n", []),
+            ("**An unmatched ``marker**\n", []),
+            ("**A quoted pair '``' and ``.**\n", []),
+            ("**An escaped \\\x60\x60event_id``.**\n", []),
+            ("**``event_id`` with an unclosed span.\n", []),
+            (".. comment **``event_id``**\n", []),
+            (".. code-block:: rst\n\n   **``event_id``**\n", []),
+            ("Example::\n\n   **``event_id``**\n", []),
+            ("``**event_id**``\n", []),
+            (".. extension-directive::\n\n   **``event_id``**\n", []),
+        ]
+        check = checks.CheckNestedInlineLiteral({})
+        for text, expected_lines in cases:
+            with (
+                self.subTest(text=text),
+                tempfile.NamedTemporaryFile(suffix=".rst") as fh,
+            ):
+                fh.write(text.encode("utf-8"))
+                fh.flush()
+                errors = list(check.report_iter(parser.ParsedFile(fh.name)))
+                self.assertEqual(
+                    errors,
+                    [
+                        (line, "D006", "Move inline code outside emphasis")
+                        for line in expected_lines
+                    ],
+                )

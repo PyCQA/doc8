@@ -8,6 +8,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+/.venv
 bin/
 build/
 develop-eggs/
@@ -57,3 +58,4 @@ src/doc8/_version.py
 .idea/
 .vscode/
 junit.xml
+uv.lock

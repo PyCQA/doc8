@@ -23,32 +23,21 @@ env:
   PY_COLORS: 1
 
 jobs:
-  prepare:
-    name: prepare
-    runs-on: ubuntu-24.04
-    outputs:
-      matrix: ${{ steps.generate_matrix.outputs.matrix }}
-    steps:
-      - name: Determine matrix
-        id: generate_matrix
-        uses: coactions/dynamic-matrix@v4
-        with:
-          min_python: "3.10"
-          max_python: "3.14"
-          default_python: "3.10"
-          other_names: |
-            lint
-            packaging
-            docs
   build:
-    name: ${{ matrix.name }}
-    runs-on: ${{ matrix.os || 'ubuntu-24.04' }}
-    needs:
-      - prepare
-
+    name: ${{ matrix.tox_env }}
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+      matrix:
+        include:
+          - {tox_env: py310, python_version: "3.10"}
+          - {tox_env: py311, python_version: "3.11"}
+          - {tox_env: py312, python_version: "3.12"}
+          - {tox_env: py313, python_version: "3.13"}
+          - {tox_env: py314, python_version: "3.14"}
+          - {tox_env: lint, python_version: "3.10"}
+          - {tox_env: packaging, python_version: "3.10"}
+          - {tox_env: docs, python_version: "3.10"}
 
     steps:
       - uses: actions/checkout@v4
@@ -58,18 +47,17 @@ jobs:
 
       - name: Set pre-commit cache
         uses: actions/cache@v4
-        if: ${{ matrix.name == 'lint' }}
+        if: ${{ matrix.tox_env == 'lint' }}
         with:
           path: |
             ~/.cache/pre-commit
-          key: pre-commit-${{ matrix.name }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          key: pre-commit-${{ matrix.tox_env }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
-      - name: Set up Python ${{ matrix.python_version || '3.10' }}
-        if: "!contains(matrix.shell, 'wsl')"
+      - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v5
         with:
           cache: pip
-          python-version: ${{ matrix.python_version || '3.10' }}
+          python-version: ${{ matrix.python_version }}
 
 
       - name: Install tox
@@ -80,24 +68,12 @@ jobs:
       - name: Log installed dists
         run: python3 -m pip freeze --all
 
-      - run: ${{ matrix.command }}
-
-      - run: ${{ matrix.command2 }}
-        if: ${{ matrix.command2 }}
-
-      - run: ${{ matrix.command3 }}
-        if: ${{ matrix.command3 }}
-
-      - run: ${{ matrix.command4 }}
-        if: ${{ matrix.command4 }}
-
-      - run: ${{ matrix.command5 }}
-        if: ${{ matrix.command5 }}
+      - run: tox -e ${{ matrix.tox_env }}
 
       - name: Archive logs
-        uses: coactions/upload-artifact@v4
+        uses: actions/upload-artifact@v4
         with:
-          name: logs-${{ matrix.name }}.zip
+          name: logs-${{ matrix.tox_env }}
           include-hidden-files: true
           if-no-files-found: ignore
           path: |
@@ -107,8 +83,8 @@ jobs:
       - name: Report failure if git reports dirty status
         run: |
           if [[ -n $(git status -s) ]]; then
-            # shellcheck disable=SC2016
             echo -n '::error file=git-status::'
+            # shellcheck disable=SC2016
             printf '### Failed as git reported modified and/or untracked files\n```\n%s\n```\n' "$(git status -s)" | tee -a "$GITHUB_STEP_SUMMARY"
             exit 99
           fi
@@ -132,27 +108,18 @@ jobs:
 
       - run: pip3 install 'coverage>=7.5.1'
 
-      - name: Merge logs into a single archive
-        uses: actions/upload-artifact/merge@v4
-        with:
-          name: logs.zip
-          include-hidden-files: true
-          pattern: logs-*.zip
-          # artifacts like py312.zip and py312-macos do have overlapping files
-          separate-directories: true
-
       - name: Download artifacts
         uses: actions/download-artifact@v4
         continue-on-error: true # to allow rerunning this job
         with:
-          name: logs.zip
+          pattern: logs-*
+          merge-multiple: true
           path: .
 
 
       - name: Upload coverage data
-        uses: codecov/codecov-action@v5.4.3
+        uses: codecov/codecov-action@v7.1.1
         with:
-          name: ${{ matrix.name }}
           # verbose: true # optional (default = false)
           fail_ci_if_error: true
           use_oidc: ${{ !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }} # cspell:ignore oidc

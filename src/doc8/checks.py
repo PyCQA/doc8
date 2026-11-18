@@ -81,6 +81,15 @@ class CheckNewlineEndOfFile(ContentCheck):
             yield (len(parsed_file.lines), "D005", "No newline at end of file")
 
 
+class CheckNestedInlineLiteral(ContentCheck):
+    REPORTS = frozenset(["D006"])
+    EXT_MATCHER = re.compile(r"\.rst$", re.IGNORECASE)
+
+    def report_iter(self, parsed_file):
+        for line in parsed_file.nested_inline_literal_lines:
+            yield (line, "D006", "Move inline code outside emphasis")
+
+
 class CheckValidity(ContentCheck):
     REPORTS = frozenset(["D000"])
     EXT_MATCHER = re.compile(r"(.*)[.]rst", re.IGNORECASE)
@@ -120,6 +129,10 @@ class CheckValidity(ContentCheck):
         ),
         re.compile(
             r'^PEP number must be a number from 0 to 9999; "\d{1,4}#[^"]*" is invalid.',
+        ),
+        re.compile(
+            r'^Error in "(?:admonition|attention|caution|danger|error|hint|important|note|tip|warning)" directive:\nunknown option: "collapsible"',
+            re.MULTILINE,
         ),
     ]
 

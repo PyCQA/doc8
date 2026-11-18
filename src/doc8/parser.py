@@ -20,6 +20,8 @@ import restructuredtext_lint as rl
 from docutils import frontend, utils
 from docutils import parsers as docutils_parser
 
+from doc8._inline_markup import InlineMarkupInliner
+
 
 class ParsedFile:
     FALLBACK_ENCODING = "utf-8"
@@ -30,6 +32,7 @@ class ParsedFile:
         self._raw_content = None
         self._encoding = encoding
         self._doc = None
+        self._nested_inline_literal_lines: tuple[int, ...] = ()
         self._errors = None
         self._lines = None
         self._has_read = False
@@ -53,7 +56,8 @@ class ParsedFile:
             # parser is what sphinx and others use anyway so it's hopefully
             # mature).
             parser_cls = docutils_parser.get_parser_class("rst")
-            parser = parser_cls()
+            inliner = InlineMarkupInliner()
+            parser = parser_cls(inliner=inliner)
             defaults = {
                 "halt_level": 5,
                 "report_level": 5,
@@ -71,8 +75,14 @@ class ParsedFile:
                 settings=opt.get_default_values(),
             )
             parser.parse(self.contents, doc)
+            self._nested_inline_literal_lines = tuple(sorted(inliner.lines))
             self._doc = doc
         return self._doc
+
+    @property
+    def nested_inline_literal_lines(self):
+        _ = self.document  # Populate the line numbers during the shared parse.
+        return self._nested_inline_literal_lines
 
     def _read(self):
         if self._has_read:

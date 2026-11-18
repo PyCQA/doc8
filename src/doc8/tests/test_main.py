@@ -24,6 +24,7 @@ Detailed error counts:
     - doc8.checks.CheckCarriageReturn = 0
     - doc8.checks.CheckIndentationNoTab = 0
     - doc8.checks.CheckMaxLineLength = 0
+    - doc8.checks.CheckNestedInlineLiteral = 0
     - doc8.checks.CheckNewlineEndOfFile = 1
     - doc8.checks.CheckTrailingWhitespace = 1
     - doc8.checks.CheckValidity = 0
@@ -47,6 +48,7 @@ Validating {path}/invalid.rst (utf-8, 10 chars, 1 lines)
   Running check 'doc8.checks.CheckMaxLineLength'
   Running check 'doc8.checks.CheckNewlineEndOfFile'
     - {path}/invalid.rst:1: D005 No newline at end of file
+  Running check 'doc8.checks.CheckNestedInlineLiteral'
 ========
 Total files scanned = 1
 Total files ignored = 0
@@ -55,6 +57,7 @@ Detailed error counts:
     - doc8.checks.CheckCarriageReturn = 0
     - doc8.checks.CheckIndentationNoTab = 0
     - doc8.checks.CheckMaxLineLength = 0
+    - doc8.checks.CheckNestedInlineLiteral = 0
     - doc8.checks.CheckNewlineEndOfFile = 1
     - doc8.checks.CheckTrailingWhitespace = 1
     - doc8.checks.CheckValidity = 0
@@ -71,6 +74,7 @@ Detailed error counts:
     - doc8.checks.CheckCarriageReturn = 0
     - doc8.checks.CheckIndentationNoTab = 0
     - doc8.checks.CheckMaxLineLength = 0
+    - doc8.checks.CheckNestedInlineLiteral = 0
     - doc8.checks.CheckNewlineEndOfFile = 1
     - doc8.checks.CheckTrailingWhitespace = 1
     - doc8.checks.CheckValidity = 0"""
@@ -213,6 +217,26 @@ class TestApi(unittest.TestCase):
             self.assertEqual(out.getvalue(), "")
             self.assertEqual(err.getvalue(), "")
         self.assertEqual(result.total_errors, 2)
+
+    def test_doc8__nested_inline_literal_in_rst_only(self):
+        with TmpFs() as tmpfs:
+            for filename in ("example.RST", "example.txt"):
+                tmpfs.create_file(filename, "**``event_id`` deduplication**\n")
+
+            options = {"paths": [tmpfs.path], "extension": [".RST", ".txt"]}
+            result = doc8(**options)
+            self.assertEqual(
+                [error[1:] for error in result.errors],
+                [
+                    (
+                        f"{tmpfs.path}/example.RST",
+                        1,
+                        "D006",
+                        "Move inline code outside emphasis",
+                    ),
+                ],
+            )
+            self.assertEqual(doc8(**options, ignore={"D006"}).errors, [])
 
 
 class TestArguments(unittest.TestCase):

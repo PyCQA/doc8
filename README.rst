@@ -64,6 +64,7 @@ Usage
         - no tabulation for indentation - D003
         - no carriage returns (use unix newlines) - D004
         - no newline at end of file - D005
+        - no inline literals inside emphasis - D006
 
     positional arguments:
       path                  Path to scan for doc files (default: current
@@ -93,6 +94,16 @@ Usage
       -q, --quiet           only print violations
       -v, --verbose         run in verbose mode.
       --version             show the version and exit.
+
+D006 reports inline literals inside bold or italic text because
+reStructuredText does not render both styles on the same text.
+For example, keep only the inline literal::
+
+    ``event_id`` deduplication
+
+D006 flags the nested markup in this example::
+
+    **``event_id`` deduplication**
 
 INI file usage
 ~~~~~~~~~~~~~~
